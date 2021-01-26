@@ -1,0 +1,26 @@
+{
+  "name": "augmented-anchors",
+  "version": "1.0.0",
+  "description": "Provides extra functionality to the html <a> tag",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/andremarcondesteixeira/augmented-anchors.git"
+  },
+  "keywords": [
+    "html",
+    "anchor",
+    "link",
+    "hyperlink",
+    "augmentation"
+  ],
+  "author": "André Marcondes Teixeira",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/andremarcondesteixeira/augmented-anchors/issues"
+  },
+  "homepage": "https://github.com/andremarcondesteixeira/augmented-anchors#readme"
+}
