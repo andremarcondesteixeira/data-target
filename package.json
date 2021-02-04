@@ -1,35 +1,36 @@
 {
-  "name": "augmented-anchors",
-  "version": "1.0.0",
-  "description": "Provides extra functionality to the html <a> tag",
-  "main": "index.js",
-  "type": "module",
-  "scripts": {
-    "test": "karma start --single-run --browsers ChromeHeadless karma.conf.cjs"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/andremarcondesteixeira/augmented-anchors.git"
-  },
-  "keywords": [
-    "html",
-    "anchor",
-    "link",
-    "hyperlink",
-    "augmentation"
-  ],
-  "author": "André Marcondes Teixeira",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/andremarcondesteixeira/augmented-anchors/issues"
-  },
-  "homepage": "https://github.com/andremarcondesteixeira/augmented-anchors#readme",
-  "devDependencies": {
-    "karma": "^6.0.2",
-    "karma-chrome-launcher": "^3.1.0",
-    "karma-coverage": "^2.0.3",
-    "karma-firefox-launcher": "^2.1.0",
-    "karma-mocha": "^2.0.1",
-    "mocha": "^8.2.1"
-  }
+    "name": "augmented-anchors",
+    "version": "1.0.0",
+    "description": "Provides extra functionality to the html <a> tag",
+    "main": "index.js",
+    "type": "module",
+    "scripts": {
+        "test": "karma start karma.conf.cjs"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/andremarcondesteixeira/augmented-anchors.git"
+    },
+    "keywords": [
+        "html",
+        "anchor",
+        "link",
+        "hyperlink",
+        "augmentation"
+    ],
+    "author": "André Marcondes Teixeira",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/andremarcondesteixeira/augmented-anchors/issues"
+    },
+    "homepage": "https://github.com/andremarcondesteixeira/augmented-anchors#readme",
+    "dependencies": {},
+    "devDependencies": {
+        "karma": "^6.1.0",
+        "karma-chrome-launcher": "^3.1.0",
+        "karma-coverage": "^2.0.3",
+        "karma-firefox-launcher": "^2.1.0",
+        "karma-mocha": "^2.0.1",
+        "mocha": "^8.2.1"
+    }
 }
