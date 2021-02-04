@@ -1,10 +1,12 @@
 import { getAugmentedAnchors } from '../src/index.js';
 
-test('select all anchors with data-augmented attribute', () => {
-    const anchors = [true, true, false, true].map(targetIsSelector => createAnchor(targetIsSelector));
-    const container = createDivWith(anchors);
-    const selected = getAugmentedAnchors(container);
-    expect(selected.length).toBe(3);
+describe('foo', () => {
+    it('select all anchors with data-augmented attribute', () => {
+        const anchors = [true, true, false, true].map(targetIsSelector => createAnchor(targetIsSelector));
+        const container = createDivWith(anchors);
+        const selected = getAugmentedAnchors(container);
+        assert.equal(selected.length, 3);
+    });
 });
 
 function createAnchor(targetIsSelector) {
