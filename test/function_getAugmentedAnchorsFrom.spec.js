@@ -2,8 +2,7 @@ import { getAugmentedAnchorsFrom } from '../src/index.js';
 
 describe('function getAugmentedAnchorsFrom', () => {
     it('selects all anchors with valid data-target and data-module attributes combinations', () => {
-        const rootElement = document.createElement('div');
-        rootElement.innerHTML = `
+        const html = `
             <a id="OK-with-data-target-without-data-module"      href="#" data-target="whatever"                       ></a>
             <a id="OK-with-data-target-with-empty-data-module-A" href="#" data-target="whatever" data-module=""        ></a>
             <a id="OK-with-data-target-with-empty-data-module-B" href="#" data-target="whatever" data-module           ></a>
@@ -12,8 +11,23 @@ describe('function getAugmentedAnchorsFrom', () => {
             <a id="OK-with-empty-data-target-with-data-module-B" href="#" data-target            data-module="whatever"></a>
             <a id="OK-with-data-target-with-data-module"         href="#" data-target="whatever" data-module="whatever"></a>
         `;
-        const selected = getAugmentedAnchorsFrom(rootElement);
-        assert.equal(selected.length, 7);
+        const expectedIDs = [
+            'with-data-target-without-data-module',
+            'OK-with-data-target-with-empty-data-module-A',
+            'OK-with-data-target-with-empty-data-module-B',
+            'OK-without-data-target-with-data-module',
+            'OK-with-empty-data-target-with-data-module-A',
+            'OK-with-empty-data-target-with-data-module-B',
+            'OK-with-data-target-with-data-module'
+        ]
+
+        const rootElement = document.createElement('div');
+        rootElement.innerHTML = html;
+        const selectedAnchors = getAugmentedAnchorsFrom(rootElement);
+        const selectedIDs = Array.from(selectedAnchors).map(element => element.id);
+
+        expect(selectedAnchors.length).to.equal(7);
+        expect(expectedIDs.toString()).to.equal(selectedIDs.toString());
     });
 
     it('ignores all anchors with invalid data-target and data-module attributes combinations', () => {
