@@ -21,9 +21,6 @@ module.exports = function (config) {
             type: 'module'
         }, {
             pattern: 'test/**/*.html'
-        }, {
-            pattern: 'test/**/*.mjs',
-            type: 'module'
         }],
 
 
