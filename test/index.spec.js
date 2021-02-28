@@ -1,4 +1,4 @@
-import { getAugmentedAnchors } from '../src/index.js';
+import { getAugmentedAnchorsFrom } from '../src/index.js';
 
 describe('foo', () => {
     it('select all anchors with data-target and/or data-module attribute', () => {
@@ -9,7 +9,7 @@ describe('foo', () => {
             createAnchor({ 'data-target': '#my-element-id', 'data-module': 'path/to/my/script.js' })
         ];
         const container = createDivWith(anchors);
-        const selected = getAugmentedAnchors(container);
+        const selected = getAugmentedAnchorsFrom(container);
         assert.equal(selected.length, 3);
     });
 });
