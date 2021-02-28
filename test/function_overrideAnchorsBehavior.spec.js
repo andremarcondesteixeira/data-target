@@ -2,7 +2,7 @@ import { overrideAnchorsBehavior } from '../src/index.js';
 import { generateId, createTargetElement, createAnchors, createDivWith } from './helpers.mjs';
 
 describe('function overrideAnchorsBehavior', () => {
-    it('given non-empty data-target attribute, when data-target selector is processed, then it should render the content inside the first element found by the selector', () => {
+    it('should render content inside the first element found by a non-empty data-target selector', () => {
         const targetId = generateId();
         const targetElement = createTargetElement(targetId);
         const anchors = createAnchors(`#${targetId}`);
