@@ -11,21 +11,21 @@ describe('getAugmentedAnchorsFrom', () => {
         const container = createDivWith(anchors);
         const selected = getAugmentedAnchorsFrom(container);
         assert.equal(selected.length, 3);
+
+        function createAnchor(extraAttributes = {}) {
+            const anchor = document.createElement('a');
+            anchor.href = '#';
+            anchor.target = '_self';
+            for (let attribute in extraAttributes) {
+                anchor.setAttribute(attribute, extraAttributes[attribute]);
+            }
+            return anchor;
+        }
+
+        function createDivWith(anchors) {
+            const div = document.createElement('div');
+            anchors.forEach(anchor => div.appendChild(anchor));
+            return div;
+        }
     });
 });
-
-function createAnchor(extraAttributes = {}) {
-    const anchor = document.createElement('a');
-    anchor.href = '#';
-    anchor.target = '_self';
-    for (let attribute in extraAttributes) {
-        anchor.setAttribute(attribute, extraAttributes[attribute]);
-    }
-    return anchor;
-}
-
-function createDivWith(anchors) {
-    const div = document.createElement('div');
-    anchors.forEach(anchor => div.appendChild(anchor));
-    return div;
-}
