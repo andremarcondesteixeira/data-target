@@ -12,7 +12,7 @@ describe('function getAugmentedAnchorsFrom', () => {
             <a id="OK-with-data-target-with-data-module"         href="#" data-target="whatever" data-module="whatever"></a>
         `;
         const expectedIDs = [
-            'with-data-target-without-data-module',
+            'OK-with-data-target-without-data-module',
             'OK-with-data-target-with-empty-data-module-A',
             'OK-with-data-target-with-empty-data-module-B',
             'OK-without-data-target-with-data-module',
