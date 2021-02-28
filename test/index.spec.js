@@ -72,13 +72,21 @@ describe('function overrideAnchorsBehavior for anchors with data-target attribut
 
     it('renders the content of pages referred by the anchors in the first element found when applying the selector in the data-target attribute', () => {
         const targetId = generateId();
-        const target = createTargetElement(targetId);
-        const anchors = createAnchors(targetId);
+        const targetElement = createTargetElement(targetId);
+        const anchors = createAnchors(`#${targetId}`);
         const rootElement = createDivWith(anchors);
-        rootElement.appendChild(target);
+        rootElement.appendChild(targetElement);
         overrideAnchorsBehavior(rootElement);
         anchors[1].click();
-        const targetTestContent = target.querySelector('.test-content');
-        assert.isNotNull(targetTestContent);
+
+        return new Promise(resolve => {
+            const onLoadPage = () => {
+                const targetTestContent = targetElement.querySelector('.test-content');
+                assert.isNotNull(targetTestContent);
+                rootElement.removeEventListener('content-loaded', onLoadPage);
+                resolve();
+            };
+            rootElement.addEventListener('content-loaded', onLoadPage);
+        })
     });
 });
