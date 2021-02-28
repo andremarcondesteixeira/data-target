@@ -14,13 +14,12 @@ describe('function overrideAnchorsBehavior', () => {
         rootElement.querySelector('a').click();
 
         return new Promise(resolve => {
-            const onContentLoaded = () => {
+            rootElement.addEventListener('content-loaded', function onContentLoaded() {
                 const targetTestContent = rootElement.querySelector('#test-element').querySelector('.test-content');
                 assert.isNotNull(targetTestContent);
                 rootElement.removeEventListener('content-loaded', onContentLoaded);
                 resolve();
-            };
-            rootElement.addEventListener('content-loaded', onContentLoaded);
+            });
         });
     });
 });
