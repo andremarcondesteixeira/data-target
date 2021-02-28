@@ -1,5 +1,5 @@
 export function getAugmentedAnchorsFrom(parent) {
-    return parent.querySelectorAll('a[data-target], a[data-module]');
+    return parent.querySelectorAll('a[data-target]:not([data-target=""]), a[data-module]:not([data-module=""])');
 }
 
 export function overrideAnchorsBehavior(rootElement) {
