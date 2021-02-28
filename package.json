@@ -6,7 +6,7 @@
     "type": "module",
     "scripts": {
         "test": "karma start karma.conf.cjs",
-        "test-dev": "karma start --auto-watch --no-single-run karma.conf.cjs"
+        "test-dev": "karma start karma-dev.conf.cjs"
     },
     "repository": {
         "type": "git",
