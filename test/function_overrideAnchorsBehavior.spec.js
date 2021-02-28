@@ -8,20 +8,19 @@ describe('function overrideAnchorsBehavior', () => {
                data-target="#test-element"></a>
             <div id="test-element">
                 <!-- CONTENT SHOULD BE RENDERED HERE -->
-            </div>
-        `;
+            </div>`;
 
         overrideAnchorsBehavior(rootElement);
         rootElement.querySelector('a').click();
 
         return new Promise(resolve => {
-            const onLoadPage = () => {
+            const onContentLoaded = () => {
                 const targetTestContent = rootElement.querySelector('#test-element').querySelector('.test-content');
                 assert.isNotNull(targetTestContent);
-                rootElement.removeEventListener('content-loaded', onLoadPage);
+                rootElement.removeEventListener('content-loaded', onContentLoaded);
                 resolve();
             };
-            rootElement.addEventListener('content-loaded', onLoadPage);
+            rootElement.addEventListener('content-loaded', onContentLoaded);
         });
     });
 });
