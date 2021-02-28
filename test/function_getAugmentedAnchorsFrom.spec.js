@@ -24,7 +24,7 @@ describe('function getAugmentedAnchorsFrom', () => {
         const rootElement = document.createElement('div');
         rootElement.innerHTML = html;
         const selectedAnchors = getAugmentedAnchorsFrom(rootElement);
-        const selectedIDs = Array.from(selectedAnchors).map(element => element.id);
+        const selectedIDs = Array.from(selectedAnchors).map(element => element.id).sort();
 
         expect(selectedAnchors.length).to.equal(7);
         expect(expectedIDs.toString()).to.equal(selectedIDs.toString());
