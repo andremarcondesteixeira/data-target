@@ -1,3 +1,3 @@
 export function getAugmentedAnchors(parent) {
-    return parent.querySelectorAll('a[data-augmented]');
+    return parent.querySelectorAll('a[data-module]');
 }
