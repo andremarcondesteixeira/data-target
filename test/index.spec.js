@@ -1,6 +1,6 @@
 import { getAugmentedAnchorsFrom } from '../src/index.js';
 
-describe('index.js', () => {
+describe('getAugmentedAnchorsFrom', () => {
     it('select all anchors with data-target and/or data-module attribute', () => {
         const anchors = [
             createAnchor(),
