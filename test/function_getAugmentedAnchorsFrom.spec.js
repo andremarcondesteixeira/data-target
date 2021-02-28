@@ -19,7 +19,7 @@ describe('function getAugmentedAnchorsFrom', () => {
             'OK-with-empty-data-target-with-data-module-A',
             'OK-with-empty-data-target-with-data-module-B',
             'OK-with-data-target-with-data-module'
-        ]
+        ].sort();
 
         const rootElement = document.createElement('div');
         rootElement.innerHTML = html;
