@@ -41,5 +41,4 @@ function dispachContentLoadedEvent(targetElement) {
         cancelable: true
     });
     targetElement.dispatchEvent(event);
-    console.log(event);
 }
