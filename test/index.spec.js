@@ -1,12 +1,12 @@
 import { getAugmentedAnchors } from '../src/index.js';
 
 describe('foo', () => {
-    it('select all anchors with data-module attribute', () => {
+    it('select all anchors with data-target and/or data-module attribute', () => {
         const anchors = [
             createAnchor(),
-            createAnchorWithDataTarget(),
-            createAnchorWithDataTarget(),
-            createAnchorWithDataTarget()
+            createAnchor({ 'data-target': '#my-element-id' }),
+            createAnchor({ 'data-module': 'path/to/my/script.js' }),
+            createAnchor({ 'data-target': '#my-element-id', 'data-module': 'path/to/my/script.js' })
         ];
         const container = createDivWith(anchors);
         const selected = getAugmentedAnchors(container);
@@ -14,16 +14,13 @@ describe('foo', () => {
     });
 });
 
-function createAnchor() {
+function createAnchor(extraAttributes = {}) {
     const anchor = document.createElement('a');
     anchor.href = '#';
     anchor.target = '_self';
-    return anchor;
-}
-
-function createAnchorWithDataTarget() {
-    const anchor = createAnchor();
-    anchor.setAttribute('data-target', '#my-element-id');
+    for (let attribute in extraAttributes) {
+        anchor.setAttribute(attribute, extraAttributes[attribute]);
+    }
     return anchor;
 }
 
