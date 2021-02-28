@@ -43,7 +43,7 @@ describe('function getAugmentedAnchorsFrom', () => {
             <a id="IGNORED-with-empty-data-target-with-empty-data-module-C" href="#" data-target="" data-module   ></a>
             <a id="IGNORED-with-empty-data-target-with-empty-data-module-D" href="#" data-target    data-module   ></a>
         `;
-        const selected = getAugmentedAnchorsFrom(rootElement);
-        assert.equal(selected.length, 0);
+        const selectedAnchors = getAugmentedAnchorsFrom(rootElement);
+        assert.equal(selectedAnchors.length, 0);
     });
 });
