@@ -1,10 +1,10 @@
 import { getAugmentedAnchorsFrom } from '../src/index.js';
-import { createAnchors, createDivWith } from './helpers.mjs';
+import { createAugmentedAndNonAugmentedAnchors, createDivWithAnchors } from './helpers.mjs';
 
 describe('function getAugmentedAnchorsFrom', () => {
     it('selects all anchors with data-target and/or data-module attribute', () => {
-        const anchors = createAnchors();
-        const container = createDivWith(anchors);
+        const anchors = createAugmentedAndNonAugmentedAnchors();
+        const container = createDivWithAnchors(anchors);
         const selected = getAugmentedAnchorsFrom(container);
         assert.equal(selected.length, 3);
     });

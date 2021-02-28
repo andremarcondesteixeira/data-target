@@ -1,3 +1,17 @@
+export function buildContextWithAugmentedAndNonAugmentedAnchors() {
+    const targetId = generateId();
+    const targetElement = createTargetElement(targetId);
+    const allAugmentedAndNonAugmentedAnchors = createAugmentedAndNonAugmentedAnchors(`#${targetId}`);
+    const rootElement = createDivWithAnchors(allAugmentedAndNonAugmentedAnchors);
+    rootElement.appendChild(targetElement);
+    return {
+        targetId,
+        targetElement,
+        allAugmentedAndNonAugmentedAnchors,
+        rootElement
+    }
+}
+
 export function generateId() {
     const now = Date.now();
     const id = `test-element-${now}`;
@@ -11,7 +25,7 @@ export function createTargetElement(id) {
     return target;
 }
 
-export function createAnchors(targetSelector) {
+export function createAugmentedAndNonAugmentedAnchors(targetSelector) {
     const anchors = [
         createAnchor(),
         createAnchor({ 'data-target': targetSelector }),
@@ -31,7 +45,7 @@ export function createAnchor(extraAttributes = {}) {
     return anchor;
 }
 
-export function createDivWith(anchors) {
+export function createDivWithAnchors(anchors) {
     const div = document.createElement('div');
     anchors.forEach(anchor => div.appendChild(anchor));
     return div;
