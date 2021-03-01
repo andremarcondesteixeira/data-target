@@ -34,6 +34,8 @@
         "karma-coverage": "^2.0.3",
         "karma-firefox-launcher": "^2.1.0",
         "karma-mocha": "^2.0.1",
-        "mocha": "^8.3.0"
+        "karma-sinon": "^1.0.5",
+        "mocha": "^8.3.0",
+        "sinon": "^9.2.4"
     }
 }
