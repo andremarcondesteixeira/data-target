@@ -2,7 +2,7 @@
     "name": "augmented-anchors",
     "version": "1.0.0",
     "description": "Provides extra functionality to the html <a> tag",
-    "main": "index.js",
+    "main": "src/augmented-anchors.js",
     "type": "module",
     "scripts": {
         "test": "karma start karma.conf.cjs",

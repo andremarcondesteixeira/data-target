@@ -1,4 +1,4 @@
-import { getAugmentedAnchorsFrom } from '../src/index.js';
+import { getAugmentedAnchorsFrom } from '../src/augmented-anchors.js';
 
 describe('function getAugmentedAnchorsFrom', () => {
     it('selects all anchors with valid data-target and data-module attributes combinations', () => {
