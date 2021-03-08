@@ -1,2 +1,2 @@
 # augmented-anchors
-Provides some augmentations to the &lt;a> html tag
+Provides some augmentations to the &lt;a&gt; html tag
