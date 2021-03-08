@@ -1,5 +1,5 @@
 import { overrideAnchorsBehavior } from '../src/augmented-anchors.js';
-import { callme } from './test-module.js';
+import { callMe } from './contents/test-module.js';
 
 describe('function overrideAnchorsBehavior', () => {
     it('should render content inside the first element found by a valid data-target selector', () => {
@@ -29,13 +29,13 @@ describe('function overrideAnchorsBehavior', () => {
             <div id="test-element">
                 <!-- CONTENT SHOULD BE RENDERED HERE -->
             </div>`;
-        const spy = sinon.spy(callme);
+        const spy = sinon.spy(callMe);
 
         overrideAnchorsBehavior(rootElement);
         rootElement.querySelector('a').click();
 
         return doTest(rootElement, () => {
-            assertEqual(1, spy.callCount);
+            assert.equal(1, spy.callCount);
         });
     });
 
