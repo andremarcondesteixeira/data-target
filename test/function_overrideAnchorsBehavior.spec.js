@@ -38,21 +38,21 @@ describe('function overrideAnchorsBehavior', () => {
             finish();
         });
     });
-
-    function doTest(rootElement, trigger, testsCallback) {
-        return new Promise(resolve => {
-            rootElement.addEventListener('content-loaded', function onContentLoaded() {
-                testsCallback(() => {
-                    rootElement.removeEventListener('content-loaded', onContentLoaded);
-                    resolve();
-                });
-            });
-
-            trigger();
-        });
-    }
-
-    function getTrigger(rootElement) {
-        return () => rootElement.querySelector('a').click();
-    }
 });
+
+function doTest(rootElement, trigger, testsCallback) {
+    return new Promise(resolve => {
+        rootElement.addEventListener('content-loaded', function onContentLoaded() {
+            testsCallback(() => {
+                rootElement.removeEventListener('content-loaded', onContentLoaded);
+                resolve();
+            });
+        });
+
+        trigger();
+    });
+}
+
+function getTrigger(rootElement) {
+    return () => rootElement.querySelector('a').click();
+}
