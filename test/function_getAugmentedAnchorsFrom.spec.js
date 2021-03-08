@@ -1,7 +1,7 @@
 import { getAugmentedAnchorsFrom } from '../src/augmented-anchors.js';
 
 describe('function getAugmentedAnchorsFrom', () => {
-    it('selects all anchors with valid data-target and data-module attributes combinations', () => {
+    it('should select all anchors with valid data-target and data-module attributes combinations', () => {
         const html = `
             <a id="OK-with-data-target-without-data-module"      href="#" data-target="whatever"                       ></a>
             <a id="OK-with-data-target-with-empty-data-module-A" href="#" data-target="whatever" data-module=""        ></a>
@@ -30,7 +30,7 @@ describe('function getAugmentedAnchorsFrom', () => {
         expect(expectedIDs.toString()).to.equal(selectedIDs.toString());
     });
 
-    it('ignores all anchors with invalid data-target and data-module attributes combinations', () => {
+    it('should ignore all anchors with invalid data-target and data-module attributes combinations', () => {
         const rootElement = document.createElement('div');
         rootElement.innerHTML = `
             <a id="IGNORED-non-augmented"                                   href="#"                              ></a>
