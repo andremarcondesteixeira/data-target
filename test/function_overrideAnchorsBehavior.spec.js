@@ -1,4 +1,5 @@
 import { overrideAnchorsBehavior } from '../src/augmented-anchors.js';
+import { callme } from './test-module.js';
 
 describe('function overrideAnchorsBehavior', () => {
     it('should render content inside the first element found by a valid data-target selector', () => {
@@ -13,13 +14,19 @@ describe('function overrideAnchorsBehavior', () => {
         overrideAnchorsBehavior(rootElement);
         rootElement.querySelector('a').click();
 
+        return doTest(rootElement, () => {
+            const targetTestContent = rootElement.querySelector('#test-element').querySelector('.test-content');
+            assert.isNotNull(targetTestContent);
+        });
+    });
+
+    function doTest(rootElement, callback) {
         return new Promise(resolve => {
             rootElement.addEventListener('content-loaded', function onContentLoaded() {
-                const targetTestContent = rootElement.querySelector('#test-element').querySelector('.test-content');
-                assert.isNotNull(targetTestContent);
+                callback();
                 rootElement.removeEventListener('content-loaded', onContentLoaded);
                 resolve();
             });
         });
-    });
+    }
 });
