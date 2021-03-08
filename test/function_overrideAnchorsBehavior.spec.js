@@ -1,4 +1,5 @@
 import { overrideAnchorsBehavior } from '../src/augmented-anchors.js';
+import { setListenerForTestModule, getCount } from './contents/test-module.js';
 
 describe('function overrideAnchorsBehavior', () => {
     it('should render content inside the first element found by a valid data-target selector', () => {
@@ -12,17 +13,14 @@ describe('function overrideAnchorsBehavior', () => {
 
         overrideAnchorsBehavior(rootElement);
 
-        const trigger = () => rootElement.querySelector('a').click();
-        const test = finish => {
+        return doTest(rootElement, getTrigger(rootElement), finish => {
             const targetTestContent = rootElement.querySelector('#test-element').querySelector('.test-content');
             assert.isNotNull(targetTestContent);
             finish();
-        };
-
-        return doTest(rootElement, trigger, test);
+        });
     });
 
-    xit('should load a javascript module after content is rendered when both data-target and data-module attributes are valid', () => {
+    it('should load a javascript module after content is rendered when both data-target and data-module attributes are valid', () => {
         const rootElement = document.createElement('div');
         rootElement.innerHTML = `
             <a href="/base/test/contents/test-content.html"
@@ -31,16 +29,14 @@ describe('function overrideAnchorsBehavior', () => {
             <div id="test-element">
                 <!-- CONTENT SHOULD BE RENDERED HERE -->
             </div>`;
-        const spy = sinon.spy(callMe);
+
         setListenerForTestModule(rootElement);
         overrideAnchorsBehavior(rootElement);
-        const trigger = () => rootElement.querySelector('a').click();
-        const test = finish => {
-            assert.equal(1, spy.callCount);
-            finish();
-        };
 
-        return doTest(rootElement, trigger, test);
+        return doTest(rootElement, getTrigger(rootElement), finish => {
+            assert.equal(1, getCount());
+            finish();
+        });
     });
 
     function doTest(rootElement, trigger, testsCallback) {
@@ -54,5 +50,9 @@ describe('function overrideAnchorsBehavior', () => {
 
             trigger();
         });
+    }
+
+    function getTrigger(rootElement) {
+        return () => rootElement.querySelector('a').click();
     }
 });

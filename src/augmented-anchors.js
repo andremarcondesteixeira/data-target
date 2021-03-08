@@ -21,7 +21,7 @@ async function loadModule(anchor) {
 
     if (modulePath) {
         try {
-            return import(modulePath);
+            return await import(modulePath);
         } catch (error) {
             console.error(error);
             return null;
