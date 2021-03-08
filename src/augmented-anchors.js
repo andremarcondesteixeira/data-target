@@ -9,16 +9,16 @@ export function overrideAnchorsBehavior(rootElement) {
     });
 }
 
-function onClick(event, rootElement) {
+async function onClick(event, rootElement) {
     event.preventDefault();
     const anchor = event.currentTarget;
-    getContent(anchor, rootElement);
+    await getContent(anchor, rootElement);
 }
 
-function getContent(anchor, rootElement) {
-    fetch(anchor.href)
-        .then(response => response.text())
-        .then(html => setContentInTargetElement(rootElement, anchor, html));
+async function getContent(anchor, rootElement) {
+    const response = await fetch(anchor.href);
+    const html = await response.text();
+    return setContentInTargetElement(rootElement, anchor, html);
 }
 
 function setContentInTargetElement(rootElement, anchor, html) {
