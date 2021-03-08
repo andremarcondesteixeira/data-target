@@ -1,7 +1,7 @@
 import { overrideAnchorsBehavior } from '../src/augmented-anchors.js';
 
 describe('function overrideAnchorsBehavior', () => {
-    it('should render content inside the first element found by a non-empty data-target selector', () => {
+    it('should render content inside the first element found by a valid data-target selector', () => {
         const rootElement = document.createElement('div');
         rootElement.innerHTML = `
             <a href="/base/test/test-content.html"
