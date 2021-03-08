@@ -1,5 +1,5 @@
 import { overrideAnchorsBehavior } from '../src/augmented-anchors.js';
-import { callMe } from './contents/test-module.js';
+import { callMe, setListenerForTestModule } from './contents/test-module.js';
 
 describe('function overrideAnchorsBehavior', () => {
     it('should render content inside the first element found by a valid data-target selector', () => {
@@ -11,12 +11,13 @@ describe('function overrideAnchorsBehavior', () => {
                 <!-- CONTENT SHOULD BE RENDERED HERE -->
             </div>`;
 
-        overrideAnchorsBehavior(rootElement);
-        rootElement.querySelector('a').click();
-
-        return doTest(rootElement, () => {
-            const targetTestContent = rootElement.querySelector('#test-element').querySelector('.test-content');
-            assert.isNotNull(targetTestContent);
+        return doTest(rootElement, finish => {
+            overrideAnchorsBehavior(rootElement, () => {
+                const targetTestContent = rootElement.querySelector('#test-element').querySelector('.test-content');
+                assert.isNotNull(targetTestContent);
+                finish();
+            });
+            rootElement.querySelector('a').click();
         });
     });
 
@@ -30,21 +31,24 @@ describe('function overrideAnchorsBehavior', () => {
                 <!-- CONTENT SHOULD BE RENDERED HERE -->
             </div>`;
         const spy = sinon.spy(callMe);
+        setListenerForTestModule(rootElement);
 
-        overrideAnchorsBehavior(rootElement);
-        rootElement.querySelector('a').click();
-
-        return doTest(rootElement, () => {
-            assert.equal(1, spy.callCount);
+        return doTest(rootElement, finish => {
+            overrideAnchorsBehavior(rootElement, () => {
+                assert.equal(1, spy.callCount);
+                finish();
+            });
+            rootElement.querySelector('a').click();
         });
     });
 
-    function doTest(rootElement, callback) {
+    function doTest(rootElement, testsCallback) {
         return new Promise(resolve => {
             rootElement.addEventListener('content-loaded', function onContentLoaded() {
-                callback();
-                rootElement.removeEventListener('content-loaded', onContentLoaded);
-                resolve();
+                testsCallback(() => {
+                    rootElement.removeEventListener('content-loaded', onContentLoaded);
+                    resolve();
+                });
             });
         });
     }
