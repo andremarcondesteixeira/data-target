@@ -5,15 +5,15 @@ export function getAugmentedAnchorsFrom(parent) {
 export function overrideAnchorsBehavior(rootElement) {
     const anchors = getAugmentedAnchorsFrom(rootElement);
     anchors.forEach(anchor => {
-        anchor.addEventListener('click', event => onClick(event, rootElement));
+        anchor.addEventListener('click', event => onClick(event, anchor, rootElement));
     });
 }
 
-async function onClick(event, rootElement) {
+async function onClick(event, anchor, rootElement) {
     event.preventDefault();
-    await loadModule(event.currentTarget);
-    await loadContent(event.currentTarget, rootElement);
-    dispachContentLoadedEvent(targetElement);
+    await loadModule(anchor);
+    const content = await fetchContent(anchor);
+    renderContentInTargetElement(rootElement, anchor, content);
 }
 
 async function loadModule(anchor) {
@@ -31,10 +31,9 @@ async function loadModule(anchor) {
     return null;
 }
 
-async function loadContent(anchor, rootElement) {
-    const response = await fetch(anchor.href);
-    const html = await response.text();
-    renderContentInTargetElement(rootElement, anchor, html);
+async function fetchContent(anchor) {
+    let response = await fetch(anchor.href);
+    return await response.text();
 }
 
 function renderContentInTargetElement(rootElement, anchor, html) {
@@ -42,6 +41,7 @@ function renderContentInTargetElement(rootElement, anchor, html) {
     const targetElement = rootElement.querySelector(targetSelector);
     clearTargetElement(targetElement);
     targetElement.insertAdjacentHTML('afterbegin', html);
+    dispachContentLoadedEvent(targetElement);
 }
 
 function clearTargetElement(targetElement) {
