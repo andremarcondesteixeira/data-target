@@ -39,7 +39,7 @@ describe('function overrideAnchorsBehavior', () => {
         });
     });
 
-    it('should dispatch an event containing the anchor href and loaded module info', () => {
+    it('should dispatch a content-loaded event containing the anchor href and loaded module info', () => {
         const rootElement = document.createElement('div');
         rootElement.innerHTML = `
             <a href="/base/test/contents/test-content.html"
