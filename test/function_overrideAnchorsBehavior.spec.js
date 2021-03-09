@@ -38,25 +38,6 @@ describe('function overrideAnchorsBehavior', () => {
             finish();
         });
     });
-
-    it('should dispatch a content-loaded event containing the anchor href and loaded module info', () => {
-        const rootElement = document.createElement('div');
-        rootElement.innerHTML = `
-            <a href="/base/test/contents/test-content.html"
-               data-target="#test-element"
-               data-module="/base/test/contents/test-module.js"></a>
-            <div id="test-element">
-                <!-- CONTENT SHOULD BE RENDERED HERE -->
-            </div>`;
-
-        overrideAnchorsBehavior(rootElement);
-
-        return doTest(rootElement, getTrigger(rootElement), (finish, event) => {
-            expect(event.detail.href).to.be.equal('http://localhost:9876/base/test/contents/test-content.html');
-            expect(event.detail.module).to.be.equal('http://localhost:9876/base/test/contents/test-module.js');
-            finish();
-        });
-    });
 });
 
 function doTest(rootElement, trigger, testsCallback) {

@@ -41,7 +41,7 @@ function renderContentInTargetElement(rootElement, anchor, html) {
     const targetElement = rootElement.querySelector(targetSelector);
     clearTargetElement(targetElement);
     targetElement.insertAdjacentHTML('afterbegin', html);
-    dispachContentLoadedEvent(targetElement, createCustomEventDetail(anchor));
+    dispachContentLoadedEvent(targetElement);
 }
 
 function clearTargetElement(targetElement) {
@@ -50,22 +50,10 @@ function clearTargetElement(targetElement) {
     }
 }
 
-function dispachContentLoadedEvent(targetElement, details) {
+function dispachContentLoadedEvent(targetElement) {
     const event = new CustomEvent('content-loaded', {
         bubbles: true,
-        cancelable: true,
-        detail: {
-            ...details
-        }
+        cancelable: true
     });
     targetElement.dispatchEvent(event);
-}
-
-function createCustomEventDetail(anchor) {
-    const moduleLink = document.createElement('a');
-    moduleLink.setAttribute('href', anchor.getAttribute('data-module')?.trim());
-    return {
-        href: anchor.href,
-        module: moduleLink.href
-    };
 }
