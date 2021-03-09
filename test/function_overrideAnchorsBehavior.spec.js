@@ -15,7 +15,7 @@ describe('function overrideAnchorsBehavior', () => {
 
         return doTest(rootElement, getTrigger(rootElement), finish => {
             const targetTestContent = rootElement.querySelector('#test-element').querySelector('.test-content');
-            assert.isNotNull(targetTestContent);
+            expect(targetTestContent).to.not.be.null;
             finish();
         });
     });
@@ -34,7 +34,26 @@ describe('function overrideAnchorsBehavior', () => {
         overrideAnchorsBehavior(rootElement);
 
         return doTest(rootElement, getTrigger(rootElement), finish => {
-            assert.equal(1, getCount());
+            expect(getCount()).to.be.equal(1);
+            finish();
+        });
+    });
+
+    it('should dispatch an event containing the anchor href and loaded module info', () => {
+        const rootElement = document.createElement('div');
+        rootElement.innerHTML = `
+            <a href="/base/test/contents/test-content.html"
+               data-target="#test-element"
+               data-module="base/test/contents/test-module.js"></a>
+            <div id="test-element">
+                <!-- CONTENT SHOULD BE RENDERED HERE -->
+            </div>`;
+
+        overrideAnchorsBehavior(rootElement);
+
+        return doTest(rootElement, getTrigger(rootElement), (finish, event) => {
+            expect(event.detail.href).to.be.equal('http://localhost:9876/base/test/contents/test-content.html');
+            expect(event.detail.module).to.be.equal('http://localhost:9876/base/test/contents/test-module.js');
             finish();
         });
     });
@@ -42,11 +61,11 @@ describe('function overrideAnchorsBehavior', () => {
 
 function doTest(rootElement, trigger, testsCallback) {
     return new Promise(resolve => {
-        rootElement.addEventListener('content-loaded', function onContentLoaded() {
+        rootElement.addEventListener('content-loaded', function onContentLoaded(event) {
             testsCallback(() => {
                 rootElement.removeEventListener('content-loaded', onContentLoaded);
                 resolve();
-            });
+            }, event);
         });
 
         trigger();

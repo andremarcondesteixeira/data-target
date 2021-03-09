@@ -41,7 +41,10 @@ function renderContentInTargetElement(rootElement, anchor, html) {
     const targetElement = rootElement.querySelector(targetSelector);
     clearTargetElement(targetElement);
     targetElement.insertAdjacentHTML('afterbegin', html);
-    dispachContentLoadedEvent(targetElement);
+    dispachContentLoadedEvent(targetElement, {
+        href: anchor.href,
+        module: anchor.getAttribute('data-module')?.trim()
+    });
 }
 
 function clearTargetElement(targetElement) {
@@ -50,10 +53,13 @@ function clearTargetElement(targetElement) {
     }
 }
 
-function dispachContentLoadedEvent(targetElement) {
-    const event = new Event('content-loaded', {
+function dispachContentLoadedEvent(targetElement, details) {
+    const event = new CustomEvent('content-loaded', {
         bubbles: true,
-        cancelable: true
+        cancelable: true,
+        detail: {
+            ...details
+        }
     });
     targetElement.dispatchEvent(event);
 }
