@@ -41,10 +41,7 @@ function renderContentInTargetElement(rootElement, anchor, html) {
     const targetElement = rootElement.querySelector(targetSelector);
     clearTargetElement(targetElement);
     targetElement.insertAdjacentHTML('afterbegin', html);
-    dispachContentLoadedEvent(targetElement, {
-        href: anchor.href,
-        module: anchor.getAttribute('data-module')?.trim()
-    });
+    dispachContentLoadedEvent(targetElement, createCustomEventDetail(anchor));
 }
 
 function clearTargetElement(targetElement) {
@@ -62,4 +59,13 @@ function dispachContentLoadedEvent(targetElement, details) {
         }
     });
     targetElement.dispatchEvent(event);
+}
+
+function createCustomEventDetail(anchor) {
+    const moduleLink = document.createElement('a');
+    moduleLink.setAttribute('href', anchor.getAttribute('data-module')?.trim());
+    return {
+        href: anchor.href,
+        module: moduleLink.href
+    };
 }
