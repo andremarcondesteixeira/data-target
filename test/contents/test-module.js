@@ -8,7 +8,6 @@ export function setListenerForTestModule(rootElement) {
 
 export function callMe() {
     count++;
-    console.log('callMe function from test-module.js was called');
     listener.removeEventListener('content-loaded', callMe);
 }
 

@@ -25,7 +25,7 @@ describe('function overrideAnchorsBehavior', () => {
         rootElement.innerHTML = `
             <a href="/base/test/contents/test-content.html"
                data-target="#test-element"
-               data-module="base/test/contents/test-module.js"></a>
+               data-module="/base/test/contents/test-module.js"></a>
             <div id="test-element">
                 <!-- CONTENT SHOULD BE RENDERED HERE -->
             </div>`;
@@ -44,7 +44,7 @@ describe('function overrideAnchorsBehavior', () => {
         rootElement.innerHTML = `
             <a href="/base/test/contents/test-content.html"
                data-target="#test-element"
-               data-module="base/test/contents/test-module.js"></a>
+               data-module="/base/test/contents/test-module.js"></a>
             <div id="test-element">
                 <!-- CONTENT SHOULD BE RENDERED HERE -->
             </div>`;
