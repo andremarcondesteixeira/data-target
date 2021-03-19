@@ -1,4 +1,4 @@
-import { enableDataTargetSelector } from '../src/html-anchor-data-target-selector.js';
+import { enableDataTargetSelector } from '../src/html-anchor-selector-target.js';
 
 describe('function overrideAnchorsBehavior', () => {
     it('should render content inside the first element found by a valid data-target selector', () => {
