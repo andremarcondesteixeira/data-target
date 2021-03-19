@@ -15,7 +15,7 @@ describe('function enableAnchorsTargetSelectors', () => {
         enableAnchorsTargetSelectors(rootElement);
 
         return new Promise(resolve => {
-            rootElement.addEventListener('hats:DOMContentLoaded', function onContentLoaded(event) {
+            rootElement.addEventListener('hats:DOMContentLoaded', event => {
                 const renderedElement = rootElement.querySelector('#target').querySelector('.test-content');
                 expect(renderedElement).to.not.be.null;
 
@@ -24,7 +24,6 @@ describe('function enableAnchorsTargetSelectors', () => {
 
                 expect(event.detail.href).to.be.equal('http://localhost:9876/base/test/contents/test-content.html');
 
-                rootElement.removeEventListener('hats:DOMContentLoaded', onContentLoaded);
                 resolve();
             });
 
