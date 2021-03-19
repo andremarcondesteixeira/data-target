@@ -2,7 +2,7 @@ export function getAnchors(parent) {
     return parent.querySelectorAll('a[data-target-selector]:not([data-target-selector=""])');
 }
 
-export function enableAnchorSelectorTarget(rootElement) {
+export function enableAnchorsTargetSelectors(rootElement) {
     const anchors = getAnchors(rootElement);
     anchors.forEach(anchor => {
         anchor.addEventListener('click', event => onClick(event, anchor, rootElement));
@@ -35,7 +35,7 @@ function clearTargetElement(targetElement) {
 }
 
 function dispatchContentLoadedEvent(targetElement) {
-    const event = new CustomEvent('content-loaded', {
+    const event = new CustomEvent('hats:DOMContentLoaded', {
         bubbles: true,
         cancelable: true
     });

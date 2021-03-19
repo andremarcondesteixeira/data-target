@@ -1,4 +1,4 @@
-import { getAnchors } from '../src/html-anchor-selector-target.js';
+import { getAnchors } from '../src/hats.js';
 
 describe('function getAnchors', () => {
     it('should select all anchors with a non-empty data-target-selector attribute', () => {
