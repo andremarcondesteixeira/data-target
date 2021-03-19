@@ -1,5 +1,5 @@
 export function getAnchors(parent) {
-    return parent.querySelectorAll('a[data-selector-target]:not([data-selector-target=""])');
+    return parent.querySelectorAll('a[data-target-selector]:not([data-target-selector=""])');
 }
 
 export function enableAnchorSelectorTarget(rootElement) {
@@ -21,7 +21,7 @@ async function fetchContent(anchor) {
 }
 
 function renderContentInTargetElement(rootElement, anchor, html) {
-    const targetSelector = anchor.getAttribute('data-selector-target');
+    const targetSelector = anchor.getAttribute('data-target-selector');
     const targetElement = rootElement.querySelector(targetSelector);
     clearTargetElement(targetElement);
     targetElement.insertAdjacentHTML('afterbegin', html);
