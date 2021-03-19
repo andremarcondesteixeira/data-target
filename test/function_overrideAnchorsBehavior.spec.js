@@ -5,7 +5,7 @@ describe('function overrideAnchorsBehavior', () => {
         const rootElement = document.createElement('div');
         rootElement.innerHTML = `
             <a href="/base/test/contents/test-content.html"
-               data-target="#test-element"></a>
+               data-target-selector="#test-element"></a>
             <div id="test-element">
                 <!-- CONTENT SHOULD BE RENDERED HERE -->
             </div>`;
