@@ -25,7 +25,7 @@ function renderContentInTargetElement(rootElement, anchor, html) {
     const targetElement = rootElement.querySelector(targetSelector);
     clearTargetElement(targetElement);
     targetElement.insertAdjacentHTML('afterbegin', html);
-    dispachContentLoadedEvent(targetElement);
+    dispatchContentLoadedEvent(targetElement);
 }
 
 function clearTargetElement(targetElement) {
@@ -34,7 +34,7 @@ function clearTargetElement(targetElement) {
     }
 }
 
-function dispachContentLoadedEvent(targetElement) {
+function dispatchContentLoadedEvent(targetElement) {
     const event = new CustomEvent('content-loaded', {
         bubbles: true,
         cancelable: true
