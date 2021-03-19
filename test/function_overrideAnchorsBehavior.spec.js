@@ -1,4 +1,4 @@
-import { overrideAnchorsBehavior } from '../src/html-anchor-data-target-selector.js';
+import { enableDataTargetSelector } from '../src/html-anchor-data-target-selector.js';
 
 describe('function overrideAnchorsBehavior', () => {
     it('should render content inside the first element found by a valid data-target selector', () => {
@@ -10,7 +10,7 @@ describe('function overrideAnchorsBehavior', () => {
                 <!-- CONTENT SHOULD BE RENDERED HERE -->
             </div>`;
 
-        overrideAnchorsBehavior(rootElement);
+        enableDataTargetSelector(rootElement);
 
         return new Promise(resolve => {
             rootElement.addEventListener('content-loaded', function onContentLoaded() {
