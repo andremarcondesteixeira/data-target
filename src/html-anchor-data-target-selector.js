@@ -1,9 +1,9 @@
-export function getAugmentedAnchorsFrom(parent) {
+export function getAnchors(parent) {
     return parent.querySelectorAll('a[data-target-selector]:not([data-target-selector=""])');
 }
 
 export function overrideAnchorsBehavior(rootElement) {
-    const anchors = getAugmentedAnchorsFrom(rootElement);
+    const anchors = getAnchors(rootElement);
     anchors.forEach(anchor => {
         anchor.addEventListener('click', event => onClick(event, anchor, rootElement));
     });

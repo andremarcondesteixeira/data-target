@@ -1,4 +1,4 @@
-import { getAugmentedAnchorsFrom } from '../src/html-anchor-data-target-selector.js';
+import { getAnchors } from '../src/html-anchor-data-target-selector.js';
 
 describe('function getAugmentedAnchorsFrom', () => {
     it('should select all anchors with a non-empty data-target-selector attribute', () => {
@@ -13,7 +13,7 @@ describe('function getAugmentedAnchorsFrom', () => {
 
         const rootElement = document.createElement('div');
         rootElement.innerHTML = html;
-        const selectedAnchors = getAugmentedAnchorsFrom(rootElement);
+        const selectedAnchors = getAnchors(rootElement);
         const selectedIDs = Array.from(selectedAnchors).map(element => element.id).sort();
 
         expect(selectedAnchors.length).to.equal(2);
@@ -27,7 +27,7 @@ describe('function getAugmentedAnchorsFrom', () => {
             <a id="empty-data-target-selector-1" href="#" data-target=""></a>
             <a id="empty-data-target-selector-2" href="#" data-target   ></a>
         `;
-        const selectedAnchors = getAugmentedAnchorsFrom(rootElement);
+        const selectedAnchors = getAnchors(rootElement);
         assert.equal(selectedAnchors.length, 0);
     });
 });
