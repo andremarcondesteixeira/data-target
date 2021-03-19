@@ -10,9 +10,8 @@ describe('function enableAnchorsTargetSelectors', () => {
                 <section class="content" id="target">
                     <!-- CONTENT SHOULD BE RENDERED HERE -->
                 </section>
-                <section class="content" id="not-the-target">
-                    <!-- CONTENT SHOULD NOT BE RENDERED HERE -->
-                </section>
+                <!-- CONTENT SHOULD NOT BE RENDERED IN THE ELEMENT BELOW -->
+                <section class="content" id="not-the-target">this content must not change</section>
             </main>`;
 
         enableAnchorsTargetSelectors(rootElement);
@@ -21,6 +20,10 @@ describe('function enableAnchorsTargetSelectors', () => {
             rootElement.addEventListener('hats:DOMContentLoaded', function onContentLoaded(event) {
                 const renderedElement = rootElement.querySelector('#target').querySelector('.test-content');
                 expect(renderedElement).to.not.be.null;
+
+                const notTheTarget = rootElement.querySelector('#not-the-target');
+                expect(notTheTarget.textContent).to.be.equal('this content must not change');
+
                 rootElement.removeEventListener('hats:DOMContentLoaded', onContentLoaded);
                 resolve();
             });
