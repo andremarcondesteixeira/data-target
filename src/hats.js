@@ -25,7 +25,7 @@ function renderContentInTargetElement(rootElement, anchor, html) {
     const targetElement = rootElement.querySelector(targetSelector);
     clearTargetElement(targetElement);
     targetElement.insertAdjacentHTML('afterbegin', html);
-    dispatchContentLoadedEvent(targetElement);
+    dispatchContentLoadedEvent(targetElement, { href: anchor.href });
 }
 
 function clearTargetElement(targetElement) {
@@ -34,10 +34,11 @@ function clearTargetElement(targetElement) {
     }
 }
 
-function dispatchContentLoadedEvent(targetElement) {
+function dispatchContentLoadedEvent(targetElement, detail) {
     const event = new CustomEvent('hats:DOMContentLoaded', {
         bubbles: true,
-        cancelable: true
+        cancelable: true,
+        detail
     });
     targetElement.dispatchEvent(event);
 }

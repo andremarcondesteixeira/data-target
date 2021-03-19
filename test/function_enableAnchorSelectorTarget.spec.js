@@ -22,7 +22,7 @@ describe('function enableAnchorsTargetSelectors', () => {
                 const notTheTarget = rootElement.querySelector('#not-the-target');
                 expect(notTheTarget.textContent).to.be.equal('this content must not change');
 
-                expect(event.details).to.be.equal('http://localhost:9876/base/test/contents/test-content.html');
+                expect(event.detail.href).to.be.equal('http://localhost:9876/base/test/contents/test-content.html');
 
                 rootElement.removeEventListener('hats:DOMContentLoaded', onContentLoaded);
                 resolve();
