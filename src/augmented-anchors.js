@@ -21,7 +21,7 @@ async function fetchContent(anchor) {
 }
 
 function renderContentInTargetElement(rootElement, anchor, html) {
-    const targetSelector = anchor.getAttribute('data-target');
+    const targetSelector = anchor.getAttribute('data-target-selector');
     const targetElement = rootElement.querySelector(targetSelector);
     clearTargetElement(targetElement);
     targetElement.insertAdjacentHTML('afterbegin', html);
