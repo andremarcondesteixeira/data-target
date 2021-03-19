@@ -43,7 +43,8 @@ function doTest(html, testFunction) {
 
     return new Promise(resolve => {
         rootElement.addEventListener('hats:DOMContentLoaded', event => {
-            testFunction(() => resolve(), rootElement, event);
+            const finish = () => resolve();
+            testFunction(finish, rootElement, event);
         });
 
         rootElement.querySelector('a').click();
