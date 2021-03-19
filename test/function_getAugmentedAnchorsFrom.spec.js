@@ -1,6 +1,6 @@
 import { getAnchors } from '../src/html-anchor-data-target-selector.js';
 
-describe('function getAugmentedAnchorsFrom', () => {
+describe('function getAnchors', () => {
     it('should select all anchors with a non-empty data-target-selector attribute', () => {
         const html = `
             <a id="anchor1" href="#" data-target-selector="#someId">anchor 1</a>
