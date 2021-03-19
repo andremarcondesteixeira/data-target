@@ -12,27 +12,15 @@ describe('function overrideAnchorsBehavior', () => {
 
         overrideAnchorsBehavior(rootElement);
 
-        return doTest(rootElement, getTrigger(rootElement), finish => {
-            const targetTestContent = rootElement.querySelector('#test-element').querySelector('.test-content');
-            expect(targetTestContent).to.not.be.null;
-            finish();
+        return new Promise(resolve => {
+            rootElement.addEventListener('content-loaded', function onContentLoaded() {
+                const targetTestContent = rootElement.querySelector('#test-element').querySelector('.test-content');
+                expect(targetTestContent).to.not.be.null;
+                rootElement.removeEventListener('content-loaded', onContentLoaded);
+                resolve();
+            });
+
+            rootElement.querySelector('a').click();
         });
     });
 });
-
-function doTest(rootElement, trigger, testsCallback) {
-    return new Promise(resolve => {
-        rootElement.addEventListener('content-loaded', function onContentLoaded(event) {
-            testsCallback(() => {
-                rootElement.removeEventListener('content-loaded', onContentLoaded);
-                resolve();
-            }, event);
-        });
-
-        trigger();
-    });
-}
-
-function getTrigger(rootElement) {
-    return () => rootElement.querySelector('a').click();
-}
