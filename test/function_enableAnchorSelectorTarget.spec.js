@@ -31,4 +31,28 @@ describe('function enableAnchorsTargetSelectors', () => {
             rootElement.querySelector('a').click();
         });
     });
+
+    it('should enable data-target-selector in nested anchors', () => {
+        const rootElement = document.createElement('div');
+        rootElement.innerHTML = `
+            <a href="/base/test/contents/nested.html" data-target-selector="#content">anchor</a>
+            <section id="content"></section>`;
+
+        enableAnchorsTargetSelectors(rootElement);
+
+        return new Promise(resolve => {
+            rootElement.addEventListener('hats:DOMContentLoaded', () => {
+                const renderedElement = rootElement.querySelector('#inner-content');
+                renderedElement.addEventListener('hats:DOMContentLoaded', () => {
+                    const content = renderedElement.querySelector('.test-content');
+                    expect(content).to.not.be.null;
+                    resolve();
+                });
+
+                rootElement.querySelector('#content a').click();
+            });
+
+            rootElement.querySelector('a').click();
+        });
+    });
 });
