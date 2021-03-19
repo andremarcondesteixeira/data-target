@@ -25,6 +25,7 @@ function renderContentInTargetElement(rootElement, anchor, html) {
     const targetElement = rootElement.querySelector(targetSelector);
     clearTargetElement(targetElement);
     targetElement.insertAdjacentHTML('afterbegin', html);
+    enableAnchorsTargetSelectors(targetElement);
     dispatchContentLoadedEvent(targetElement, { href: anchor.href });
 }
 
