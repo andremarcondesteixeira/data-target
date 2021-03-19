@@ -1,4 +1,4 @@
-import { getAugmentedAnchorsFrom } from '../src/augmented-anchors.js';
+import { getAugmentedAnchorsFrom } from '../src/html-anchor-data-target-selector.js';
 
 describe('function getAugmentedAnchorsFrom', () => {
     it('should select all anchors with a non-empty data-target-selector attribute', () => {

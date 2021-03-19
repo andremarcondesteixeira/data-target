@@ -1,4 +1,4 @@
-import { overrideAnchorsBehavior } from '../src/augmented-anchors.js';
+import { overrideAnchorsBehavior } from '../src/html-anchor-data-target-selector.js';
 
 describe('function overrideAnchorsBehavior', () => {
     it('should render content inside the first element found by a valid data-target selector', () => {
