@@ -7,9 +7,8 @@ describe('function enableAnchorsTargetSelectors', () => {
             <a href="/base/test/contents/test-content.html"
                data-target-selector="#main .content">anchor</a>
             <main id="main">
-                <section class="content" id="target">
-                    <!-- CONTENT SHOULD BE RENDERED HERE -->
-                </section>
+                <!-- CONTENT SHOULD BE RENDERED INSIDE THE ELEMENT BELOW -->
+                <section class="content" id="target"></section>
                 <!-- CONTENT SHOULD NOT BE RENDERED IN THE ELEMENT BELOW -->
                 <section class="content" id="not-the-target">this content must not change</section>
             </main>`;
