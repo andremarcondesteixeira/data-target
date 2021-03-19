@@ -11,24 +11,8 @@ export function overrideAnchorsBehavior(rootElement) {
 
 async function onClick(event, anchor, rootElement) {
     event.preventDefault();
-    await loadModule(anchor);
     const content = await fetchContent(anchor);
     renderContentInTargetElement(rootElement, anchor, content);
-}
-
-async function loadModule(anchor) {
-    const modulePath = anchor.getAttribute('data-module')?.trim();
-
-    if (modulePath) {
-        try {
-            return await import(modulePath);
-        } catch (error) {
-            console.error(error);
-            return null;
-        }
-    }
-
-    return null;
 }
 
 async function fetchContent(anchor) {
