@@ -44,7 +44,7 @@ describe('function enableAnchorsTargetSelectors', () => {
 
         return doTest(html, (finish, root) => {
             root.querySelector('#content').addEventListener('hats:DOMContentLoaded', event => {
-                expect(event.detail.responseStatusCode).to.be.equal(400);
+                expect(event.detail.responseStatusCode).to.be.equal(404);
                 finish();
             });
 
