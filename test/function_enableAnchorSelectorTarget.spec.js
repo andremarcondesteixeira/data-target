@@ -42,9 +42,14 @@ describe('function enableAnchorsTargetSelectors', () => {
             <a href="/base/test/contents/test-content.html" data-target-selector="#content">anchor</a>
             <div id="content"></div>`;
         let callbackCalled = false;
-        initialize(root, () => callbackCalled = true);
+        let href;
+        initialize(root, _href => {
+            callbackCalled = true;
+            href = _href;
+        });
         root.querySelector('a').click();
         expect(callbackCalled).to.be.true;
+        expect(href).to.be.equal('http://localhost:9876/base/test/contents/test-content.html');
     });
 
     it('should throw an error if data-target-selector resolves to no element', () => {
