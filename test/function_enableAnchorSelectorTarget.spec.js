@@ -33,9 +33,18 @@ describe('function enableAnchorsTargetSelectors', () => {
             root.querySelector('#content a').click();
         });
     });
+
+    it('should throw an error if data-target-selector resolves to no element', () => {
+        console.error = sinon.fake();
+        const root = document.createElement('div');
+        root.innerHTML = `<a href="/base/test/contents/test-content.html" data-target-selector="#non-existing-element">anchor</a>`;
+        enableAnchorsTargetSelectors(root);
+        root.querySelector('a').click();
+        expect(console.error.callCount).to.be.equal(1);
+    });
 });
 
-function doTest(html, testFunction) {
+function doTest(html, testFunction, errorHandler) {
     const rootElement = document.createElement('div');
     rootElement.innerHTML = html;
 
@@ -47,6 +56,10 @@ function doTest(html, testFunction) {
             testFunction(finish, rootElement, event);
         });
 
-        rootElement.querySelector('a').click();
+        try {
+            rootElement.querySelector('a').click();
+        } catch (error) {
+            errorHandler(error);
+        }
     });
 }
