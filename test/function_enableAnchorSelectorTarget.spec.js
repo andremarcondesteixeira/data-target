@@ -17,6 +17,7 @@ describe('function enableAnchorsTargetSelectors', () => {
             expect(root.querySelector('#target').querySelector('.test-content')).to.not.be.null;
             expect(root.querySelector('#not-the-target').textContent).to.be.equal('this content must not change');
             expect(event.detail.href).to.be.equal('http://localhost:9876/base/test/contents/test-content.html');
+            expect(event.detail.responseStatusCode).to.be.equal(200);
             finish();
         });
     });
