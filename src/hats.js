@@ -1,7 +1,10 @@
-export function enableAnchorsTargetSelectors(rootElement) {
+export function enableAnchorsTargetSelectors(rootElement, beforeLoad = () => { }) {
     const anchors = getAnchors(rootElement);
     anchors.forEach(anchor => {
-        anchor.addEventListener('click', event => onClick(event, anchor, rootElement));
+        anchor.addEventListener('click', event => {
+            beforeLoad(anchor.href);
+            onClick(event, anchor, rootElement);
+        });
     });
 }
 
