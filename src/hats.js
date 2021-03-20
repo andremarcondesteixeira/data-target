@@ -27,16 +27,22 @@ function getTargetElement(anchor, rootElement) {
 }
 
 async function doLoadContent(anchor, targetElement) {
-    const content = await fetchContent(anchor);
-    renderContentInTargetElement(targetElement, content);
+    const response = await fetchContent(anchor);
+    renderContentInTargetElement(targetElement, response.content);
     initialize(targetElement);
-    dispatchContentLoadedEvent(targetElement, { href: anchor.href });
+    dispatchContentLoadedEvent(targetElement, {
+        href: anchor.href,
+        responseStatusCode: response.statusCode
+    });
 }
 
 async function fetchContent(anchor) {
     let response = await fetch(anchor.href);
     const content = await response.text();
-    return content;
+    return {
+        content,
+        statusCode: response.status
+    };
 }
 
 function renderContentInTargetElement(targetElement, html) {
