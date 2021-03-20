@@ -16,11 +16,11 @@ async function tryLoadContent(event, anchor, rootElement) {
     event.preventDefault();
     const targetElement = getTargetElement(anchor, rootElement);
     targetElement
-        ? handleClick(anchor, targetElement)
+        ? doLoadContent(anchor, targetElement)
         : console.error(`No element found with selector: ${anchor.getAttribute('data-target-selector')}`);
 }
 
-async function handleClick(anchor, targetElement) {
+async function doLoadContent(anchor, targetElement) {
     const content = await fetchContent(anchor);
     renderContentInTargetElement(targetElement, content);
     initialize(targetElement);
