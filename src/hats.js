@@ -1,4 +1,4 @@
-export function enableAnchorsTargetSelectors(rootElement, beforeLoad = () => { }) {
+export function initialize(rootElement, beforeLoad = () => { }) {
     const anchors = getAnchors(rootElement);
     anchors.forEach(anchor => {
         anchor.addEventListener('click', event => {
@@ -23,7 +23,7 @@ async function tryLoadContent(event, anchor, rootElement) {
 async function handleClick(anchor, targetElement) {
     const content = await fetchContent(anchor);
     renderContentInTargetElement(targetElement, content);
-    enableAnchorsTargetSelectors(targetElement);
+    initialize(targetElement);
     dispatchContentLoadedEvent(targetElement, { href: anchor.href });
 }
 

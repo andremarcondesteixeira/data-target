@@ -1,4 +1,4 @@
-import { enableAnchorsTargetSelectors } from '../src/hats.js';
+import { initialize } from '../src/hats.js';
 
 describe('function enableAnchorsTargetSelectors', () => {
     it('should replace content inside the first element found by a valid data-target-selector attribute and dispatches a hats:DOMContentLoaded event', () => {
@@ -42,7 +42,7 @@ describe('function enableAnchorsTargetSelectors', () => {
             <a href="/base/test/contents/test-content.html" data-target-selector="#content">anchor</a>
             <div id="content"></div>`;
         let callbackCalled = false;
-        enableAnchorsTargetSelectors(root, () => callbackCalled = true);
+        initialize(root, () => callbackCalled = true);
         root.querySelector('a').click();
         expect(callbackCalled).to.be.true;
     });
@@ -51,7 +51,7 @@ describe('function enableAnchorsTargetSelectors', () => {
         console.error = sinon.fake();
         const root = document.createElement('div');
         root.innerHTML = `<a href="/base/test/contents/test-content.html" data-target-selector="#non-existing-element">anchor</a>`;
-        enableAnchorsTargetSelectors(root);
+        initialize(root);
         root.querySelector('a').click();
         expect(console.error.callCount).to.be.equal(1);
         expect(console.error.firstArg).to.be.equal('No element found with selector: #non-existing-element');
@@ -62,7 +62,7 @@ function doTest(html, testFunction, errorHandler) {
     const rootElement = document.createElement('div');
     rootElement.innerHTML = html;
 
-    enableAnchorsTargetSelectors(rootElement);
+    initialize(rootElement);
 
     return new Promise(resolve => {
         rootElement.addEventListener('hats:DOMContentLoaded', event => {
