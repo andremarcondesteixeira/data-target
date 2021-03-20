@@ -36,6 +36,17 @@ describe('function enableAnchorsTargetSelectors', () => {
         });
     });
 
+    it('should run a callback before trying to load content', () => {
+        const root = document.createElement('div');
+        root.innerHTML = `
+            <a href="/base/test/contents/test-content.html" data-target-selector="#content">anchor</a>
+            <div id="content"></div>`;
+        let callbackCalled = false;
+        enableAnchorsTargetSelectors(root, () => callbackCalled = true);
+        root.querySelector('a').click();
+        expect(callbackCalled).to.be.true;
+    });
+
     it('should throw an error if data-target-selector resolves to no element', () => {
         console.error = sinon.fake();
         const root = document.createElement('div');
