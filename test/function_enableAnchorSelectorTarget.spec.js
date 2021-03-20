@@ -37,6 +37,21 @@ describe('function enableAnchorsTargetSelectors', () => {
         });
     });
 
+    it('should return 404 as responseStatusCode for inexisting pages', () => {
+        const html = `
+            <a href="/base/test/contents/inexisting.html" data-target-selector="#content">anchor</a>
+            <section id="content"></section>`;
+
+        return doTest(html, (finish, root) => {
+            root.querySelector('#content').addEventListener('hats:DOMContentLoaded', event => {
+                expect(event.detail.responseStatusCode).to.be.equal(400);
+                finish();
+            });
+
+            root.querySelector('a').click();
+        });
+    });
+
     it('should run a callback before trying to load content', () => {
         const root = document.createElement('div');
         root.innerHTML = `
