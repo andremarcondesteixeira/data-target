@@ -41,6 +41,7 @@ describe('function enableAnchorsTargetSelectors', () => {
         enableAnchorsTargetSelectors(root);
         root.querySelector('a').click();
         expect(console.error.callCount).to.be.equal(1);
+        expect(console.error.firstArg).to.be.equal('No element found with selector: #non-existing-element -forced-error');
     });
 });
 
