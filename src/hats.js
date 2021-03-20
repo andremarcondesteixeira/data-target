@@ -11,22 +11,32 @@ export function enableAnchorsTargetSelectors(rootElement) {
 
 async function onClick(event, anchor, rootElement) {
     event.preventDefault();
+    const targetElement = getTargetElement(anchor, rootElement);
+    handleClick(anchor, targetElement);
+}
+
+async function handleClick(anchor, targetElement) {
     const content = await fetchContent(anchor);
-    renderContentInTargetElement(rootElement, anchor, content);
+    renderContentInTargetElement(targetElement, content);
+    enableAnchorsTargetSelectors(targetElement);
+    dispatchContentLoadedEvent(targetElement, { href: anchor.href });
+}
+
+function getTargetElement(anchor, rootElement) {
+    const targetSelector = anchor.getAttribute('data-target-selector');
+    const targetElement = rootElement.querySelector(targetSelector);
+    return targetElement;
 }
 
 async function fetchContent(anchor) {
     let response = await fetch(anchor.href);
-    return await response.text();
+    const content = await response.text();
+    return content;
 }
 
-function renderContentInTargetElement(rootElement, anchor, html) {
-    const targetSelector = anchor.getAttribute('data-target-selector');
-    const targetElement = rootElement.querySelector(targetSelector);
+function renderContentInTargetElement(targetElement, html) {
     clearTargetElement(targetElement);
     targetElement.insertAdjacentHTML('afterbegin', html);
-    enableAnchorsTargetSelectors(targetElement);
-    dispatchContentLoadedEvent(targetElement, { href: anchor.href });
 }
 
 function clearTargetElement(targetElement) {
