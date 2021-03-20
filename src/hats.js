@@ -12,7 +12,9 @@ export function enableAnchorsTargetSelectors(rootElement) {
 async function onClick(event, anchor, rootElement) {
     event.preventDefault();
     const targetElement = getTargetElement(anchor, rootElement);
-    handleClick(anchor, targetElement);
+    targetElement
+        ? handleClick(anchor, targetElement)
+        : console.error(`No element found with selector: ${anchor.getAttribute('data-target-selector')}`);
 }
 
 async function handleClick(anchor, targetElement) {
