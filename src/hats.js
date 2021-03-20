@@ -3,7 +3,7 @@ export function enableAnchorsTargetSelectors(rootElement, beforeLoad = () => { }
     anchors.forEach(anchor => {
         anchor.addEventListener('click', event => {
             beforeLoad(anchor.href);
-            onClick(event, anchor, rootElement);
+            tryLoadContent(event, anchor, rootElement);
         });
     });
 }
@@ -12,7 +12,7 @@ export function getAnchors(parent) {
     return parent.querySelectorAll('a[data-target-selector]:not([data-target-selector=""])');
 }
 
-async function onClick(event, anchor, rootElement) {
+async function tryLoadContent(event, anchor, rootElement) {
     event.preventDefault();
     const targetElement = getTargetElement(anchor, rootElement);
     targetElement
