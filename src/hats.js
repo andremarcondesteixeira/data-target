@@ -20,17 +20,17 @@ async function tryLoadContent(event, anchor, rootElement) {
         : console.error(`No element found with selector: ${anchor.getAttribute('data-target-selector')}`);
 }
 
+function getTargetElement(anchor, rootElement) {
+    const targetSelector = anchor.getAttribute('data-target-selector');
+    const targetElement = rootElement.querySelector(targetSelector);
+    return targetElement;
+}
+
 async function doLoadContent(anchor, targetElement) {
     const content = await fetchContent(anchor);
     renderContentInTargetElement(targetElement, content);
     initialize(targetElement);
     dispatchContentLoadedEvent(targetElement, { href: anchor.href });
-}
-
-function getTargetElement(anchor, rootElement) {
-    const targetSelector = anchor.getAttribute('data-target-selector');
-    const targetElement = rootElement.querySelector(targetSelector);
-    return targetElement;
 }
 
 async function fetchContent(anchor) {
