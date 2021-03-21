@@ -1,6 +1,6 @@
 import { initialize } from '../src/hats.js';
 
-describe('function enableAnchorsTargetSelectors', () => {
+describe('function initialize', () => {
     it('should replace content inside the first element found by a valid data-target-selector attribute and dispatches a hats:DOMContentLoaded event', () => {
         const html = `
             <a href="/base/test/contents/test-content.html" data-target-selector="#main .content">anchor</a>
