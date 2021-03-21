@@ -9,10 +9,10 @@ describe('function initialize', () => {
                 <p>This content will be replaced</p>
             </section>`;
 
-        return doTest(html, (finish, root, hati_DOMContentLoaded_event) => {
+        return doTest(html, (finish, root, event) => {
             expect(root.querySelector('#test-content').innerText).to.be.equal('Test content');
-            expect(hati_DOMContentLoaded_event.detail.href).to.be.equal('http://localhost:9876/base/test/contents/test-content.html');
-            expect(hati_DOMContentLoaded_event.detail.responseStatusCode).to.be.equal(200);
+            expect(event.detail.href).to.be.equal('http://localhost:9876/base/test/contents/test-content.html');
+            expect(event.detail.responseStatusCode).to.be.equal(200);
             finish();
         });
     });
