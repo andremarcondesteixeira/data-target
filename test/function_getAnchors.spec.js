@@ -1,10 +1,10 @@
 import { getAnchors } from '../src/hati.js';
 
 describe('function getAnchors', () => {
-    it('should select all anchors with a non-empty data-target-selector attribute', () => {
+    it('should select all anchors with a non-empty data-target-id attribute', () => {
         const html = `
-            <a id="anchor1" href="#" data-target-selector="#someId">anchor 1</a>
-            <a id="anchor2" href="#" data-target-selector=".someClass">anchor 1</a>
+            <a id="anchor1" href="#" data-target-id="#someId">anchor 1</a>
+            <a id="anchor2" href="#" data-target-id=".someClass">anchor 1</a>
         `;
         const expectedIDs = [
             'anchor1',
@@ -20,12 +20,12 @@ describe('function getAnchors', () => {
         expect(expectedIDs.toString()).to.equal(selectedIDs.toString());
     });
 
-    it('should ignore all anchors without or with an empty data-target-selector', () => {
+    it('should ignore all anchors without or with an empty data-target-id', () => {
         const rootElement = document.createElement('div');
         rootElement.innerHTML = `
-            <a id="no-data-target-selector"      href="#"               ></a>
-            <a id="empty-data-target-selector-1" href="#" data-target=""></a>
-            <a id="empty-data-target-selector-2" href="#" data-target   ></a>
+            <a id="no-data-target-id"      href="#"               ></a>
+            <a id="empty-data-target-id-1" href="#" data-target=""></a>
+            <a id="empty-data-target-id-2" href="#" data-target   ></a>
         `;
         const selectedAnchors = getAnchors(rootElement);
         assert.equal(selectedAnchors.length, 0);

@@ -9,7 +9,7 @@ export function initialize(rootElement, beforeLoad = () => { }) {
 }
 
 export function getAnchors(parent) {
-    return parent.querySelectorAll('a[data-target-selector]:not([data-target-selector=""])');
+    return parent.querySelectorAll('a[data-target-id]:not([data-target-id=""])');
 }
 
 async function tryLoadContent(event, anchor, rootElement) {
@@ -17,11 +17,11 @@ async function tryLoadContent(event, anchor, rootElement) {
     const targetElement = getTargetElement(anchor, rootElement);
     targetElement
         ? doLoadContent(anchor, targetElement)
-        : console.error(`No element found with selector: ${anchor.getAttribute('data-target-selector')}`);
+        : console.error(`No element found with selector: ${anchor.getAttribute('data-target-id')}`);
 }
 
 function getTargetElement(anchor, rootElement) {
-    const targetSelector = anchor.getAttribute('data-target-selector');
+    const targetSelector = anchor.getAttribute('data-target-id');
     const targetElement = rootElement.querySelector(targetSelector);
     return targetElement;
 }
