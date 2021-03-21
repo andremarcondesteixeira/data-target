@@ -1,7 +1,7 @@
 import { initialize } from '../src/hati.js';
 
 describe('function initialize', () => {
-    it('should replace content inside the first element found by a valid data-target-selector attribute and dispatches a hats:DOMContentLoaded event', () => {
+    it('should replace content inside the first element found by a valid data-target-selector attribute and dispatches a hati:DOMContentLoaded event', () => {
         const html = `
             <a href="/base/test/contents/test-content.html" data-target-selector="#main .content">anchor</a>
             <main id="main">
@@ -28,7 +28,7 @@ describe('function initialize', () => {
             <section id="content"></section>`;
 
         return doTest(html, (finish, root) => {
-            root.querySelector('#inner-content').addEventListener('hats:DOMContentLoaded', () => {
+            root.querySelector('#inner-content').addEventListener('hati:DOMContentLoaded', () => {
                 expect(root.querySelector('.test-content')).to.not.be.null;
                 finish();
             });
@@ -43,7 +43,7 @@ describe('function initialize', () => {
             <section id="content"></section>`;
 
         return doTest(html, (finish, root) => {
-            root.querySelector('#content').addEventListener('hats:DOMContentLoaded', event => {
+            root.querySelector('#content').addEventListener('hati:DOMContentLoaded', event => {
                 expect(event.detail.responseStatusCode).to.be.equal(404);
                 finish();
             });
@@ -86,7 +86,7 @@ function doTest(html, testFunction, errorHandler) {
     initialize(rootElement);
 
     return new Promise(resolve => {
-        rootElement.addEventListener('hats:DOMContentLoaded', event => {
+        rootElement.addEventListener('hati:DOMContentLoaded', event => {
             const finish = () => resolve();
             testFunction(finish, rootElement, event);
         });

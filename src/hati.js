@@ -57,7 +57,7 @@ function clearTargetElement(targetElement) {
 }
 
 function dispatchContentLoadedEvent(targetElement, detail) {
-    const event = new CustomEvent('hats:DOMContentLoaded', {
+    const event = new CustomEvent('hati:DOMContentLoaded', {
         bubbles: true,
         cancelable: true,
         detail
