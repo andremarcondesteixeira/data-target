@@ -4,12 +4,10 @@ describe('function initialize', () => {
     it('should replace content inside the element which the id is the same as the data-target-id attribute and dispatch a hati:DOMContentLoaded event', () => {
         const html = `
             <a href="/base/test/contents/test-content.html" data-target-id="content">anchor</a>
-            <main id="main">
-                <!-- CONTENT SHOULD BE RENDERED INSIDE THE ELEMENT BELOW -->
-                <section id="content">
-                    <p>This content will be replaced</p>
-                </section>
-            </main>`;
+            <!-- CONTENT SHOULD BE RENDERED INSIDE THE ELEMENT BELOW -->
+            <section id="content">
+                <p>This content will be replaced</p>
+            </section>`;
 
         return doTest(html, (finish, root, hati_DOMContentLoaded_event) => {
             expect(root.querySelector('#test-content').innerText).to.be.equal('Test content');
