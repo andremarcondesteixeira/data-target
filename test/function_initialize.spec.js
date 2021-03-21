@@ -1,23 +1,20 @@
 import { initialize } from '../src/hati.js';
 
 describe('function initialize', () => {
-    it('should replace content inside the first element found by a valid data-target-id attribute and dispatches a hati:DOMContentLoaded event', () => {
+    it('should replace content inside the element which the id is the same as the data-target-id attribute and dispatch a hati:DOMContentLoaded event', () => {
         const html = `
-            <a href="/base/test/contents/test-content.html" data-target-id="#main .content">anchor</a>
+            <a href="/base/test/contents/test-content.html" data-target-id="content">anchor</a>
             <main id="main">
                 <!-- CONTENT SHOULD BE RENDERED INSIDE THE ELEMENT BELOW -->
-                <section class="content" id="target">
+                <section id="content">
                     <p>This content will be replaced</p>
                 </section>
-                <!-- CONTENT SHOULD NOT BE RENDERED IN THE ELEMENT BELOW -->
-                <section class="content" id="not-the-target">this content must not change</section>
             </main>`;
 
-        return doTest(html, (finish, root, event) => {
-            expect(root.querySelector('#target').querySelector('.test-content')).to.not.be.null;
-            expect(root.querySelector('#not-the-target').textContent).to.be.equal('this content must not change');
-            expect(event.detail.href).to.be.equal('http://localhost:9876/base/test/contents/test-content.html');
-            expect(event.detail.responseStatusCode).to.be.equal(200);
+        return doTest(html, (finish, root, hati_DOMContentLoaded_event) => {
+            expect(root.querySelector('#test-content').innerText).to.be.equal('Test content');
+            expect(hati_DOMContentLoaded_event.detail.href).to.be.equal('http://localhost:9876/base/test/contents/test-content.html');
+            expect(hati_DOMContentLoaded_event.detail.responseStatusCode).to.be.equal(200);
             finish();
         });
     });
