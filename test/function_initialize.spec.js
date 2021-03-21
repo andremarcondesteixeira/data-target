@@ -21,12 +21,12 @@ describe('function initialize', () => {
 
     it('should enable data-target-id in nested anchors', () => {
         const html = `
-            <a href="/base/test/contents/nested.html" data-target-id="#content">anchor</a>
+            <a href="/base/test/contents/nested.html" data-target-id="content">anchor</a>
             <section id="content"></section>`;
 
         return doTest(html, (finish, root) => {
             root.querySelector('#inner-content').addEventListener('hati:DOMContentLoaded', () => {
-                expect(root.querySelector('.test-content')).to.not.be.null;
+                expect(root.querySelector('#test-content')).to.not.be.null;
                 finish();
             });
 
@@ -36,7 +36,7 @@ describe('function initialize', () => {
 
     it('should return 404 as responseStatusCode for inexisting pages', () => {
         const html = `
-            <a href="/base/test/contents/inexisting.html" data-target-id="#content">anchor</a>
+            <a href="/base/test/contents/inexisting.html" data-target-id="content">anchor</a>
             <section id="content"></section>`;
 
         return doTest(html, (finish, root) => {
@@ -52,7 +52,7 @@ describe('function initialize', () => {
     it('should run a callback before trying to load content', () => {
         const root = document.createElement('div');
         root.innerHTML = `
-            <a href="/base/test/contents/test-content.html" data-target-id="#content">anchor</a>
+            <a href="/base/test/contents/test-content.html" data-target-id="content">anchor</a>
             <div id="content"></div>`;
         let callbackCalled = false;
         let href;
@@ -68,11 +68,11 @@ describe('function initialize', () => {
     it('should throw an error if data-target-id resolves to no element', () => {
         console.error = sinon.fake();
         const root = document.createElement('div');
-        root.innerHTML = `<a href="/base/test/contents/test-content.html" data-target-id="#non-existing-element">anchor</a>`;
+        root.innerHTML = `<a href="/base/test/contents/test-content.html" data-target-id="non-existing-element">anchor</a>`;
         initialize(root);
         root.querySelector('a').click();
         expect(console.error.callCount).to.be.equal(1);
-        expect(console.error.firstArg).to.be.equal('No element found with selector: #non-existing-element');
+        expect(console.error.firstArg).to.be.equal('No element found with id: non-existing-element');
     });
 });
 
