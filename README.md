@@ -6,6 +6,8 @@ This new property allows you to point to another element which will receive the 
 
 "Hati" means "heart" in indonesian.
 
+!["Hati" means "Heart" in indonesian](https://raw.githubusercontent.com/andremarcondesteixeira/hati/main/heart.svg)
+
 ## Example
 
 ``` html
