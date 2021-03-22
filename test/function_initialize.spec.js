@@ -98,7 +98,7 @@ describe('function initialize', () => {
 
         rootElement.querySelector('a').click();
 
-        expect(window.href).to.be.equal('http://localhost:9876/base/test/contents/test-content.html');
+        expect(location.href).to.be.equal('http://localhost:9876/base/test/contents/test-content.html');
     });
 });
 

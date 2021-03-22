@@ -3,6 +3,7 @@ export function initialize(rootElement) {
     anchors.forEach(anchor => {
         anchor.addEventListener('click', event => {
             dispatchBeforeLoadEvent(anchor);
+            changeUrl(anchor);
             tryLoadContent(event, anchor, rootElement);
         });
     });
@@ -21,6 +22,10 @@ function dispatchBeforeLoadEvent(anchor) {
         }
     });
     anchor.dispatchEvent(event);
+}
+
+function changeUrl(anchor) {
+    history.pushState({}, null, anchor.href);
 }
 
 async function tryLoadContent(event, anchor, rootElement) {
