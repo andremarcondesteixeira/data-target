@@ -15,10 +15,10 @@ This new property allows you to point to another element which will receive the 
 
 The `data-target-id` attribute accepts a string that corresponds to the `id` of another element.
 
-**Error handling**
+## Error handling
 
 If no element is found with the `id` specified in `data-target-id` then the browser's console will show an error message: `no element found with id: ${the id}`
 
-**Note**
+## Note
 
 This is a toy project. I don't advise to use it in production since there are far better ways to implement navigation. I use it in my blog, though :)
