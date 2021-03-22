@@ -66,17 +66,25 @@ describe('function initialize', () => {
         });
     });
 
-    it('should throw an error if data-target-id resolves to no element', () => {
+    it('should log an error in the console and dispatch a hati:error event if data-target-id resolves to no element', () => {
         const rootElement = document.createElement('div');
         rootElement.innerHTML = `<a href="/base/test/contents/test-content.html" data-target-id="non-existing-element">anchor</a>`;
 
         console.error = sinon.fake();
 
         initialize(rootElement);
-        rootElement.querySelector('a').click();
 
-        expect(console.error.callCount).to.be.equal(1);
-        expect(console.error.firstArg).to.be.equal('No element found with id: non-existing-element');
+        return new Promise(resolve => {
+            rootElement.addEventListener('hati:error', event => {
+                expect(event.detail.href).to.be.equal('http://localhost:9876/base/test/contents/test-content.html');
+                expect(event.detail.errorMessage).to.be.equal('No element found with id: non-existing-element');
+                resolve();
+            });
+
+            rootElement.querySelector('a').click();
+            expect(console.error.callCount).to.be.equal(1);
+            expect(console.error.firstArg).to.be.equal('No element found with id: non-existing-element');
+        });
     });
 });
 
