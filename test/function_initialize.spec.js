@@ -78,6 +78,7 @@ describe('function initialize', () => {
             rootElement.addEventListener('hati:error', event => {
                 expect(event.detail.href).to.be.equal('http://localhost:9876/base/test/contents/test-content.html');
                 expect(event.detail.errorMessage).to.be.equal('No element found with id: non-existing-element');
+                expect(event.target).to.be.equal(rootElement.querySelector('a'));
                 resolve();
             });
 

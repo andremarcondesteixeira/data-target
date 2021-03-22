@@ -28,7 +28,7 @@ async function tryLoadContent(event, anchor, rootElement) {
     const targetElement = getTargetElement(anchor, rootElement);
     !!targetElement
         ? doLoadContent(anchor, targetElement)
-        : console.error(`No element found with id: ${anchor.getAttribute('data-target-id')}`);
+        : handleError(anchor);
 }
 
 function getTargetElement(anchor, rootElement) {
@@ -74,4 +74,18 @@ function dispatchContentLoadedEvent(targetElement, detail) {
         detail
     });
     targetElement.dispatchEvent(event);
+}
+
+function handleError(anchor) {
+    const errorMessage = `No element found with id: ${anchor.getAttribute('data-target-id')}`;
+    const event = new CustomEvent('hati:error', {
+        bubbles: true,
+        cancelable: true,
+        detail: {
+            href: anchor.href,
+            errorMessage
+        }
+    });
+    anchor.dispatchEvent(event);
+    return console.error(errorMessage);
 }
