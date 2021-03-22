@@ -9,8 +9,8 @@ describe('function initialize', () => {
                 <p>This content will be replaced</p>
             </section>`;
 
-        return doTest(html, (finish, root, event) => {
-            expect(root.querySelector('#test-content').innerText).to.be.equal('Test content');
+        return doTest(html, (finish, rootElement, event) => {
+            expect(rootElement.querySelector('#test-content').innerText).to.be.equal('Test content');
             expect(event.detail.href).to.be.equal('http://localhost:9876/base/test/contents/test-content.html');
             expect(event.detail.responseStatusCode).to.be.equal(200);
             finish();
@@ -22,13 +22,13 @@ describe('function initialize', () => {
             <a href="/base/test/contents/nested.html" data-target-id="content">anchor</a>
             <section id="content"></section>`;
 
-        return doTest(html, (finish, root) => {
-            root.querySelector('#inner-content').addEventListener('hati:DOMContentLoaded', () => {
-                expect(root.querySelector('#test-content')).to.not.be.null;
+        return doTest(html, (finish, rootElement) => {
+            rootElement.querySelector('#outer-content').addEventListener('hati:DOMContentLoaded', () => {
+                expect(rootElement.querySelector('#test-content').innerText).to.be.equal('Test content');
                 finish();
             });
 
-            root.querySelector('#content a').click();
+            rootElement.querySelector('#content a').click();
         });
     });
 
@@ -37,38 +37,42 @@ describe('function initialize', () => {
             <a href="/base/test/contents/inexisting.html" data-target-id="content">anchor</a>
             <section id="content"></section>`;
 
-        return doTest(html, (finish, root) => {
-            root.querySelector('#content').addEventListener('hati:DOMContentLoaded', event => {
+        return doTest(html, (finish, rootElement) => {
+            rootElement.querySelector('#content').addEventListener('hati:DOMContentLoaded', event => {
                 expect(event.detail.responseStatusCode).to.be.equal(404);
                 finish();
             });
 
-            root.querySelector('a').click();
+            rootElement.querySelector('a').click();
         });
     });
 
     it('should run a callback before trying to load content', () => {
-        const root = document.createElement('div');
-        root.innerHTML = `
+        const rootElement = document.createElement('div');
+        rootElement.innerHTML = `
             <a href="/base/test/contents/test-content.html" data-target-id="content">anchor</a>
             <div id="content"></div>`;
-        let callbackCalled = false;
-        let href;
-        initialize(root, _href => {
+
+        let href, callbackCalled = false;
+        initialize(rootElement, _href => {
             callbackCalled = true;
             href = _href;
         });
-        root.querySelector('a').click();
+        rootElement.querySelector('a').click();
+
         expect(callbackCalled).to.be.true;
         expect(href).to.be.equal('http://localhost:9876/base/test/contents/test-content.html');
     });
 
     it('should throw an error if data-target-id resolves to no element', () => {
+        const rootElement = document.createElement('div');
+        rootElement.innerHTML = `<a href="/base/test/contents/test-content.html" data-target-id="non-existing-element">anchor</a>`;
+
         console.error = sinon.fake();
-        const root = document.createElement('div');
-        root.innerHTML = `<a href="/base/test/contents/test-content.html" data-target-id="non-existing-element">anchor</a>`;
-        initialize(root);
-        root.querySelector('a').click();
+
+        initialize(rootElement);
+        rootElement.querySelector('a').click();
+
         expect(console.error.callCount).to.be.equal(1);
         expect(console.error.firstArg).to.be.equal('No element found with id: non-existing-element');
     });

@@ -15,14 +15,14 @@ export function getAnchors(rootElement) {
 async function tryLoadContent(event, anchor, rootElement) {
     event.preventDefault();
     const targetElement = getTargetElement(anchor, rootElement);
-    targetElement
+    !!targetElement
         ? doLoadContent(anchor, targetElement)
         : console.error(`No element found with id: ${anchor.getAttribute('data-target-id')}`);
 }
 
 function getTargetElement(anchor, rootElement) {
-    const targetSelector = anchor.getAttribute('data-target-id');
-    const targetElement = rootElement.getElementById(targetSelector);
+    const targetElementId = anchor.getAttribute('data-target-id');
+    const targetElement = rootElement.querySelector(`#${targetElementId}`);
     return targetElement;
 }
 
