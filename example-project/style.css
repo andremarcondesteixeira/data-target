@@ -1,0 +1,48 @@
+@import url('https://fonts.googleapis.com/css2?family=Raleway&display=swap');
+
+:root {
+    --gradient: linear-gradient(to right, #00000020, #00000010);
+}
+
+* {
+    border: none;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+a:not(:last-of-type) {
+    margin-right: 1rem;
+}
+
+body {
+    align-items: center;
+    background-color: #eee;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    font-family: Raleway;
+    font-size: 16px;
+    padding: 2rem 10rem;
+}
+
+h1 {
+    margin-bottom: 1rem;
+}
+
+section {
+    background-image: var(--gradient);
+    border-radius: 5px;
+    margin-top: 1rem;
+    min-height: 88px;
+    padding: 1rem;
+}
+
+#content {
+    background-image: url("heart.png"), var(--gradient);
+    background-repeat: no-repeat, no-repeat;
+    background-size: 30%, 100%;
+    background-position: 300px 100px, top left;
+    width: 400px;
+    height: 200px;
+}
