@@ -56,8 +56,8 @@ describe('function initialize', () => {
         initialize(rootElement);
 
         return new Promise(resolve => {
-            rootElement.addEventListener('hats:beforeLoad', event => {
-                expect(event.target).to.be.equal(rootElement.querySelector('#content'));
+            rootElement.addEventListener('hati:beforeLoad', event => {
+                expect(event.target).to.be.equal(rootElement.querySelector('a'));
                 expect(event.detail.href).to.be.equal('http://localhost:9876/base/test/contents/test-content.html');
                 resolve();
             });

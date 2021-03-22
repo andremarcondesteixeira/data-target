@@ -1,8 +1,8 @@
-export function initialize(rootElement, beforeLoad = () => { }) {
+export function initialize(rootElement) {
     const anchors = getAnchors(rootElement);
     anchors.forEach(anchor => {
         anchor.addEventListener('click', event => {
-            beforeLoad(anchor.href);
+            dispatchBeforeLoadEvent(anchor);
             tryLoadContent(event, anchor, rootElement);
         });
     });
@@ -10,6 +10,17 @@ export function initialize(rootElement, beforeLoad = () => { }) {
 
 export function getAnchors(rootElement) {
     return rootElement.querySelectorAll('a[data-target-id]:not([data-target-id=""])');
+}
+
+function dispatchBeforeLoadEvent(anchor) {
+    const event = new CustomEvent('hati:beforeLoad', {
+        bubbles: true,
+        cancelable: true,
+        detail: {
+            href: anchor.href
+        }
+    });
+    anchor.dispatchEvent(event);
 }
 
 async function tryLoadContent(event, anchor, rootElement) {
