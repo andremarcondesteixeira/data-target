@@ -47,21 +47,23 @@ describe('function initialize', () => {
         });
     });
 
-    it('should run a callback before trying to load content', () => {
+    it('should dispatch a hati:beforeLoad event before trying to load content', () => {
         const rootElement = document.createElement('div');
         rootElement.innerHTML = `
             <a href="/base/test/contents/test-content.html" data-target-id="content">anchor</a>
             <div id="content"></div>`;
 
-        let href, callbackCalled = false;
-        initialize(rootElement, _href => {
-            callbackCalled = true;
-            href = _href;
-        });
-        rootElement.querySelector('a').click();
+        initialize(rootElement);
 
-        expect(callbackCalled).to.be.true;
-        expect(href).to.be.equal('http://localhost:9876/base/test/contents/test-content.html');
+        return new Promise(resolve => {
+            rootElement.addEventListener('hats:beforeLoad', event => {
+                expect(event.target).to.be.equal(rootElement.querySelector('#content'));
+                expect(event.detail.href).to.be.equal('http://localhost:9876/base/test/contents/test-content.html');
+                resolve();
+            });
+
+            rootElement.querySelector('a').click();
+        });
     });
 
     it('should throw an error if data-target-id resolves to no element', () => {
