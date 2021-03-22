@@ -87,6 +87,19 @@ describe('function initialize', () => {
             expect(console.error.firstArg).to.be.equal('No element found with id: non-existing-element');
         });
     });
+
+    it('should change the url without a page reload when an anchor is clicked', () => {
+        const rootElement = document.createElement('div');
+        rootElement.innerHTML = `
+            <a href="/base/test/contents/test-content.html" data-target-id="content">anchor</a>
+            <div id="content"></div>`;
+
+        initialize(rootElement);
+
+        rootElement.querySelector('a').click();
+
+        expect(window.href).to.be.equal('http://localhost:9876/base/test/contents/test-content.html');
+    });
 });
 
 function doTest(html, testFunction, errorHandler) {
