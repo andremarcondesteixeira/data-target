@@ -1,9 +1,9 @@
-export function initialize(rootElement) {
+export function initialize(rootElement, options = {}) {
     const anchors = getAnchors(rootElement);
     anchors.forEach(anchor => {
         anchor.addEventListener('click', event => {
             dispatchBeforeLoadEvent(anchor);
-            changeUrl(anchor);
+            changeUrl(anchor, options);
             tryLoadContent(event, anchor, rootElement);
         });
     });
@@ -24,8 +24,9 @@ function dispatchBeforeLoadEvent(anchor) {
     anchor.dispatchEvent(event);
 }
 
-function changeUrl(anchor) {
-    history.pushState({}, null, anchor.href);
+function changeUrl(anchor, options) {
+    const urlBuilder = options.router ?? (href => href);
+    history.pushState({}, null, urlBuilder(anchor.href));
 }
 
 async function tryLoadContent(event, anchor, rootElement) {

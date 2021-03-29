@@ -100,6 +100,22 @@ describe('function initialize', () => {
 
         expect(location.href).to.be.equal('http://localhost:9876/base/test/contents/test-content.html');
     });
+
+    it('should call a provided callback, if it exists, to build the new url when clicking an anchor', () => {
+        const rootElement = document.createElement('div');
+        rootElement.innerHTML = `
+            <a href="/base/test/contents/test-content.html" data-target-id="content">anchor</a>
+            <div id="content"></div>`;
+
+        const router = sinon.spy(href => `${href}-custom`);
+
+        initialize(rootElement, { router });
+
+        rootElement.querySelector('a').click();
+
+        expect(location.href).to.be.equal('http://localhost:9876/base/test/contents/test-content.html-custom');
+        expect(router.callCount).to.be.equal(1);
+    });
 });
 
 function doTest(html, testFunction, errorHandler) {
