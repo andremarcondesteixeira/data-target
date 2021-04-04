@@ -101,28 +101,25 @@ describe('function initialize', () => {
         expect(location.href).to.be.equal('http://localhost:9876/base/test/contents/test-content.html');
     });
 
-    it('should call a provided callback, if it exists, to build the new url when clicking an anchor', () => {
-        const rootElement = document.createElement('div');
-        rootElement.innerHTML = `
-            <a href="/base/test/contents/test-content.html" data-target-id="content">anchor</a>
+    it('should call a provided callback to build the actual url that will load documents based on the anchors href', () => {
+        const html = `
+            <a href="/base/test/contents/test-content" data-target-id="content">anchor</a>
             <div id="content"></div>`;
 
-        const router = sinon.spy(href => `${href}-custom`);
-
-        initialize(rootElement, { router });
-
-        rootElement.querySelector('a').click();
-
-        expect(location.href).to.be.equal('http://localhost:9876/base/test/contents/test-content.html-custom');
-        expect(router.callCount).to.be.equal(1);
+        return doTest(html, (finish, rootElement) => {
+            expect(rootElement.querySelector('#test-content').innerText).to.be.equal('Test content');
+            expect(location.href).to.be.equal('http://localhost:9876/base/test/contents/test-content');
+            expect(router.callCount).to.be.equal(1);
+            finish();
+        }, null, { router: sinon.spy(href => `${href}.html`) });
     });
 });
 
-function doTest(html, testFunction, errorHandler) {
+function doTest(html, testFunction, errorHandler, options) {
     const rootElement = document.createElement('div');
     rootElement.innerHTML = html;
 
-    initialize(rootElement);
+    initialize(rootElement, options);
 
     return new Promise(resolve => {
         rootElement.addEventListener('hati:DOMContentLoaded', event => {
