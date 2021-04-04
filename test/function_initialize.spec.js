@@ -105,13 +105,14 @@ describe('function initialize', () => {
         const html = `
             <a href="/base/test/contents/test-content" data-target-id="content">anchor</a>
             <div id="content"></div>`;
+        const router = sinon.spy(href => `${href}.html`);
 
         return doTest(html, (finish, rootElement) => {
             expect(rootElement.querySelector('#test-content').innerText).to.be.equal('Test content');
             expect(location.href).to.be.equal('http://localhost:9876/base/test/contents/test-content');
             expect(router.callCount).to.be.equal(1);
             finish();
-        }, null, { router: sinon.spy(href => `${href}.html`) });
+        }, null, { router });
     });
 });
 
@@ -119,7 +120,7 @@ function doTest(html, testFunction, errorHandler, options) {
     const rootElement = document.createElement('div');
     rootElement.innerHTML = html;
 
-    initialize(rootElement, options);
+    initialize(rootElement, options ?? {});
 
     return new Promise(resolve => {
         rootElement.addEventListener('hati:DOMContentLoaded', event => {

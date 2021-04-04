@@ -1,10 +1,10 @@
-export function initialize(rootElement, options = {}) {
+export function initialize(rootElement, options) {
     const anchors = getAnchors(rootElement);
     anchors.forEach(anchor => {
         anchor.addEventListener('click', event => {
             dispatchBeforeLoadEvent(anchor);
-            changeUrl(anchor, options);
-            tryLoadContent(event, anchor, rootElement);
+            history.pushState({}, null, anchor.href);
+            tryLoadContent(event, anchor, rootElement, options ?? {});
         });
     });
 }
@@ -24,16 +24,11 @@ function dispatchBeforeLoadEvent(anchor) {
     anchor.dispatchEvent(event);
 }
 
-function changeUrl(anchor, options) {
-    const urlBuilder = options.router ?? (href => href);
-    history.pushState({}, null, urlBuilder(anchor.href));
-}
-
-async function tryLoadContent(event, anchor, rootElement) {
+async function tryLoadContent(event, anchor, rootElement, options) {
     event.preventDefault();
     const targetElement = getTargetElement(anchor, rootElement);
     !!targetElement
-        ? doLoadContent(anchor, targetElement)
+        ? doLoadContent(anchor, targetElement, options)
         : handleError(anchor);
 }
 
@@ -43,8 +38,9 @@ function getTargetElement(anchor, rootElement) {
     return targetElement;
 }
 
-async function doLoadContent(anchor, targetElement) {
-    const response = await fetchContent(anchor);
+async function doLoadContent(anchor, targetElement, options) {
+    const href = options?.router ? options.router(anchor.href) : anchor.href;
+    const response = await fetchContent(href);
     renderContentInTargetElement(targetElement, response.content);
     initialize(targetElement);
     dispatchContentLoadedEvent(targetElement, {
@@ -53,8 +49,8 @@ async function doLoadContent(anchor, targetElement) {
     });
 }
 
-async function fetchContent(anchor) {
-    let response = await fetch(anchor.href);
+async function fetchContent(href) {
+    let response = await fetch(href);
     const content = await response.text();
     return {
         content,
