@@ -89,5 +89,5 @@ function handleError(anchor) {
         }
     });
     anchor.dispatchEvent(event);
-    return console.error(errorMessage);
+    console.error(errorMessage);
 }
