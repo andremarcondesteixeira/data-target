@@ -4,7 +4,7 @@ export function initialize(rootElement, options) {
         anchor.addEventListener('click', event => {
             dispatchBeforeLoadEvent(anchor);
             history.pushState({}, null, anchor.href);
-            tryLoadContent(event, anchor, rootElement, options ?? {});
+            tryLoadContent(event, anchor, rootElement, options);
         });
     });
 }
