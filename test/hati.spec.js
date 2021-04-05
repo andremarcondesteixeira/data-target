@@ -1,6 +1,6 @@
-import { initialize } from '../src/hati.js';
+import hati from '../src/hati.js';
 
-describe('function initialize', () => {
+describe('hati', () => {
     it('should replace content inside the element which the id is the same as the data-target-id attribute and dispatch a hati:DOMContentLoaded event', () => {
         const html = `
             <a href="/base/test/contents/test-content.html" data-target-id="content">anchor</a>
@@ -53,7 +53,7 @@ describe('function initialize', () => {
             <a href="/base/test/contents/test-content.html" data-target-id="content">anchor</a>
             <div id="content"></div>`;
 
-        initialize({ root });
+        hati({ root });
 
         return new Promise(resolve => {
             root.addEventListener('hati:beforeLoad', event => {
@@ -72,7 +72,7 @@ describe('function initialize', () => {
 
         console.error = sinon.fake();
 
-        initialize({ root });
+        hati({ root });
 
         return new Promise(resolve => {
             root.addEventListener('hati:error', event => {
@@ -94,7 +94,7 @@ describe('function initialize', () => {
             <a href="/base/test/contents/test-content.html" data-target-id="content">anchor</a>
             <div id="content"></div>`;
 
-        initialize({ root });
+        hati({ root });
 
         root.querySelector('a').click();
 
@@ -122,7 +122,7 @@ function doTest(html, testFunction, errorHandler, config) {
     const root = document.createElement('div');
     root.innerHTML = html;
 
-    initialize({ root, ...config });
+    hati({ root, ...config });
 
     return new Promise(resolve => {
         root.addEventListener('hati:DOMContentLoaded', event => {

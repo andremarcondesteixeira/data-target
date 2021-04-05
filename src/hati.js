@@ -1,5 +1,5 @@
-export function initialize(config) {
-    const anchors = getAnchors(config.root);
+export default function hati(config) {
+    const anchors = config.root.querySelectorAll('a[data-target-id]:not([data-target-id=""])');
     anchors.forEach(a => a.addEventListener('click', handleClick));
 
     function handleClick(event) {
@@ -37,7 +37,7 @@ export function initialize(config) {
         const href = config?.router ? config.router(anchor.href) : anchor.href;
         const response = await fetchContent(href);
         renderContentInTargetElement(targetElement, response.content);
-        initialize({ ...config, root: targetElement });
+        hati({ ...config, root: targetElement });
         dispatchContentLoadedEvent(targetElement, {
             href: anchor.href,
             responseStatusCode: response.statusCode
@@ -81,8 +81,4 @@ export function initialize(config) {
         anchor.dispatchEvent(event);
         console.error(errorMessage);
     }
-}
-
-export function getAnchors(root) {
-    return root.querySelectorAll('a[data-target-id]:not([data-target-id=""])');
 }

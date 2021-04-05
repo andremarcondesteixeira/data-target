@@ -5,7 +5,7 @@
         <title>HATI example project</title>
         <link rel="stylesheet" href="style.css" />
         <script type="module">
-            import { initialize } from './hati.min.js';
+            import hati from './hati.min.js';
 
             window.addEventListener('hati:DOMContentLoaded', event => {
                 console.log(event);
@@ -19,7 +19,8 @@
                 console.log(event);
             });
 
-            initialize(document, {
+            hati({
+                root: document,
                 router: href => `${href}.html`
             });
         </script>
