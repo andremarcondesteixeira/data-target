@@ -1,6 +1,10 @@
 export default function hati(config) {
-    const anchors = config.root.querySelectorAll('a[data-target-id]:not([data-target-id=""])');
-    anchors.forEach(a => a.addEventListener('click', handleClick));
+    const router = config?.router ?? (url => url);
+
+    config
+        .root
+        .querySelectorAll('a[data-target-id]:not([data-target-id=""])')
+        .forEach(a => a.addEventListener('click', handleClick));
 
     function handleClick(event) {
         dispatchBeforeLoadEvent(event.target);
@@ -34,8 +38,8 @@ export default function hati(config) {
     }
 
     async function doLoadContent(anchor, targetElement) {
-        const href = config?.router ? config.router(anchor.href) : anchor.href;
-        const response = await fetchContent(href);
+        const url = router(anchor.href);
+        const response = await fetchContent(url);
         renderContentInTargetElement(targetElement, response.content);
         hati({ ...config, root: targetElement });
         dispatchContentLoadedEvent(targetElement, {
