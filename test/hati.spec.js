@@ -42,6 +42,20 @@ describe('hati', () => {
         });
     });
 
+    it('should be able to target an element upper in the DOM tree', () => {
+        return doTest({
+            html: `
+                <a href="/base/test/contents/nested-targeting-to-upper.html" data-target-id="content">anchor</a>
+                <section id="content"></section>
+                <section id="upper"><section>
+            `,
+            hatiDOMContentLoadedEventhandler: ({ finish, root }) => {
+                expect(root.querySelector('#upper').innerText).to.be.equal('Test content');
+                finish();
+            }
+        });
+    });
+
     it('should return 404 as responseStatusCode for inexisting pages', () => {
         return doTest({
             html: `
