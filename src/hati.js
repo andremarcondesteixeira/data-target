@@ -7,8 +7,8 @@ export default function hati(config) {
         .forEach(a => a.addEventListener('click', handleClick));
 
     function handleClick(event) {
-        dispatchBeforeLoadEvent(event.target);
         history.pushState({}, null, event.target.href);
+        dispatchBeforeLoadEvent(event.target);
         tryLoadContent(event);
     }
 
@@ -82,7 +82,7 @@ export default function hati(config) {
                 errorMessage
             }
         });
-        anchor.dispatchEvent(event);
         console.error(errorMessage);
+        anchor.dispatchEvent(event);
     }
 }
