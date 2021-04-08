@@ -1,9 +1,9 @@
 import hati from '../src/hati.js';
 
 describe('hati', () => {
-    let historyPushStateCalls = [];
+    let lastUrlPassedToHistoryPushState;
     history.pushState = function (...args) {
-        historyPushStateCalls.push(args[2]);
+        lastUrlPassedToHistoryPushState = args[2];
     };
 
     it('should replace content inside the element which the id is the same as the data-target-id attribute and dispatch a hati:DOMContentLoaded event', () => {
@@ -18,7 +18,7 @@ describe('hati', () => {
             hatiDOMContentLoadedEventhandler: ({ finish, root, event }) => {
                 expect(root.querySelector('#test-content').innerText).to.be.equal('Test content');
                 const expectedUrl = 'http://localhost:9876/base/test/contents/test-content.html';
-                expect(historyPushStateCalls.pop()).to.be.equal(expectedUrl);
+                expect(lastUrlPassedToHistoryPushState).to.be.equal(expectedUrl);
                 expect(event.detail.responseStatusCode).to.be.equal(200);
                 finish();
             }
@@ -63,7 +63,7 @@ describe('hati', () => {
             `,
             hatiBeforeLoadEventHandler: ({ finish }) => {
                 const expectedUrl = 'http://localhost:9876/base/test/contents/test-content.html';
-                expect(historyPushStateCalls.pop()).to.be.equal(expectedUrl);
+                expect(lastUrlPassedToHistoryPushState).to.be.equal(expectedUrl);
                 finish();
             }
         });
@@ -75,7 +75,7 @@ describe('hati', () => {
             html: `<a href="/base/test/contents/test-content.html" data-target-id="non-existing-element">anchor</a>`,
             hatiBeforeLoadEventHandler: ({ finish }) => {
                 const expectedUrl = 'http://localhost:9876/base/test/contents/test-content.html';
-                expect(historyPushStateCalls.pop()).to.be.equal(expectedUrl);
+                expect(lastUrlPassedToHistoryPushState).to.be.equal(expectedUrl);
                 finish();
             },
             hatiErrorEventHandler: ({ finish, event }) => {
@@ -96,7 +96,7 @@ describe('hati', () => {
             `,
             hatiBeforeLoadEventHandler: ({ finish }) => {
                 const expectedUrl = 'http://localhost:9876/base/test/contents/test-content.html';
-                expect(historyPushStateCalls.pop()).to.be.equal(expectedUrl);
+                expect(lastUrlPassedToHistoryPushState).to.be.equal(expectedUrl);
                 finish();
             }
         });
@@ -111,7 +111,7 @@ describe('hati', () => {
             `,
             hatiBeforeLoadEventHandler: ({ finish }) => {
                 const expectedUrl = 'http://localhost:9876/base/test/contents/test-content';
-                expect(historyPushStateCalls.pop()).to.be.equal(expectedUrl);
+                expect(lastUrlPassedToHistoryPushState).to.be.equal(expectedUrl);
                 finish();
             },
             hatiDOMContentLoadedEventhandler: ({ finish, root }) => {
