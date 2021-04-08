@@ -1,10 +1,13 @@
 export default function hati(config) {
     const router = config?.router ?? (url => url);
 
-    config
-        .root
-        .querySelectorAll('a[data-target-id]:not([data-target-id=""])')
-        .forEach(a => a.addEventListener('click', handleClick));
+    addClickListeners(config.root);
+
+    function addClickListeners(root) {
+        root
+            .querySelectorAll('a[data-target-id]:not([data-target-id=""])')
+            .forEach(a => a.addEventListener('click', handleClick));
+    }
 
     function handleClick(event) {
         history.pushState({}, null, event.target.href);
@@ -41,7 +44,7 @@ export default function hati(config) {
         const url = router(anchor.href);
         const response = await fetchContent(url);
         renderContentInTargetElement(targetElement, response.content);
-        hati({ ...config, root: targetElement });
+        addClickListeners(targetElement);
         dispatchContentLoadedEvent(targetElement, {
             href: anchor.href,
             responseStatusCode: response.statusCode

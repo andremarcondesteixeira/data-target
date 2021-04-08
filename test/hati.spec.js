@@ -25,20 +25,29 @@ describe('hati', () => {
         });
     });
 
-    it('should enable data-target-id in nested anchors', () => {
+    xit('should enable data-target-id in nested anchors', () => {
         return doTest({
             html: `
                 <a href="/base/test/contents/nested.html" data-target-id="content">anchor</a>
                 <section id="content"></section>
             `,
+            eventTargetAssertionGenerators: {
+                hatiBeforeLoad: function* (root) {
+                    yield root.querySelector('a');
+                    yield root.querySelector('#content a');
+                },
+                hatiDOMContentLoaded: function* (root) {
+                    yield root.querySelector('#content');
+                    yield root.querySelector('#outer-content')
+                }
+            },
             hatiDOMContentLoadedEventhandler: ({ finish, root }) => {
                 root.querySelector('#outer-content').addEventListener('hati:DOMContentLoaded', () => {
                     expect(root.querySelector('#test-content').innerText).to.be.equal('Test content');
                     finish();
                 });
                 root.querySelector('#content a').click();
-            },
-            skipEventTargetAssertions: true
+            }
         });
     });
 
@@ -49,9 +58,22 @@ describe('hati', () => {
                 <section id="content"></section>
                 <section id="upper"><section>
             `,
+            eventTargetAssertionGenerators: {
+                hatiBeforeLoad: function* (root) {
+                    yield root.querySelector('a');
+                    yield root.querySelector('#content a');
+                },
+                hatiDOMContentLoaded: function* (root) {
+                    yield root.querySelector('#content');
+                    yield root.querySelector('#upper')
+                }
+            },
             hatiDOMContentLoadedEventhandler: ({ finish, root }) => {
-                expect(root.querySelector('#upper').innerText).to.be.equal('Test content');
-                finish();
+                root.querySelector('#upper').addEventListener('hati:DOMContentLoaded', () => {
+                    expect(root.querySelector('#upper #test-content').innerText).to.be.equal('Test content');
+                    finish();
+                });
+                root.querySelector('#content a').click();
             }
         });
     });
@@ -71,7 +93,7 @@ describe('hati', () => {
 
     it('should dispatch a hati:beforeLoad event before trying to load content', () => {
         return doTest({
-            html:  `
+            html: `
                 <a href="/base/test/contents/test-content.html" data-target-id="content">anchor</a>
                 <div id="content"></div>
             `,
@@ -139,16 +161,38 @@ describe('hati', () => {
 });
 
 function doTest({
-    html,
+    config,
+    errorHandler,
+    eventTargetAssertionGenerators,
     hatiBeforeLoadEventHandler,
     hatiDOMContentLoadedEventhandler,
     hatiErrorEventHandler,
-    errorHandler,
-    config,
-    skipEventTargetAssertions
+    html,
 }) {
     const root = document.createElement('div');
     root.innerHTML = html;
+
+    const hatiBeforeLoadEventTargetAssertionGenerator = (
+        eventTargetAssertionGenerators?.hatiBeforeLoad ??
+        function* (root) {
+            yield root.querySelector('a');
+        }
+    )(root);
+
+    const hatiDOMContentLoadedEventTargetAssertionGenerator = (
+        eventTargetAssertionGenerators?.hatiDOMContentLoaded ??
+        function* (root) {
+            const targetId = root.querySelector('a').getAttribute('data-target-id');
+            yield root.querySelector(`#${targetId}`);
+        }
+    )(root);
+
+    const hatiErrorEventTargetAssertionGenerator = (
+        eventTargetAssertionGenerators?.hatiError ??
+        function* (root) {
+            yield root.querySelector('a');
+        }
+    )(root);
 
     hati({ root, ...config });
 
@@ -160,29 +204,24 @@ function doTest({
         };
 
         root.addEventListener('hati:beforeLoad', event => {
-            if (!skipEventTargetAssertions) {
-                expect(event.target).to.be.equal(root.querySelector('a'));
-            }
+            const generator = hatiBeforeLoadEventTargetAssertionGenerator;
+            expect(event.target).to.be.equal(generator.next().value);
             if (typeof hatiBeforeLoadEventHandler === 'function') {
                 hatiBeforeLoadEventHandler({ finish, root, event });
             } else finish();
         });
 
         root.addEventListener('hati:error', event => {
-            if (!skipEventTargetAssertions) {
-                expect(event.target).to.be.equal(root.querySelector('a'));
-            }
+            const generator = hatiErrorEventTargetAssertionGenerator;
+            expect(event.target).to.be.equal(generator.next().value);
             if (typeof hatiErrorEventHandler === 'function') {
                 hatiErrorEventHandler({ finish, root, event });
             } else finish();
         });
 
         root.addEventListener('hati:DOMContentLoaded', event => {
-            if (!skipEventTargetAssertions) {
-                const targetId = root.querySelector('a').getAttribute('data-target-id');
-                const targetElement = root.querySelector(`#${targetId}`);
-                expect(event.target).to.be.equal(targetElement);
-            }
+            const generator = hatiDOMContentLoadedEventTargetAssertionGenerator;
+            expect(event.target).to.be.equal(generator.next().value);
             if (typeof hatiDOMContentLoadedEventhandler === 'function') {
                 hatiDOMContentLoadedEventhandler({ finish, root, event });
             } else finish();
