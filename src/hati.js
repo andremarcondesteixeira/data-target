@@ -20,7 +20,11 @@ export default function hati(config) {
             bubbles: true,
             cancelable: true,
             detail: {
-                href: anchor.href
+                href: anchor.href,
+                matchUrl: (regex, callback) => {
+                    if (regex.test(anchor.href))
+                        callback();
+                }
             }
         });
         anchor.dispatchEvent(event);
@@ -70,7 +74,13 @@ export default function hati(config) {
         const event = new CustomEvent('hati:DOMContentLoaded', {
             bubbles: true,
             cancelable: true,
-            detail
+            detail: {
+                ...detail,
+                matchUrl: (regex, callback) => {
+                    if (regex.test(detail.href))
+                        callback();
+                }
+            }
         });
         targetElement.dispatchEvent(event);
     }
@@ -82,7 +92,11 @@ export default function hati(config) {
             cancelable: true,
             detail: {
                 href: anchor.href,
-                errorMessage
+                errorMessage,
+                matchUrl: (regex, callback) => {
+                    if (regex.test(anchor.href))
+                        callback();
+                }
             }
         });
         console.error(errorMessage);

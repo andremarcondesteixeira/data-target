@@ -20,7 +20,7 @@ module.exports = function (config) {
             pattern: 'test/**/*.spec.js',
             type: 'module'
         }, {
-            pattern: 'test/contents/*.html'
+            pattern: 'test/contents/**/*.html'
         }],
 
 
