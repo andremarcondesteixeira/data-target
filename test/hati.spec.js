@@ -10,6 +10,23 @@ describe('hati', () => {
     });
 });
 
+function createRoot() {
+    const root = document.createElement('div');
+    root.innerHTML = `
+        <a href="/base/test/contents/page1" id="anchor1" data-target-id="content">Page 1</a>
+        <a href="/base/test/contents/page3" id="anchor2" data-target-id="inexistent-section">Page 2 to inexistent section</a>
+        <a href="/base/test/contents/inexistent" id="error404Anchor" data-target-id="content">Page 2</a>
+        <nav data-anchors-target-id="content">
+            <a href="/base/test/contents/page4" id="anchor4">Page 4</a>
+            <a href="/base/test/contents/page5" id="anchor5">Page 5</a>
+            <a href="/base/test/contents/page6" id="anchor6" data-target-id="content-2">Page 6</a>
+        </nav>
+        <div id="content"></div>
+        <div id="content-2"></div>
+    `;
+    return root;
+}
+
 function doTest(root, resolve) {
     hati({
         root,
@@ -126,21 +143,4 @@ function doTest(root, resolve) {
     });
 
     root.querySelector('#anchor1').click();
-}
-
-function createRoot() {
-    const root = document.createElement('div');
-    root.innerHTML = `
-        <a href="/base/test/contents/page1" id="anchor1" data-target-id="content">Page 1</a>
-        <a href="/base/test/contents/page3" id="anchor2" data-target-id="inexistent-section">Page 2 to inexistent section</a>
-        <a href="/base/test/contents/inexistent" id="error404Anchor" data-target-id="content">Page 2</a>
-        <nav data-anchors-target-id="content">
-            <a href="/base/test/contents/page4" id="anchor4">Page 4</a>
-            <a href="/base/test/contents/page5" id="anchor5">Page 5</a>
-            <a href="/base/test/contents/page6" id="anchor6" data-target-id="content-2">Page 6</a>
-        </nav>
-        <div id="content"></div>
-        <div id="content-2"></div>
-    `;
-    return root;
 }
