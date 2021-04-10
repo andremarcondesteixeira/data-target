@@ -1,9 +1,9 @@
-export default function hati(config) {
+export default function hati(root, config) {
     const router = config?.router ?? (url => url);
 
-    addClickListeners(config.root);
+    addClickListeners();
 
-    function addClickListeners(root) {
+    function addClickListeners() {
         root.querySelectorAll('a[data-target-id]:not([data-target-id=""])')
             .forEach(a => a.addEventListener('click', handleClick));
 
@@ -49,7 +49,7 @@ export default function hati(config) {
 
     function getTargetElement(anchor) {
         const targetElementId = anchor.getAttribute('data-target-id');
-        const targetElement = config.root.querySelector(`#${targetElementId}`);
+        const targetElement = root.querySelector(`#${targetElementId}`);
         return targetElement;
     }
 
