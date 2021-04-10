@@ -4,9 +4,18 @@ export default function hati(config) {
     addClickListeners(config.root);
 
     function addClickListeners(root) {
-        root
-            .querySelectorAll('a[data-target-id]:not([data-target-id=""])')
+        root.querySelectorAll('a[data-target-id]:not([data-target-id=""])')
             .forEach(a => a.addEventListener('click', handleClick));
+
+        root.querySelectorAll('[data-anchors-target-id]:not([data-anchors-target-id=""])')
+            .forEach(node => {
+                node.querySelectorAll('a:not([data-target-id])')
+                    .forEach(a => {
+                        const dataAnchorsTargetId = node.getAttribute('data-anchors-target-id');
+                        a.setAttribute('data-target-id', dataAnchorsTargetId);
+                        a.addEventListener('click', handleClick);
+                    });
+            });
     }
 
     function handleClick(event) {
