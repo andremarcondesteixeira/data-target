@@ -2,6 +2,7 @@ export default function hati(root, config) {
     const router = config?.router ?? (url => url);
 
     addClickListeners();
+    clickOnInitialLink();
 
     function addClickListeners() {
         root.querySelectorAll('a[data-target-id]:not([data-target-id=""])')
@@ -16,6 +17,10 @@ export default function hati(root, config) {
                         a.addEventListener('click', handleClick);
                     });
             });
+    }
+
+    function clickOnInitialLink() {
+        root.querySelector('a[data-init]')?.click();
     }
 
     function handleClick(event) {
