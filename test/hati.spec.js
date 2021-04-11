@@ -34,6 +34,8 @@ function testWithoutDataInitWithRouter(finish) {
     hati(root, {
         router: href => `${href}.html`
     });
+    const anchor = root.querySelector('#anchor1');
+    anchor.click();
 }
 
 function testWithDataInitAndRouter(finish) {
