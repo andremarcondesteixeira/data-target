@@ -4,10 +4,10 @@ describe('hati', () => {
     it('should work', () => {
         return new Promise(resolve => {
             const root = createRoot();
+            prepareTest(root, resolve);
             hati(root, {
                 router: href => `${href}.html`
             });
-            doTest(root, resolve);
         });
     });
 });
@@ -15,7 +15,7 @@ describe('hati', () => {
 function createRoot() {
     const root = document.createElement('div');
     root.innerHTML = `
-        <a href="/base/test/contents/page1" id="anchor1" data-target-id="content">Page 1</a>
+        <a href="/base/test/contents/page1" id="anchor1" data-target-id="content" data-init>Page 1</a>
         <a href="/base/test/contents/page3" id="anchor2" data-target-id="inexistent-section">Page 2 to inexistent section</a>
         <a href="/base/test/contents/inexistent" id="error404Anchor" data-target-id="content">Page 2</a>
         <nav data-anchors-target-id="content">
@@ -29,7 +29,7 @@ function createRoot() {
     return root;
 }
 
-function doTest(root, resolve) {
+function prepareTest(root, resolve) {
     root.addEventListener('hati:beforeLoad', event => {
         event.detail.matchUrl(/^.*\/page1$/, () => {
             expect(event.detail.href).to.be.equal(`http://localhost:9876/base/test/contents/page1`);
@@ -138,6 +138,4 @@ function doTest(root, resolve) {
             root.querySelector('#error404Anchor').click();
         });
     });
-
-    root.querySelector('#anchor1').click();
 }
