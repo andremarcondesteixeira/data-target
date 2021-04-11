@@ -29,7 +29,7 @@ function createRoot() {
     return root;
 }
 
-function doTest(root, resolve, urlSuffix = '') {
+function doTest(root, resolve) {
     root.addEventListener('hati:beforeLoad', event => {
         event.detail.matchUrl(/^.*\/page1$/, () => {
             expect(event.detail.href).to.be.equal(`http://localhost:9876/base/test/contents/page1`);
