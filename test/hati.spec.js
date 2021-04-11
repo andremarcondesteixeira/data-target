@@ -96,7 +96,7 @@ function prepareTest(root, resolve, urlSuffix = '') {
     root.addEventListener('hati:beforeLoad', event => {
         event.detail.matchUrl(new RegExp(`^.+\/page1${regexSuffix(urlSuffix)}$`), () => {
             amountOfTestsRunned++;
-            expect(amountOfTestsRunned, 'saporra').to.be.equal(1);
+            expect(amountOfTestsRunned).to.be.equal(1);
             let url = `http://localhost:9876/base/test/contents/page1${assertionSuffix(urlSuffix)}`;
             expect(event.detail.href).to.be.equal(url);
             expect(event.target).to.be.equal(root.querySelector('#anchor1'));
