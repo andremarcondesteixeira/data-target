@@ -81,7 +81,7 @@ export default function hati(root, config) {
             detail: {
                 ...detail,
                 matchUrl: (regex, callback) => {
-                    if (regex.test(detail.href))
+                    if (regex.test(detail.url))
                         callback();
                 }
             }
