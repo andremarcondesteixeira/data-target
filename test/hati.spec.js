@@ -93,78 +93,12 @@ function createRootWithoutDataInit(urlSuffix = '') {
 function prepareTest(root, resolve, urlSuffix = '') {
     let amountOfTestsRunned = 0;
 
-    root.addEventListener('hati:beforeLoad', event => {
+    root.addEventListener('hati:DOMContentLoaded', event => {
         event.detail.matchUrl(new RegExp(`^.+\/page1${regexSuffix(urlSuffix)}$`), () => {
             amountOfTestsRunned++;
             expect(amountOfTestsRunned).to.be.equal(1);
             let url = `http://localhost:9876/base/test/contents/page1${assertionSuffix(urlSuffix)}`;
-            expect(event.detail.href).to.be.equal(url);
-            expect(event.target).to.be.equal(root.querySelector('#anchor1'));
-        });
-
-        event.detail.matchUrl(new RegExp(`^.+\/page1\/page1-2${regexSuffix(urlSuffix)}$`), () => {
-            amountOfTestsRunned++;
-            expect(amountOfTestsRunned).to.be.equal(3);
-            let url = `http://localhost:9876/base/test/contents/page1/page1-2${assertionSuffix(urlSuffix)}`;
-            expect(event.detail.href).to.be.equal(url);
-            expect(event.target).to.be.equal(root.querySelector('#content a'));
-        });
-
-        event.detail.matchUrl(new RegExp(`^.+\/page2${urlSuffixRegex(urlSuffix)}$`), () => {
-            amountOfTestsRunned++;
-            expect(amountOfTestsRunned).to.be.equal(5);
-            let url = `http://localhost:9876/base/test/contents/page2${urlSuffix}`;
-            expect(event.detail.href).to.be.equal(url);
-            expect(event.target).to.be.equal(root.querySelector('#page-1-subcontent a'));
-        });
-
-        event.detail.matchUrl(new RegExp(`^.+\/page3${urlSuffixRegex(urlSuffix)}$`), () => {
-            amountOfTestsRunned++;
-            expect(amountOfTestsRunned).to.be.equal(7);
-            let url = `http://localhost:9876/base/test/contents/page3${urlSuffix}`;
-            expect(event.detail.href).to.be.equal(url);
-            expect(event.target).to.be.equal(root.querySelector('#anchor3'));
-        });
-
-        event.detail.matchUrl(new RegExp(`^.+\/inexistent${urlSuffixRegex(urlSuffix)}$`), () => {
-            amountOfTestsRunned++;
-            expect(amountOfTestsRunned).to.be.equal(9);
-            let url = `http://localhost:9876/base/test/contents/inexistent${urlSuffix}`;
-            expect(event.detail.href).to.be.equal(url);
-            expect(event.target).to.be.equal(root.querySelector('#error404Anchor'));
-        });
-
-        event.detail.matchUrl(new RegExp(`^.+\/page4${urlSuffixRegex(urlSuffix)}$`), () => {
-            amountOfTestsRunned++;
-            expect(amountOfTestsRunned).to.be.equal(11);
-            let url = `http://localhost:9876/base/test/contents/page4${urlSuffix}`;
-            expect(event.detail.href).to.be.equal(url);
-            expect(event.target).to.be.equal(root.querySelector('#anchor4'));
-        });
-
-        event.detail.matchUrl(new RegExp(`^.+\/page5${urlSuffixRegex(urlSuffix)}$`), () => {
-            amountOfTestsRunned++;
-            expect(amountOfTestsRunned).to.be.equal(13);
-            let url = `http://localhost:9876/base/test/contents/page5${urlSuffix}`;
-            expect(event.detail.href).to.be.equal(url);
-            expect(event.target).to.be.equal(root.querySelector('#anchor5'));
-        });
-
-        event.detail.matchUrl(new RegExp(`^.+\/page6${urlSuffixRegex(urlSuffix)}$`), () => {
-            amountOfTestsRunned++;
-            expect(amountOfTestsRunned).to.be.equal(15);
-            let url = `http://localhost:9876/base/test/contents/page6${urlSuffix}`;
-            expect(event.detail.href).to.be.equal(url);
-            expect(event.target).to.be.equal(root.querySelector('#anchor6'));
-        });
-    });
-
-    root.addEventListener('hati:DOMContentLoaded', event => {
-        event.detail.matchUrl(new RegExp(`^.+\/page1${regexSuffix(urlSuffix)}$`), () => {
-            amountOfTestsRunned++;
-            expect(amountOfTestsRunned).to.be.equal(2);
-            let url = `http://localhost:9876/base/test/contents/page1${assertionSuffix(urlSuffix)}`;
-            expect(event.detail.href).to.be.equal(url);
+            expect(event.detail.url).to.be.equal(url);
             expect(event.target).to.be.equal(root.querySelector('#content'));
             expect(event.detail.responseStatusCode).to.be.equal(200);
             expect(root.querySelector('#content .content').innerText).to.be.equal('page 1');
@@ -173,9 +107,9 @@ function prepareTest(root, resolve, urlSuffix = '') {
 
         event.detail.matchUrl(new RegExp(`^.+\/page1\/page1-2${regexSuffix(urlSuffix)}$`), () => {
             amountOfTestsRunned++;
-            expect(amountOfTestsRunned).to.be.equal(4);
+            expect(amountOfTestsRunned).to.be.equal(2);
             let url = `http://localhost:9876/base/test/contents/page1/page1-2${assertionSuffix(urlSuffix)}`;
-            expect(event.detail.href).to.be.equal(url);
+            expect(event.detail.url).to.be.equal(url);
             expect(event.target).to.be.equal(root.querySelector('#page-1-subcontent'));
             expect(event.detail.responseStatusCode).to.be.equal(200);
             expect(root.querySelector('#page-1-subcontent .content').innerText).to.be.equal('page 1-2');
@@ -184,9 +118,9 @@ function prepareTest(root, resolve, urlSuffix = '') {
 
         event.detail.matchUrl(new RegExp(`^.+\/page2${urlSuffixRegex(urlSuffix)}$`), () => {
             amountOfTestsRunned++;
-            expect(amountOfTestsRunned).to.be.equal(6);
+            expect(amountOfTestsRunned).to.be.equal(3);
             let url = `http://localhost:9876/base/test/contents/page2${urlSuffix}`;
-            expect(event.detail.href).to.be.equal(url);
+            expect(event.detail.url).to.be.equal(url);
             expect(event.target).to.be.equal(root.querySelector('#content'));
             expect(event.detail.responseStatusCode).to.be.equal(200);
             expect(root.querySelector('#content .content').innerText).to.be.equal('page 2');
@@ -195,9 +129,9 @@ function prepareTest(root, resolve, urlSuffix = '') {
 
         event.detail.matchUrl(new RegExp(`^.+\/inexistent${urlSuffixRegex(urlSuffix)}$`), () => {
             amountOfTestsRunned++;
-            expect(amountOfTestsRunned).to.be.equal(10);
+            expect(amountOfTestsRunned).to.be.equal(4);
             let url = `http://localhost:9876/base/test/contents/inexistent${urlSuffix}`;
-            expect(event.detail.href).to.be.equal(url);
+            expect(event.detail.url).to.be.equal(url);
             expect(event.target).to.be.equal(root.querySelector('#content'));
             expect(event.detail.responseStatusCode).to.be.equal(404);
             expect(root.querySelector('#content').innerText).to.be.equal('NOT FOUND');
@@ -206,9 +140,9 @@ function prepareTest(root, resolve, urlSuffix = '') {
 
         event.detail.matchUrl(new RegExp(`^.+\/page4${urlSuffixRegex(urlSuffix)}$`), () => {
             amountOfTestsRunned++;
-            expect(amountOfTestsRunned).to.be.equal(12);
+            expect(amountOfTestsRunned).to.be.equal(5);
             let url = `http://localhost:9876/base/test/contents/page4${urlSuffix}`;
-            expect(event.detail.href).to.be.equal(url);
+            expect(event.detail.url).to.be.equal(url);
             expect(event.target).to.be.equal(root.querySelector('#content'));
             expect(event.detail.responseStatusCode).to.be.equal(200);
             expect(root.querySelector('#content .content').innerText).to.be.equal('page 4');
@@ -217,9 +151,9 @@ function prepareTest(root, resolve, urlSuffix = '') {
 
         event.detail.matchUrl(new RegExp(`^.+\/page5${urlSuffixRegex(urlSuffix)}$`), () => {
             amountOfTestsRunned++;
-            expect(amountOfTestsRunned).to.be.equal(14);
+            expect(amountOfTestsRunned).to.be.equal(6);
             let url = `http://localhost:9876/base/test/contents/page5${urlSuffix}`;
-            expect(event.detail.href).to.be.equal(url);
+            expect(event.detail.url).to.be.equal(url);
             expect(event.target).to.be.equal(root.querySelector('#content'));
             expect(event.detail.responseStatusCode).to.be.equal(200);
             expect(root.querySelector('#content .content').innerText).to.be.equal('page 5');
@@ -230,31 +164,19 @@ function prepareTest(root, resolve, urlSuffix = '') {
         event.detail.matchUrl(new RegExp(`^.+\/page6${urlSuffixRegex(urlSuffix)}$`), () => {
             amountOfTestsRunned++;
             let url = `http://localhost:9876/base/test/contents/page6${urlSuffix}`;
-            expect(event.detail.href).to.be.equal(url);
+            expect(event.detail.url).to.be.equal(url);
             expect(event.target).to.be.equal(root.querySelector('#content-2'));
             expect(event.detail.responseStatusCode).to.be.equal(200);
             expect(root.querySelector('#content-2 .content').innerText).to.be.equal('page 6');
 
             page6Visits++;
             if (page6Visits === 2) {
-                expect(amountOfTestsRunned).to.be.equal(17);
+                expect(amountOfTestsRunned).to.be.equal(8);
                 resolve();
             } else {
-                expect(amountOfTestsRunned).to.be.equal(16);
+                expect(amountOfTestsRunned).to.be.equal(7);
                 history.back();
             }
-        });
-    });
-
-    root.addEventListener('hati:error', event => {
-        event.detail.matchUrl(new RegExp(`^.+\/page3${urlSuffixRegex(urlSuffix)}$`), () => {
-            amountOfTestsRunned++;
-            expect(amountOfTestsRunned).to.be.equal(8);
-            let url = `http://localhost:9876/base/test/contents/page3${urlSuffix}`;
-            expect(event.detail.href).to.be.equal(url);
-            expect(event.target).to.be.equal(root.querySelector('#anchor3'));
-            expect(event.detail.errorMessage).to.be.equal('No element found with id: inexistent-section');
-            root.querySelector('#error404Anchor').click();
         });
     });
 }

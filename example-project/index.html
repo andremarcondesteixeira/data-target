@@ -5,22 +5,13 @@
         <title>HATI example project</title>
         <link rel="stylesheet" href="style.css" />
         <script type="module">
-            import hati from './hati.min.js';
+            import hati from './hati.js';
 
             window.addEventListener('hati:DOMContentLoaded', event => {
                 console.log(event);
             });
 
-            window.addEventListener('hati:error', event => {
-                console.log(event);
-            });
-
-            window.addEventListener('hati:beforeLoad', event => {
-                console.log(event);
-            });
-
-            hati({
-                root: document,
+            hati(document, {
                 router: href => `${href}.html`
             });
         </script>
