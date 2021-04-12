@@ -226,15 +226,23 @@ function prepareTest(root, resolve, urlSuffix = '') {
             root.querySelector('#anchor6').click();
         });
 
+        let page6Visits = 0;
         event.detail.matchUrl(new RegExp(`^.+\/page6${urlSuffixRegex(urlSuffix)}$`), () => {
             amountOfTestsRunned++;
-            expect(amountOfTestsRunned).to.be.equal(16);
             let url = `http://localhost:9876/base/test/contents/page6${urlSuffix}`;
             expect(event.detail.href).to.be.equal(url);
             expect(event.target).to.be.equal(root.querySelector('#content-2'));
             expect(event.detail.responseStatusCode).to.be.equal(200);
             expect(root.querySelector('#content-2 .content').innerText).to.be.equal('page 6');
-            resolve();
+
+            page6Visits++;
+            if (page6Visits === 2) {
+                expect(amountOfTestsRunned).to.be.equal(17);
+                resolve();
+            } else {
+                expect(amountOfTestsRunned).to.be.equal(16);
+                history.back();
+            }
         });
     });
 
