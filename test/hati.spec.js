@@ -162,11 +162,10 @@ function prepareTest(root, finish, urlSuffix = '') {
             expect(event.detail.responseStatusCode).to.be.equal(404);
             expect(root.querySelector('#content').innerText).to.be.equal('NOT FOUND');
             let errorCalled = false;
-            console.error = () => {
-                errorCalled = true;
-            }
+            console.error = sinon.stub().callsFake(() => errorCalled = true);
             root.querySelector('#targetError').click();
             expect(errorCalled).to.be.true;
+            sinon.restore();
             finish();
         });
     });
