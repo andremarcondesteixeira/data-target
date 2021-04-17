@@ -65,6 +65,9 @@ function createRoot(urlSuffix = '') {
             <a href="/base/test/contents/page4${urlSuffix}"
                id="anchor4"
                data-target-id="content-2">Page 4</a>
+
+            <a href="/base/test/contents/error404${urlSuffix}"
+               id="error404anchor">Error 404</a>
         </nav>
 
         <div id="content"></div>
@@ -128,7 +131,7 @@ function prepareTest(root, finish, urlSuffix = '') {
             page3Visits++;
             if (page3Visits === 2) {
                 expect(amountOfTestsRunned).to.be.equal(6);
-                finish();
+                root.querySelector('#error404anchor').click();
             } else {
                 expect(amountOfTestsRunned).to.be.equal(4);
                 root.querySelector('#anchor4').click();
@@ -144,6 +147,17 @@ function prepareTest(root, finish, urlSuffix = '') {
             expect(event.detail.responseStatusCode).to.be.equal(200);
             expect(root.querySelector('#content-2 .content').innerText).to.be.equal('page 4');
             history.back();
+        });
+
+        event.detail.matchUrl(new RegExp(`^.+\/error404${urlSuffixRegex(urlSuffix)}$`), () => {
+            amountOfTestsRunned++;
+            expect(amountOfTestsRunned).to.be.equal(7);
+            let url = `http://localhost:9876/base/test/contents/error404${urlSuffix}`;
+            expect(event.detail.url).to.be.equal(url);
+            expect(event.target).to.be.equal(root.querySelector('#content'));
+            expect(event.detail.responseStatusCode).to.be.equal(404);
+            expect(root.querySelector('#content').innerText).to.be.equal('something');
+            finish();
         });
     });
 }
