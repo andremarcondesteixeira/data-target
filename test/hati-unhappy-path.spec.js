@@ -14,7 +14,7 @@ describe('the happy path of hati', () => {
                 expect(event.detail.url).to.be.equal(url);
                 expect(event.target).to.be.equal(root.querySelector('#content'));
                 expect(event.detail.responseStatusCode).to.be.equal(404);
-                expect(root.querySelector('#content').innerText).to.be.equal('something');
+                expect(root.querySelector('#content').innerText).to.be.equal('NOT FOUND');
                 resolve();
             });
         });
