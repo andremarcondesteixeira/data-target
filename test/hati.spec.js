@@ -166,7 +166,7 @@ function prepareTest(root, finish, urlSuffix = '') {
                 errorCalled = true;
             }
             root.querySelector('#targetError').click();
-            expect(errorCalled).to.be.false;
+            expect(errorCalled).to.be.true;
             finish();
         });
     });
