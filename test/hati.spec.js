@@ -70,6 +70,10 @@ function createRoot(urlSuffix = '') {
                id="error404anchor">Error 404</a>
         </nav>
 
+        <a href="/base/test/contents/page1${anchor1Suffix}"
+           id="targetError"
+           data-target-id="inexistent-element">Target Error</a>
+
         <div id="content"></div>
         <div id="content-2"></div>
     `;
@@ -157,6 +161,12 @@ function prepareTest(root, finish, urlSuffix = '') {
             expect(event.target).to.be.equal(root.querySelector('#content'));
             expect(event.detail.responseStatusCode).to.be.equal(404);
             expect(root.querySelector('#content').innerText).to.be.equal('NOT FOUND');
+            let errorCalled = false;
+            console.error = () => {
+                errorCalled = true;
+            }
+            root.querySelector('#targetError').click();
+            expect(errorCalled).to.be.false;
             finish();
         });
     });
