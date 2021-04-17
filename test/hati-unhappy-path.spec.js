@@ -1,6 +1,6 @@
 import hati from '../src/hati.js';
 
-describe('the happy path of hati', () => {
+describe('the unhappy path of hati', () => {
     it('should treat all HTTP statuses equally by default', () => new Promise(resolve => {
         const root = document.createElement('div');
         root.innerHTML = `
