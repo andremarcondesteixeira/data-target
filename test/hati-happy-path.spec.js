@@ -50,19 +50,19 @@ function createRoot(urlSuffix = '') {
     const root = document.createElement('div');
     const anchor1Suffix = urlSuffix ? `-with-extensions${urlSuffix}` : '';
     root.innerHTML = `
-        <a href="/base/test/contents/page1${anchor1Suffix}"
+        <a href="/base/test/contents/happy-path/page1${anchor1Suffix}"
            id="anchor1"
            data-target-id="content"
            data-init>Page 1</a>
 
         <nav data-anchors-target-id="content">
-            <a href="/base/test/contents/page2${urlSuffix}"
+            <a href="/base/test/contents/happy-path/page2${urlSuffix}"
                id="anchor2">Page 2</a>
 
-            <a href="/base/test/contents/page3${urlSuffix}"
+            <a href="/base/test/contents/happy-path/page3${urlSuffix}"
                id="anchor3">Page 3</a>
 
-            <a href="/base/test/contents/page4${urlSuffix}"
+            <a href="/base/test/contents/happy-path/page4${urlSuffix}"
                id="anchor4"
                data-target-id="content-2">Page 4</a>
         </nav>
@@ -84,18 +84,18 @@ function prepareTest(root, finish, urlSuffix = '') {
     let page3Visits = 0;
 
     root.addEventListener('hati:DOMContentLoaded', event => {
-        event.detail.matchUrl(new RegExp(`^.+\/page1${regexSuffix(urlSuffix)}$`), () => step1(event));
-        event.detail.matchUrl(new RegExp(`^.+\/page1\/page1-2${regexSuffix(urlSuffix)}$`), () => step2(event));
-        event.detail.matchUrl(new RegExp(`^.+\/page2${urlSuffixRegex(urlSuffix)}$`), () => step3(event));
-        event.detail.matchUrl(new RegExp(`^.+\/page3${urlSuffixRegex(urlSuffix)}$`), () => steps4and6(event));
-        event.detail.matchUrl(new RegExp(`^.+\/page4${urlSuffixRegex(urlSuffix)}$`), () => step5(event));
-        event.detail.matchUrl(new RegExp(`^.+\/error404${urlSuffixRegex(urlSuffix)}$`), () => step7(event));
+        event.detail.matchUrl(new RegExp(`^.+/happy-path/page1${regexSuffix(urlSuffix)}$`), () => step1(event));
+        event.detail.matchUrl(new RegExp(`^.+/happy-path/page1/page1-2${regexSuffix(urlSuffix)}$`), () => step2(event));
+        event.detail.matchUrl(new RegExp(`^.+/happy-path/page2${urlSuffixRegex(urlSuffix)}$`), () => step3(event));
+        event.detail.matchUrl(new RegExp(`^.+/happy-path/page3${urlSuffixRegex(urlSuffix)}$`), () => steps4and6(event));
+        event.detail.matchUrl(new RegExp(`^.+/happy-path/page4${urlSuffixRegex(urlSuffix)}$`), () => step5(event));
+        event.detail.matchUrl(new RegExp(`^.+/happy-path/error404${urlSuffixRegex(urlSuffix)}$`), () => step7(event));
     });
 
     function step1(event) {
         amountOfTestsRunned++;
         expect(amountOfTestsRunned).to.be.equal(1);
-        let url = `http://localhost:9876/base/test/contents/page1${assertionSuffix(urlSuffix)}`;
+        let url = `http://localhost:9876/base/test/contents/happy-path/page1${assertionSuffix(urlSuffix)}`;
         expect(event.detail.url).to.be.equal(url);
         expect(event.target).to.be.equal(root.querySelector('#content'));
         expect(event.detail.responseStatusCode).to.be.equal(200);
@@ -106,7 +106,7 @@ function prepareTest(root, finish, urlSuffix = '') {
     function step2(event) {
         amountOfTestsRunned++;
         expect(amountOfTestsRunned).to.be.equal(2);
-        let url = `http://localhost:9876/base/test/contents/page1/page1-2${assertionSuffix(urlSuffix)}`;
+        let url = `http://localhost:9876/base/test/contents/happy-path/page1/page1-2${assertionSuffix(urlSuffix)}`;
         expect(event.detail.url).to.be.equal(url);
         expect(event.target).to.be.equal(root.querySelector('#page-1-subcontent'));
         expect(event.detail.responseStatusCode).to.be.equal(200);
@@ -117,7 +117,7 @@ function prepareTest(root, finish, urlSuffix = '') {
     function step3(event) {
         amountOfTestsRunned++;
         expect(amountOfTestsRunned).to.be.equal(3);
-        let url = `http://localhost:9876/base/test/contents/page2${urlSuffix}`;
+        let url = `http://localhost:9876/base/test/contents/happy-path/page2${urlSuffix}`;
         expect(event.detail.url).to.be.equal(url);
         expect(event.target).to.be.equal(root.querySelector('#content'));
         expect(event.detail.responseStatusCode).to.be.equal(200);
@@ -126,7 +126,7 @@ function prepareTest(root, finish, urlSuffix = '') {
     }
 
     function steps4and6(event) {
-        let url = `http://localhost:9876/base/test/contents/page3${urlSuffix}`;
+        let url = `http://localhost:9876/base/test/contents/happy-path/page3${urlSuffix}`;
         expect(event.detail.url).to.be.equal(url);
         expect(event.target).to.be.equal(root.querySelector('#content'));
         expect(event.detail.responseStatusCode).to.be.equal(200);
@@ -146,7 +146,7 @@ function prepareTest(root, finish, urlSuffix = '') {
     function step5(event) {
         amountOfTestsRunned++;
         expect(amountOfTestsRunned).to.be.equal(5);
-        let url = `http://localhost:9876/base/test/contents/page4${urlSuffix}`;
+        let url = `http://localhost:9876/base/test/contents/happy-path/page4${urlSuffix}`;
         expect(event.detail.url).to.be.equal(url);
         expect(event.target).to.be.equal(root.querySelector('#content-2'));
         expect(event.detail.responseStatusCode).to.be.equal(200);
