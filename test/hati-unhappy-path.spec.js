@@ -47,7 +47,7 @@ describe('the unhappy path of hati', () => {
         const errorHandler = e => error = e;
         hati(root, { errorHandler });
         expect(console.error.callCount).to.be.equal(1);
-        expect(error.message).to.be.equal('No element found with id: "unhappy-path-test2-missing-target"');
+        expect(error.message).to.be.equal('No element found with id: "unhappy-path-test3-missing-target"');
         sinon.restore();
     });
 });
