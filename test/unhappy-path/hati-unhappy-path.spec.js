@@ -1,4 +1,4 @@
-import hati from '../src/hati.js';
+import hati from '../../src/hati.js';
 
 describe('the unhappy path of hati', () => {
     let root;
