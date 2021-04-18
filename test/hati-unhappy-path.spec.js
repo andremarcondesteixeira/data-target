@@ -25,14 +25,14 @@ describe('the unhappy path of hati', () => {
         const root = document.createElement('div');
         root.innerHTML = `
             <a href="/base/test/contents/unhappy-path/test2.html"
-               data-target-id="unhappy-path-test2-inexistent-target"
-               data-init>Inexistent Page</a>
+               data-target-id="unhappy-path-test2-missing-target"
+               data-init>Test 2</a>
         `;
         let error;
         console.error = sinon.stub().callsFake(e => error = e);
         hati(root);
         expect(console.error.callCount).to.be.equal(1);
-        expect(error.message).to.be.equal('No element found with id: "unhappy-path-test2-inexistent-target"');
+        expect(error.message).to.be.equal('No element found with id: "unhappy-path-test2-missing-target"');
         sinon.restore();
     });
 });
