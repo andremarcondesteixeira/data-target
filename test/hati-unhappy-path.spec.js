@@ -1,8 +1,13 @@
 import hati from '../src/hati.js';
 
 describe('the unhappy path of hati', () => {
+    let root;
+
+    beforeEach(() => {
+        root = document.createElement('div');
+    });
+
     it('should treat all HTTP statuses equally by default', () => new Promise(resolve => {
-        const root = document.createElement('div');
         root.innerHTML = `
             <a href="/base/test/contents/unhappy-path-inexistent-page.html"
                data-target-id="unhappy-path-test1-content"
@@ -22,7 +27,6 @@ describe('the unhappy path of hati', () => {
     }));
 
     it('should use the default error handler, if no error handler is provided, when target element is missing', () => {
-        const root = document.createElement('div');
         root.innerHTML = `
             <a href="/base/test/contents/unhappy-path/test2.html"
                data-target-id="unhappy-path-test2-missing-target"
@@ -37,7 +41,6 @@ describe('the unhappy path of hati', () => {
     });
 
     it('should use the the provided error handler when target element is missing', () => {
-        const root = document.createElement('div');
         root.innerHTML = `
             <a href="/base/test/contents/unhappy-path/test3.html"
                data-target-id="unhappy-path-test3-missing-target"
