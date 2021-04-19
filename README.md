@@ -1,4 +1,4 @@
-# HATI - Html Anchor Target Id
+# Mana Potion
 
 This library adds a `data-target-id` attribute to the HTML's `<a>` element.
 
