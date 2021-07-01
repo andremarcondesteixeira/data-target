@@ -1,10 +1,8 @@
-# Mana Potion
+# Heart
 
 This library adds a `data-target-id` attribute to the HTML's `<a>` element.
 
 This new property allows you to point to another element which will receive the content referenced by the anchor's href attribute.
-
-!["Hati" means "Heart" in indonesian](https://github.com/andremarcondesteixeira/hati/raw/main/heart.png)
 
 ## Example
 
