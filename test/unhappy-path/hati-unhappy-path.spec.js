@@ -51,7 +51,7 @@ describe('the unhappy path of hati', () => {
         `;
         let error;
 
-        lib(root, {
+        configureNavigation(root, {
             errorHandler: e => error = e
         });
 
