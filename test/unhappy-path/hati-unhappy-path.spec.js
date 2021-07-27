@@ -1,9 +1,10 @@
-import hati from '../../src/hati.js';
+import { configureNavigation } from '../../src/lib.js';
 
 describe('the unhappy path of hati', () => {
     let root;
 
     beforeEach(() => {
+        sinon.restore();
         root = document.createElement('div');
     });
 
@@ -14,9 +15,10 @@ describe('the unhappy path of hati', () => {
                data-init>Inexistent Page</a>
             <div id="unhappy-path-test1-content"></div>
         `;
-        hati(root);
-        const urlRegex = /^.+\/unhappy-path-inexistent-page\.html$/;
-        root.addEventListener('hati:DOMContentLoaded', event => event.detail.matchUrl(urlRegex, () => {
+
+        configureNavigation(root);
+
+        root.addEventListener('hati:DOMContentLoaded', event => event.detail.matchUrl(/^.+\/unhappy-path-inexistent-page\.html$/, () => {
             let url = `http://localhost:9876/base/test/contents/unhappy-path-inexistent-page.html`;
             expect(event.detail.url).to.be.equal(url);
             expect(event.target).to.be.equal(root.querySelector('#unhappy-path-test1-content'));
@@ -34,10 +36,11 @@ describe('the unhappy path of hati', () => {
         `;
         let error;
         console.error = sinon.stub().callsFake(e => error = e);
-        hati(root);
+
+        configureNavigation(root);
+
         expect(console.error.callCount).to.be.equal(1);
         expect(error.message).to.be.equal('No element found with id: "unhappy-path-test2-missing-target"');
-        sinon.restore();
     });
 
     it('should use the the provided error handler when target element is missing', () => {
@@ -47,10 +50,12 @@ describe('the unhappy path of hati', () => {
                data-init>Test 3</a>
         `;
         let error;
-        const errorHandler = e => error = e;
-        hati(root, { errorHandler });
+
+        lib(root, {
+            errorHandler: e => error = e
+        });
+
         expect(console.error.callCount).to.be.equal(1);
         expect(error.message).to.be.equal('No element found with id: "unhappy-path-test3-missing-target"');
-        sinon.restore();
     });
 });

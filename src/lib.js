@@ -1,4 +1,4 @@
-export default function hati(root, config) {
+export function configureNavigation(root, config) {
     const router = typeof config?.router === 'function'
         ? config.router
         : (url => url);

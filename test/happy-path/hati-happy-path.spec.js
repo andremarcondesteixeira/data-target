@@ -1,4 +1,4 @@
-import hati from '../../src/hati.js';
+import { configureNavigation } from '../../src/lib.js';
 
 describe('hati unhappy path', () => {
     let root;
@@ -13,7 +13,7 @@ describe('hati unhappy path', () => {
             <div id="content"><div>
         `;
 
-        hati(root);
+        configureNavigation(root);
         root.addEventListener('hati:DOMContentLoaded', event => event.detail.matchUrl(/^.+\/happy-path\/test1\.html$/, () => {
             console.log(event.detail);
             expect(event.target).to.be.equal(root.querySelector('#content'));
