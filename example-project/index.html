@@ -2,17 +2,17 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
-        <title>HATI example project</title>
+        <title>Boaty example project</title>
         <link rel="stylesheet" href="style.css" />
         <script type="module">
-            import hati from './hati.js';
+            import { configureNavigation } from './lib.js';
 
-            window.addEventListener('hati:DOMContentLoaded', event => {
+            window.addEventListener('content-loaded', event => {
                 console.log(event);
             });
 
-            hati(document, {
-                router: href => `${href}.html`
+            configureNavigation({
+                urlTransformer: href => `${href}.html`
             });
         </script>
     </head>
