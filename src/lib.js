@@ -1,27 +1,30 @@
 let rootElement = document;
-let transformUrl = url => url;
-let handleError = error => console.error(error);
-let makeRequest = async url => {
-    const response = await fetch(url);
-    return {
-        content: await response.text(),
-        statusCode: response.status
-    };
-};
 
 window.addEventListener('popstate', event => tryLoadContent(location.href, event.state.targetId));
 
-export function configureNavigation(config) {
-    if (typeof config?.rootElement === HTMLElement) rootElement = config.rootElement;
-    if (typeof config?.urlTransformer === 'function') transformUrl = config.urlTransformer;
-    if (typeof config?.errorHandler === 'function') handleError = config.errorHandler;
-    if (typeof config?.httpRequestDispatcher === 'function') makeRequest = config.httpRequestDispatcher;
-    addClickListeners(rootElement);
-    rootElement.querySelector('a[data-init]')?.click();
+export const config = {
+    rootElement,
+    urlTransformer: url => url,
+    errorHandler: error => console.error(error),
+    httpRequestDispatcher: async url => {
+        const response = await fetch(url);
+        return {
+            content: await response.text(),
+            statusCode: response.status
+        };
+    }
+};
+
+export default function initialize(root = config.rootElement) {
+    addClickListeners(root);
+    root.querySelector('a[data-init]')?.click();
 }
 
 function addClickListeners(element) {
-    element.querySelectorAll('a[data-target-id]:not([data-target-id=""])').forEach(a => a.addEventListener('click', handleClick));
+    element.querySelectorAll('a[data-target-id]:not([data-target-id=""])').forEach(a => {
+        a.addEventListener('click', handleClick);
+    });
+
     element.querySelectorAll('[data-default-target-id]:not([data-default-target-id=""])').forEach(parentElement => {
         parentElement.querySelectorAll('a:not([data-target-id])').forEach(linkElement => {
             linkElement.setAttribute('data-target-id', parentElement.getAttribute('data-default-target-id'));
@@ -37,24 +40,35 @@ function handleClick(event) {
     tryLoadContent(event.target.href, targetId);
 }
 
-async function tryLoadContent(url, targetId) {
+function tryLoadContent(url, targetId) {
     try {
-        const targetElement = rootElement.querySelector(`#${targetId}`);
-        if (!targetElement) return handleError(new Error(`No element found with id "${targetId}" to render response from ${url}`));
-        const response = await makeRequest(transformUrl(url));
-        renderContentInsideTargetElement(targetElement, response.content);
-        addClickListeners(targetElement);
-        dispatchContentLoadedEvent(targetElement, {
-            url,
-            responseStatusCode: response.statusCode
-        });
+        const targetElement = getTargetElement(url, targetId);
+        loadContent(url, targetElement);
     } catch (error) {
-        handleError(error);
+        config.errorHandler(error);
     }
 }
 
+function getTargetElement(url, targetId) {
+    const targetElement = config.rootElement.querySelector(`#${targetId}`);
+    if (!targetElement)
+        throw new Error(`No element found with id "${targetId}" to render response from ${url}`);
+    return targetElement;
+}
+
+async function loadContent(url, targetElement) {
+    const response = await config.httpRequestDispatcher(config.urlTransformer(url));
+    renderContentInsideTargetElement(targetElement, response.content);
+    initialize(targetElement);
+    dispatchContentLoadedEvent(targetElement, {
+        url,
+        responseStatusCode: response.statusCode
+    });
+}
+
 function renderContentInsideTargetElement(targetElement, html) {
-    while (targetElement.lastChild) targetElement.removeChild(targetElement.lastChild);
+    while (targetElement.lastChild)
+        targetElement.removeChild(targetElement.lastChild);
     targetElement.insertAdjacentHTML('afterbegin', html);
 }
 
