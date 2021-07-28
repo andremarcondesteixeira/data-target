@@ -40,11 +40,13 @@ describe('the unhappy path of hati', () => {
 
     xit('should use the the provided error handler when target element is missing', () => {
         const rootElement = document.createElement('div');
-        rootElement.innerHTML = `<a href="/base/test/contents/unhappy-path/test3.html"
-                                    data-target-id="unhappy-path-test3-missing-target"
-                                    data-init>Test 3</a>`;
+        rootElement.innerHTML = `
+            <a href="/base/test/contents/unhappy-path/test3.html"
+               data-target-id="unhappy-path-test3-missing-target"
+               data-init>Test 3</a>`;
         let errorMessage;
         const errorHandler = e => errorMessage = e.message;
+
         initialize({ rootElement, errorHandler });
 
         expect(errorMessage).to.be.equal('No element found with id: "unhappy-path-test3-missing-target"');
