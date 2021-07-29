@@ -2,23 +2,16 @@
     "name": "augmented-anchors",
     "version": "1.0.0",
     "description": "Provides extra functionality to the html <a> tag",
-    "main": "src/augmented-anchors.js",
+    "main": "src/lib.js",
     "type": "module",
     "scripts": {
-        "test": "karma start karma.conf.cjs",
-        "test-dev": "karma start karma-dev.conf.cjs"
+        "test": "karma start karma.conf.cjs"
     },
     "repository": {
         "type": "git",
         "url": "git+https://github.com/andremarcondesteixeira/augmented-anchors.git"
     },
-    "keywords": [
-        "html",
-        "anchor",
-        "link",
-        "hyperlink",
-        "augmentation"
-    ],
+    "keywords": [],
     "author": "André Marcondes Teixeira",
     "license": "MIT",
     "bugs": {
@@ -27,15 +20,6 @@
     "homepage": "https://github.com/andremarcondesteixeira/augmented-anchors#readme",
     "dependencies": {},
     "devDependencies": {
-        "chai": "^4.3.0",
-        "karma": "^6.1.1",
-        "karma-chai": "^0.1.0",
-        "karma-chrome-launcher": "^3.1.0",
-        "karma-coverage": "^2.0.3",
-        "karma-firefox-launcher": "^2.1.0",
-        "karma-mocha": "^2.0.1",
-        "karma-sinon": "^1.0.5",
-        "mocha": "^8.3.0",
         "sinon": "^9.2.4"
     }
 }
