@@ -1,9 +1,8 @@
-let rootElement = document;
-
 window.addEventListener('popstate', event => tryLoadContent(location.href, event.state.targetId));
+observeDOM();
+initialize(document);
 
-export const config = {
-    rootElement,
+export default {
     urlTransformer: url => url,
     errorHandler: error => console.error(error),
     httpRequestDispatcher: async url => {
@@ -15,7 +14,28 @@ export const config = {
     }
 };
 
-export default function initialize(root = config.rootElement) {
+function observeDOM() {
+    new MutationObserver(mutations => mutations.forEach(mutation => {
+        switch (mutation.type) {
+            case 'attributes':
+                break;
+            case 'childList':
+                console.log(mutation);
+                mutation.addedNodes.forEach(node => {
+                    node.get
+                });
+                initialize(mutation.target);
+                break;
+        }
+    })).observe(document.body, {
+        attributeFilter: ['data-target-id', 'data-default-target-id', 'data-init'],
+        childList: true,
+        subtree: true,
+    });
+}
+
+function initialize(root) {
+    console.log('initialize', root);
     addClickListeners(root);
     root.querySelector('a[data-init]')?.click();
 }
@@ -50,7 +70,7 @@ function tryLoadContent(url, targetId) {
 }
 
 function getTargetElement(url, targetId) {
-    const targetElement = config.rootElement.querySelector(`#${targetId}`);
+    const targetElement = document.querySelector(`#${targetId}`);
     if (!targetElement)
         throw new Error(`No element found with id "${targetId}" to render response from ${url}`);
     return targetElement;

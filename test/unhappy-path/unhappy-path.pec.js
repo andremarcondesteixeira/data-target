@@ -1,25 +1,21 @@
-import initialize, { config } from '../../src/lib.js';
+import * as lib from '../../src/lib.js';
 
-describe('the unhappy path of hati', () => {
-    xit('should treat all HTTP statuses equally by default', async () => {
-        const rootElement = document.createElement('div');
+describe('unhappy path', () => {
+    xit('should treat all HTTP statuses equally by default', () => new Promise(resolve => {
         rootElement.innerHTML = `
             <a href="/base/test/contents/unhappy-path-inexistent-page.html"
                data-target-id="unhappy-path-test1-content"
                data-init>Inexistent Page</a>
             <div id="unhappy-path-test1-content"></div>`;
 
-        config.rootElement = rootElement;
-        initialize();
-
         rootElement.addEventListener('content-loaded', event => event.detail.matchUrl(/^.+\/unhappy-path-inexistent-page\.html$/, () => {
             expect(event.detail.url).to.be.equal(`http://localhost:9876/base/test/contents/unhappy-path-inexistent-page.html`);
             expect(event.target).to.be.equal(rootElement.querySelector('#unhappy-path-test1-content'));
             expect(event.detail.responseStatusCode).to.be.equal(404);
             expect(rootElement.querySelector('#unhappy-path-test1-content').innerText).to.be.equal('NOT FOUND');
-            done();
+            resolve();
         }));
-    });
+    }));
 
     xit('should use the default error handler, if no error handler is provided, when target element is missing', () => {
         const rootElement = document.createElement('div');
