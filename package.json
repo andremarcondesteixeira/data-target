@@ -1,7 +1,7 @@
 {
-    "name": "augmented-anchors",
-    "version": "1.0.0",
-    "description": "Provides extra functionality to the html <a> tag",
+    "name": "",
+    "version": "0.0.1",
+    "description": "",
     "main": "src/lib.js",
     "type": "module",
     "scripts": {
@@ -9,17 +9,14 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/andremarcondesteixeira/augmented-anchors.git"
+        "url": ""
     },
     "keywords": [],
     "author": "André Marcondes Teixeira",
     "license": "MIT",
     "bugs": {
-        "url": "https://github.com/andremarcondesteixeira/augmented-anchors/issues"
+        "url": ""
     },
-    "homepage": "https://github.com/andremarcondesteixeira/augmented-anchors#readme",
-    "dependencies": {},
-    "devDependencies": {
-        "sinon": "^9.2.4"
-    }
+    "homepage": "",
+    "dependencies": {}
 }
