@@ -1,5 +1,4 @@
 window.addEventListener('popstate', event => tryLoadContent(location.href, event.state.targetId));
-observeDOM();
 initialize(document);
 
 export default {
@@ -13,26 +12,6 @@ export default {
         };
     }
 };
-
-function observeDOM() {
-    new MutationObserver(mutations => mutations.forEach(mutation => {
-        switch (mutation.type) {
-            case 'attributes':
-                break;
-            case 'childList':
-                console.log(mutation);
-                mutation.addedNodes.forEach(node => {
-                    node.get
-                });
-                initialize(mutation.target);
-                break;
-        }
-    })).observe(document.body, {
-        attributeFilter: ['data-target-id', 'data-default-target-id', 'data-init'],
-        childList: true,
-        subtree: true,
-    });
-}
 
 function initialize(root) {
     console.log('initialize', root);
