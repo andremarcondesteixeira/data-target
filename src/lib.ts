@@ -1,10 +1,10 @@
 window.addEventListener('popstate', event => tryLoadContent(location.href, event.state.targetId));
-initialize(document);
+initialize(document.body);
 
-export default {
-    urlTransformer: url => url,
-    errorHandler: error => console.error(error),
-    httpRequestDispatcher: async url => {
+const config = {
+    urlTransformer: (url: string) => url,
+    errorHandler: (error: Error) => console.error(error),
+    httpRequestDispatcher: async (url: string) => {
         const response = await fetch(url);
         return {
             content: await response.text(),
@@ -13,33 +13,38 @@ export default {
     }
 };
 
-function initialize(root) {
-    console.log('initialize', root);
+export default config;
+
+function initialize(root: HTMLElement) {
     addClickListeners(root);
-    root.querySelector('a[data-init]')?.click();
+    (root.querySelector('a[data-init]') as HTMLAnchorElement)?.click();
 }
 
-function addClickListeners(element) {
-    element.querySelectorAll('a[data-target-id]:not([data-target-id=""])').forEach(a => {
+function addClickListeners(element: HTMLElement) {
+    const links: NodeListOf<HTMLAnchorElement> = element.querySelectorAll('a[data-target-id]:not([data-target-id=""])');
+    links.forEach((a: HTMLAnchorElement) => {
         a.addEventListener('click', handleClick);
     });
 
-    element.querySelectorAll('[data-default-target-id]:not([data-default-target-id=""])').forEach(parentElement => {
-        parentElement.querySelectorAll('a:not([data-target-id])').forEach(linkElement => {
+    const elementsWithDefaultTargetId: NodeListOf<HTMLElement> = element.querySelectorAll('[data-default-target-id]:not([data-default-target-id=""])');
+    elementsWithDefaultTargetId.forEach((parentElement: HTMLElement) => {
+        const links: NodeListOf<HTMLAnchorElement> = parentElement.querySelectorAll('a:not([data-target-id])');
+        links.forEach((linkElement: HTMLAnchorElement) => {
             linkElement.setAttribute('data-target-id', parentElement.getAttribute('data-default-target-id'));
             linkElement.addEventListener('click', handleClick);
         });
     });
 }
 
-function handleClick(event) {
+function handleClick(event: MouseEvent) {
     event.preventDefault();
-    const targetId = event.target.getAttribute('data-target-id');
-    history.pushState({ targetId }, null, event.target.href);
-    tryLoadContent(event.target.href, targetId);
+    const target = event.target as HTMLAnchorElement;
+    const targetId = target.getAttribute('data-target-id');
+    history.pushState({ targetId }, null, target.href);
+    tryLoadContent(target.href, targetId);
 }
 
-function tryLoadContent(url, targetId) {
+function tryLoadContent(url: string, targetId: string) {
     try {
         const targetElement = getTargetElement(url, targetId);
         loadContent(url, targetElement);
@@ -48,14 +53,14 @@ function tryLoadContent(url, targetId) {
     }
 }
 
-function getTargetElement(url, targetId) {
-    const targetElement = document.querySelector(`#${targetId}`);
+function getTargetElement(url: string, targetId: string) {
+    const targetElement = document.querySelector(`#${targetId}`) as HTMLElement;
     if (!targetElement)
         throw new Error(`No element found with id "${targetId}" to render response from ${url}`);
     return targetElement;
 }
 
-async function loadContent(url, targetElement) {
+async function loadContent(url: string, targetElement: HTMLElement) {
     const response = await config.httpRequestDispatcher(config.urlTransformer(url));
     renderContentInsideTargetElement(targetElement, response.content);
     initialize(targetElement);
@@ -65,22 +70,27 @@ async function loadContent(url, targetElement) {
     });
 }
 
-function renderContentInsideTargetElement(targetElement, html) {
+function renderContentInsideTargetElement(targetElement: HTMLElement, html: string) {
     while (targetElement.lastChild)
         targetElement.removeChild(targetElement.lastChild);
     targetElement.insertAdjacentHTML('afterbegin', html);
 }
 
-function dispatchContentLoadedEvent(targetElement, detail) {
+function dispatchContentLoadedEvent(targetElement: HTMLElement, detail: ContentLoadedEventDetail) {
     targetElement.dispatchEvent(new CustomEvent('content-loaded', {
         bubbles: true,
         cancelable: true,
         detail: {
             ...detail,
-            matchUrl: (urlRegex, callback) => {
+            matchUrl: (urlRegex: RegExp, callback: Function) => {
                 if (urlRegex.test(detail.url))
                     callback();
             }
         }
     }));
 }
+
+type ContentLoadedEventDetail = {
+    url: string;
+    responseStatusCode: number;
+};
