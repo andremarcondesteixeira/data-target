@@ -18,5 +18,8 @@
         "url": ""
     },
     "homepage": "",
-    "dependencies": {}
+    "dependencies": {},
+    "devDependencies": {
+        "typescript": "^4.3.5"
+    }
 }
