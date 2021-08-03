@@ -5,11 +5,10 @@ test('basic test', async ({ page }) => {
         document.body.insertAdjacentHTML('beforeend', `
             <div id="content"></div>
             <a href="content.html" data-target-id="content" data-init>load</a>
-            <script src="../src/lib.ts" type="module"></script>
         `);
     });
 
-    page.addScriptTag({path: '../src'})
+    page.addScriptTag({path: '../dist/lib.js'})
 
     const result = await page.evaluate(() => (document.querySelector('#loaded-content') as HTMLDivElement).innerText);
 

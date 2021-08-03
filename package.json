@@ -5,8 +5,8 @@
     "main": "src/lib.js",
     "type": "module",
     "scripts": {
-        "test": "playwright test",
-        "build": "tsc"
+        "test": "build && playwright test",
+        "build": "tsc --project ./src/tsconfig.json && uglifyjs --compress --mangle --output dist/lib.min.js -- dist/lib.js "
     },
     "repository": {
         "type": "git",
@@ -22,6 +22,7 @@
     "dependencies": {},
     "devDependencies": {
         "@playwright/test": "^1.13.1",
-        "typescript": "^4.3.5"
+        "typescript": "^4.3.5",
+        "uglify-js": "^3.14.1"
     }
 }
