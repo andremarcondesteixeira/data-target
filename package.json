@@ -5,7 +5,8 @@
     "main": "src/lib.js",
     "type": "module",
     "scripts": {
-        "test": "karma start karma.conf.cjs"
+        "test": "playwright test",
+        "build": "tsc"
     },
     "repository": {
         "type": "git",

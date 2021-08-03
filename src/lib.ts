@@ -30,7 +30,7 @@ function addClickListeners(element: HTMLElement) {
     elementsWithDefaultTargetId.forEach((parentElement: HTMLElement) => {
         const links: NodeListOf<HTMLAnchorElement> = parentElement.querySelectorAll('a:not([data-target-id])');
         links.forEach((linkElement: HTMLAnchorElement) => {
-            linkElement.setAttribute('data-target-id', parentElement.getAttribute('data-default-target-id'));
+            linkElement.setAttribute('data-target-id', parentElement.getAttribute('data-default-target-id') as string);
             linkElement.addEventListener('click', handleClick);
         });
     });
@@ -39,8 +39,8 @@ function addClickListeners(element: HTMLElement) {
 function handleClick(event: MouseEvent) {
     event.preventDefault();
     const target = event.target as HTMLAnchorElement;
-    const targetId = target.getAttribute('data-target-id');
-    history.pushState({ targetId }, null, target.href);
+    const targetId = target.getAttribute('data-target-id') as string;
+    history.pushState({ targetId }, "", target.href);
     tryLoadContent(target.href, targetId);
 }
 
