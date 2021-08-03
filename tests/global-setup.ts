@@ -8,7 +8,7 @@ async function globalSetup() {
     process.env.SERVER_PORT = port.toString();
 
     const app = express();
-    app.use(express.static('../'));
+    app.use(express.static('./'));
     const server = app.listen(port, 'localhost', () => {
         console.log(`server listening at port ${port}`);
     });
