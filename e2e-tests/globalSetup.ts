@@ -13,7 +13,7 @@ export default async function globalSetup() {
 
     const server = express()
         .use(useragent.express())
-        .use((req, res, next) => {
+        .use((req, _, next) => {
             isDebugMode && console.info(`${req.useragent?.browser} -> ${req.method} ${req.url}`);
             next();
         })
