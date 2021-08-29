@@ -1,4 +1,4 @@
-# That navigation thing
+# Hyperlinks++
 
 This library adds a `data-target-id` attribute to the HTML's `<a>` element.
 
