@@ -2,7 +2,7 @@
 
 This library adds a `data-target-id` attribute to the HTML's `<a>` element.
 
-This new property allows you to point to another element which will receive the content referenced by the anchor's href attribute.
+This new property allows you to point to another element which will receive the content referenced by the anchor's `href` attribute.
 
 ## Example
 
