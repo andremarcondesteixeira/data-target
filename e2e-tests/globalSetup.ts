@@ -14,10 +14,10 @@ export default async function globalSetup() {
     const server = express()
         .use(useragent.express())
         .use((req, res, next) => {
-            isDebugMode && console.info(`${req.useragent?.browser} -> ${req.method} ${req.url} -> ${res.statusCode}`);
+            isDebugMode && console.info(`${req.useragent?.browser} -> ${req.method} ${req.url}`);
             next();
         })
-        .use(express.static(__dirname))
+        .use(express.static(__dirname, { fallthrough: false }))
         .listen(port, process.env.HOST, () => {
             isDebugMode && console.info(`server listening at ${process.env.URL}`);
         });
