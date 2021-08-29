@@ -1,10 +1,10 @@
 import { test, expect } from '@playwright/test';
 
-test('basic test', async ({ page }) => {
+test('clicking an anchor with a data-target-id attribute will load the content inside the element whose id matches the attribute', async ({ page }) => {
     await page.goto(`${process.env.URL}`);
     await page.setContent(`
         <div id="content"></div>
-        <a id="link" href="content.html" data-target-id="content" data-init>load</a>
+        <a id="link" href="content.html" data-target-id="content">load</a>
     `);
     await page.addScriptTag({ type: 'module', url: `${process.env.URL}/build/hyperlinksPlusPlus.js` });
     await page.click('#link');
