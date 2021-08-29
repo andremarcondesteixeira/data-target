@@ -7,7 +7,7 @@ export default async function globalSetup() {
     console.info('starting server');
 
     const port = await getPort();
-    process.env.URL = `${process.env.HOSTNAME}:${port}`;
+    process.env.URL = `http://${process.env.HOST}:${port}`;
 
     const server = express()
         .use(useragent.express())
@@ -16,7 +16,7 @@ export default async function globalSetup() {
             next();
         })
         .use(express.static(__dirname))
-        .listen(port, process.env.HOSTNAME, () => {
+        .listen(port, process.env.HOST, () => {
             console.info(`server listening at ${process.env.URL}`);
         });
 
