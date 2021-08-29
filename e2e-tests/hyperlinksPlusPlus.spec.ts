@@ -11,7 +11,7 @@ test('basic test', async ({ page }) => {
 
     const content = await page.$('#content');
     let contentText = (await content.innerText()).toLowerCase();
-    expect(contentText).not.toMatch(/(404)|(error)|(not found)/);
+    expect(contentText).not.toMatch(/(404)|(error)|(not found)|(enoent)|(no such file)/);
 
     const loadedContent = await content.waitForSelector('#loaded-content');
     const loadedContentText = await loadedContent.innerText();
