@@ -1,5 +1,5 @@
 {
-    "name": "",
+    "name": "hyperlinksplusplus",
     "version": "0.0.1",
     "description": "",
     "main": "src/lib.js",
@@ -16,7 +16,7 @@
     "author": "André Marcondes Teixeira",
     "license": "MIT",
     "bugs": {
-        "url": ""
+        "url": "https://github.com/andremarcondesteixeira/HyperlinksPlusPlus/issues"
     },
     "homepage": "",
     "dependencies": {},
