@@ -5,7 +5,7 @@
     "main": "src/lib.js",
     "type": "module",
     "scripts": {
-        "test": "npm run build && npx playwright test --config=tests/playwright.config.ts",
+        "test": "npm run build && npx playwright test --config=e2e-tests/playwright.config.ts",
         "build": "tsc --project ./src/tsconfig.json && uglifyjs --compress --mangle --output dist/lib.min.js -- dist/lib.js"
     },
     "repository": {

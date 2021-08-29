@@ -2,7 +2,7 @@ import express from 'express';
 import getPort from 'get-port';
 import 'dotenv/config';
 
-async function globalSetup() {
+export default async function globalSetup() {
     console.log('starting server');
 
     const port = await getPort({ port: getPort.makeRange(3000, 8080) });
@@ -22,5 +22,3 @@ async function globalSetup() {
         });
     };
 }
-
-export default globalSetup;
