@@ -10,7 +10,7 @@
         "run-tests": "npx playwright test --config=e2e-tests/playwright.config.ts",
         "build": "npm run transpile && npm run minify",
         "transpile": "tsc --project ./src/tsconfig.json",
-        "minify": "uglifyjs --compress --mangle --output dist/hyperlinksPlusPlus.min.js"
+        "minify": "uglifyjs ./dist/hyperlinksPlusPlus.js --compress --mangle --output ./dist/hyperlinksPlusPlus.min.js --source-map"
     },
     "repository": {
         "type": "git",
