@@ -6,21 +6,19 @@ import getPort from 'get-port';
 export default async function globalSetup() {
     console.info('starting server');
 
-    const port = await getPort({ port: getPort.makeRange(3000, 8080) });
-    process.env.SERVER_PORT = port.toString();
-    process.env.URL = `${process.env.URL}:${process.env.SERVER_PORT}`;
+    const port = await getPort();
+    process.env.URL = `${process.env.HOSTNAME}:${port}`;
 
-    const app = express()
+    const server = express()
         .use(useragent.express())
         .use((req, _, next) => {
             console.info(`${req.useragent?.browser} ${req.method} ${req.url}`);
             next();
         })
-        .use(express.static(__dirname));
-
-    const server = app.listen(port, 'localhost', () => {
-        console.info(`server listening at ${process.env.URL}`);
-    });
+        .use(express.static(__dirname))
+        .listen(port, process.env.HOSTNAME, () => {
+            console.info(`server listening at ${process.env.URL}`);
+        });
 
     return async () => {
         await new Promise(done => {
