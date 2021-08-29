@@ -21,16 +21,16 @@ function initialize(root: HTMLElement) {
 }
 
 function addClickListeners(element: HTMLElement) {
-    const links: NodeListOf<HTMLAnchorElement> = element.querySelectorAll('a[data-target-id]:not([data-target-id=""])');
+    const links: NodeListOf<HTMLAnchorElement> = element.querySelectorAll('a[data-target]:not([data-target=""])');
     links.forEach((a: HTMLAnchorElement) => {
         a.addEventListener('click', handleClick);
     });
 
-    const elementsWithDefaultTargetId: NodeListOf<HTMLElement> = element.querySelectorAll('[data-default-target-id]:not([data-default-target-id=""])');
+    const elementsWithDefaultTargetId: NodeListOf<HTMLElement> = element.querySelectorAll('[data-default-target]:not([data-default-target=""])');
     elementsWithDefaultTargetId.forEach((parentElement: HTMLElement) => {
-        const links: NodeListOf<HTMLAnchorElement> = parentElement.querySelectorAll('a:not([data-target-id])');
+        const links: NodeListOf<HTMLAnchorElement> = parentElement.querySelectorAll('a:not([data-target])');
         links.forEach((linkElement: HTMLAnchorElement) => {
-            linkElement.setAttribute('data-target-id', parentElement.getAttribute('data-default-target-id') as string);
+            linkElement.setAttribute('data-target', parentElement.getAttribute('data-default-target') as string);
             linkElement.addEventListener('click', handleClick);
         });
     });
@@ -39,7 +39,7 @@ function addClickListeners(element: HTMLElement) {
 function handleClick(event: MouseEvent) {
     event.preventDefault();
     const target = event.target as HTMLAnchorElement;
-    const targetId = target.getAttribute('data-target-id') as string;
+    const targetId = target.getAttribute('data-target') as string;
     history.pushState({ targetId }, "", target.href);
     tryLoadContent(target.href, targetId);
 }
