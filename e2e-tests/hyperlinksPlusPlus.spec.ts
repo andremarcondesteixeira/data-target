@@ -6,7 +6,7 @@ test('basic test', async ({ page }) => {
         <div id="content"></div>
         <a id="link" href="/tests/content.html" data-target-id="content" data-init>load</a>
     `);
-    await page.addScriptTag({ type: 'module', url: `${process.env.URL}/dist/lib.js` });
+    await page.addScriptTag({ type: 'module', url: `${process.env.URL}/build/hyperlinksPlusPlus.js` });
     await page.click('#link', {
         noWaitAfter: true,
         strict: true,
