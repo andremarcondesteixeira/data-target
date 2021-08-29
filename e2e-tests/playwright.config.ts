@@ -1,7 +1,7 @@
 import { PlaywrightTestConfig, devices } from '@playwright/test';
 
 const config: PlaywrightTestConfig = {
-    globalSetup: require.resolve('./global-setup'),
+    globalSetup: require.resolve('./globalSetup'),
     use: {
         bypassCSP: true
     },

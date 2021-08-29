@@ -4,12 +4,16 @@ test('basic test', async ({ page }) => {
     await page.goto(`${process.env.URL}`);
     await page.setContent(`
         <div id="content"></div>
-        <a href="/tests/content.html" data-target-id="content" data-init>load</a>
+        <a id="link" href="/tests/content.html" data-target-id="content" data-init>load</a>
     `);
     await page.addScriptTag({ type: 'module', url: `${process.env.URL}/dist/lib.js` });
-    await page.click('a');
-    const contentReceiver = await page.$('#content');
-    const loadedContent = await contentReceiver.$('#loaded-content');
+    await page.click('#link', {
+        noWaitAfter: true,
+        strict: true,
+        force: true
+    });
+
+    const loadedContent = await page.waitForSelector('#loaded-content');
     const loadedText = await loadedContent.innerText();
     expect(loadedText).toBe('loaded content');
 });

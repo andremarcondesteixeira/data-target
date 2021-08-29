@@ -1,6 +1,7 @@
+import 'dotenv/config';
 import express from 'express';
 import getPort from 'get-port';
-import 'dotenv/config';
+import path from 'node:path';
 
 export default async function globalSetup() {
     console.log('starting server');
@@ -10,9 +11,15 @@ export default async function globalSetup() {
     process.env.URL = `${process.env.URL}:${process.env.SERVER_PORT}`;
 
     const app = express();
-    app.use(express.static('./'));
+    app.use((req, _, next) => {
+        const filename = path.basename(req.url);
+        console.log(`file ${filename} requested`);
+        next();
+    });
+    app.use(express.static(__dirname));
+
     const server = app.listen(port, 'localhost', () => {
-        console.log(`server listening at port ${port}`);
+        console.log(`server listening at ${process.env.URL}`);
     });
 
     return async () => {

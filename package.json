@@ -5,20 +5,27 @@
     "main": "src/lib.js",
     "type": "module",
     "scripts": {
-        "test": "npm run build && npx playwright test --config=e2e-tests/playwright.config.ts",
-        "build": "tsc --project ./src/tsconfig.json && uglifyjs --compress --mangle --output dist/lib.min.js -- dist/lib.js"
+        "test": "npm run transpile-for-tests && npm run run-tests",
+        "transpile-for-tests": "tsc --project ./src/tsconfig.json --outDir ./e2e-tests/build",
+        "run-tests": "npx playwright test --config=e2e-tests/playwright.config.ts",
+        "build": "npm run transpile && npm run minify",
+        "transpile": "tsc --project ./src/tsconfig.json",
+        "minify": "uglifyjs --compress --mangle --output dist/hyperlinksPlusPlus.min.js"
     },
     "repository": {
         "type": "git",
-        "url": ""
+        "url": "https://github.com/andremarcondesteixeira/HyperlinksPlusPlus"
     },
-    "keywords": [],
+    "keywords": [
+        "navigation",
+        "hyperlinks"
+    ],
     "author": "André Marcondes Teixeira",
     "license": "MIT",
     "bugs": {
         "url": "https://github.com/andremarcondesteixeira/HyperlinksPlusPlus/issues"
     },
-    "homepage": "",
+    "homepage": "https://andremarcondesteixeira.github.io/HyperlinksPlusPlus/",
     "dependencies": {},
     "devDependencies": {
         "@playwright/test": "^1.14.1",
