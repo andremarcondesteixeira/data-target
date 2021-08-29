@@ -18,7 +18,9 @@
     },
     "keywords": [
         "navigation",
-        "hyperlinks"
+        "hyperlinks",
+        "anchors",
+        "html"
     ],
     "author": "André Marcondes Teixeira",
     "license": "MIT",
