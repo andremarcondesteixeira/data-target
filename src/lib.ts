@@ -3,7 +3,7 @@ initialize(document.body);
 
 const config = {
     urlTransformer: (url: string) => url,
-    errorHandler: (error: Error) => console.error(error),
+    errorHandler: (error: unknown) => console.error(error),
     httpRequestDispatcher: async (url: string) => {
         const response = await fetch(url);
         return {

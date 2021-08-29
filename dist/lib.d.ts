@@ -1,6 +1,6 @@
 declare const config: {
     urlTransformer: (url: string) => string;
-    errorHandler: (error: Error) => void;
+    errorHandler: (error: unknown) => void;
     httpRequestDispatcher: (url: string) => Promise<{
         content: string;
         statusCode: number;
