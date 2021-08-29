@@ -4,14 +4,10 @@ test('basic test', async ({ page }) => {
     await page.goto(`${process.env.URL}`);
     await page.setContent(`
         <div id="content"></div>
-        <a id="link" href="/tests/content.html" data-target-id="content" data-init>load</a>
+        <a id="link" href="content.html" data-target-id="content" data-init>load</a>
     `);
     await page.addScriptTag({ type: 'module', url: `${process.env.URL}/build/hyperlinksPlusPlus.js` });
-    await page.click('#link', {
-        noWaitAfter: true,
-        strict: true,
-        force: true
-    });
+    await page.click('#link');
 
     const loadedContent = await page.waitForSelector('#loaded-content');
     const loadedText = await loadedContent.innerText();

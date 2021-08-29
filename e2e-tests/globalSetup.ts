@@ -11,8 +11,8 @@ export default async function globalSetup() {
 
     const server = express()
         .use(useragent.express())
-        .use((req, _, next) => {
-            console.info(`${req.useragent?.browser} ${req.method} ${req.url}`);
+        .use((req, res, next) => {
+            console.info(`${req.useragent?.browser} -> ${req.method} ${req.url} -> ${res.statusCode}`);
             next();
         })
         .use(express.static(__dirname))
