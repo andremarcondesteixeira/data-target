@@ -4,12 +4,12 @@ import useragent from 'express-useragent';
 import getPort from 'get-port';
 
 export default async function globalSetup() {
-    const isDebugMode = process.env.DEBUG_MODE === '1';
+    const isDebugMode = process.env['DEBUG_MODE'] === '1';
 
     isDebugMode && console.info('starting server');
 
     const port = await getPort();
-    process.env.URL = `http://${process.env.HOST}:${port}`;
+    process.env['URL'] = `http://${process.env['HOST']}:${port}`;
 
     const server = express()
         .use(useragent.express())
@@ -18,8 +18,8 @@ export default async function globalSetup() {
             next();
         })
         .use(express.static(__dirname, { fallthrough: false }))
-        .listen(port, process.env.HOST, () => {
-            isDebugMode && console.info(`server listening at ${process.env.URL}`);
+        .listen(port, process.env['HOST'] as string, () => {
+            isDebugMode && console.info(`server listening at ${process.env['URL']}`);
         });
 
     return async () => {
