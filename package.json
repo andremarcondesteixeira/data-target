@@ -1,7 +1,7 @@
 {
     "name": "hyperlinksplusplus",
     "version": "0.0.1",
-    "description": "",
+    "description": "Allows an HTML anchor element to render the response inside another element through the usage of a data-target attribute",
     "main": "src/lib.js",
     "type": "module",
     "scripts": {
