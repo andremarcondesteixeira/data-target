@@ -7,4 +7,4 @@ declare const config: {
     }>;
 };
 export default config;
-//# sourceMappingURL=hyperlinksPlusPlus.d.ts.map
+//# sourceMappingURL=HyperlinksPlusPlus.d.ts.map

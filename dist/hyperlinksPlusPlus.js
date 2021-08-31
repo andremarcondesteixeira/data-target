@@ -14,18 +14,19 @@ const config = {
 export default config;
 function initialize(root) {
     addClickListeners(root);
-    root.querySelector('a[data-init]')?.click();
+    let autoloadingAnchors = root.querySelectorAll('a[data-init]');
+    autoloadingAnchors.forEach((anchor) => anchor.click());
 }
 function addClickListeners(element) {
-    const links = element.querySelectorAll('a[data-target-id]:not([data-target-id=""])');
+    const links = element.querySelectorAll('a[data-target]:not([data-target=""])');
     links.forEach((a) => {
         a.addEventListener('click', handleClick);
     });
-    const elementsWithDefaultTargetId = element.querySelectorAll('[data-default-target-id]:not([data-default-target-id=""])');
+    const elementsWithDefaultTargetId = element.querySelectorAll('[data-default-target]:not([data-default-target=""])');
     elementsWithDefaultTargetId.forEach((parentElement) => {
-        const links = parentElement.querySelectorAll('a:not([data-target-id])');
+        const links = parentElement.querySelectorAll('a:not([data-target])');
         links.forEach((linkElement) => {
-            linkElement.setAttribute('data-target-id', parentElement.getAttribute('data-default-target-id'));
+            linkElement.setAttribute('data-target', parentElement.getAttribute('data-default-target'));
             linkElement.addEventListener('click', handleClick);
         });
     });
@@ -33,7 +34,7 @@ function addClickListeners(element) {
 function handleClick(event) {
     event.preventDefault();
     const target = event.target;
-    const targetId = target.getAttribute('data-target-id');
+    const targetId = target.getAttribute('data-target');
     history.pushState({ targetId }, "", target.href);
     tryLoadContent(target.href, targetId);
 }
@@ -79,4 +80,4 @@ function dispatchContentLoadedEvent(targetElement, detail) {
         }
     }));
 }
-//# sourceMappingURL=hyperlinksPlusPlus.js.map
+//# sourceMappingURL=HyperlinksPlusPlus.js.map

@@ -17,7 +17,8 @@ export default config;
 
 function initialize(root: HTMLElement) {
     addClickListeners(root);
-    (root.querySelector('a[data-init]') as HTMLAnchorElement)?.click();
+    let autoloadingAnchors: NodeListOf<HTMLAnchorElement> = root.querySelectorAll('a[data-init][data-target]:not([data-target=""])');
+    autoloadingAnchors.forEach((anchor: HTMLAnchorElement) => anchor.click());
 }
 
 function addClickListeners(element: HTMLElement) {

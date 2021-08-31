@@ -1,1 +1,1 @@
-{"version":3,"file":"hyperlinksPlusPlus.d.ts","sourceRoot":"","sources":["../src/hyperlinksPlusPlus.ts"],"names":[],"mappings":"AAGA,QAAA,MAAM,MAAM;0BACc,MAAM;0BACN,OAAO;iCACM,MAAM;;;;CAO5C,CAAC;AAEF,eAAe,MAAM,CAAC"}
+{"version":3,"file":"HyperlinksPlusPlus.d.ts","sourceRoot":"","sources":["../src/HyperlinksPlusPlus.ts"],"names":[],"mappings":"AAGA,QAAA,MAAM,MAAM;0BACc,MAAM;0BACN,OAAO;iCACM,MAAM;;;;CAO5C,CAAC;AAEF,eAAe,MAAM,CAAC"}
