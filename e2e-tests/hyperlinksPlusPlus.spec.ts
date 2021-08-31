@@ -8,15 +8,18 @@ test.describe('basic functionality', () => {
             <div id="content"></div>
         `);
         await page.addScriptTag({ type: 'module', url: `${process.env['URL']}/build/hyperlinksPlusPlus.js` });
-        await page.click('#link');
 
-        const content = await page.$('#content');
-        let contentText = (await content?.innerText())?.toLowerCase();
-        expect(contentText).not.toMatch(/(404)|(error)|(not found)|(enoent)|(no such file)/);
+        page.on('load', async () => {
+            await page.click('#link');
 
-        const loadedContent = await content?.waitForSelector('#loaded-content');
-        const loadedContentText = await loadedContent?.innerText();
-        expect(loadedContentText).toBe('loaded content');
+            const content = await page.$('#content');
+            let contentText = (await content?.innerText())?.toLowerCase();
+            expect(contentText).not.toMatch(/(404)|(error)|(not found)|(enoent)|(no such file)/);
+
+            const loadedContent = await content?.waitForSelector('#loaded-content');
+            const loadedContentText = await loadedContent?.innerText();
+            expect(loadedContentText).toBe('loaded content');
+        });
     });
 
     test('an anchor with a data-init atribute will load automatically', async ({ page }) => {
@@ -27,13 +30,14 @@ test.describe('basic functionality', () => {
             <div id="content"></div>
         `);
         await page.addScriptTag({ type: 'module', url: `${process.env['URL']}/build/hyperlinksPlusPlus.js` });
+        page.on('load', async () => {
+            const content = await page.$('#content');
+            let contentText = (await content?.innerText())?.toLowerCase();
+            expect(contentText).not.toMatch(/(404)|(error)|(not found)|(enoent)|(no such file)/);
 
-        const content = await page.$('#content');
-        let contentText = (await content?.innerText())?.toLowerCase();
-        expect(contentText).not.toMatch(/(404)|(error)|(not found)|(enoent)|(no such file)/);
-
-        const loadedContent = await content?.waitForSelector('#loaded-content');
-        const loadedContentText = await loadedContent?.innerText();
-        expect(loadedContentText).toBe('loaded content');
+            const loadedContent = await content?.waitForSelector('#loaded-content');
+            const loadedContentText = await loadedContent?.innerText();
+            expect(loadedContentText).toBe('loaded content');
+        });
     });
 });
