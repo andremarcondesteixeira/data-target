@@ -10,7 +10,9 @@
         "run-tests": "npx playwright test --config=e2e-tests/playwright.config.ts",
         "build": "npm run transpile && npm run minify",
         "transpile": "tsc --project ./src/tsconfig.json",
-        "minify": "uglifyjs ./dist/hyperlinksPlusPlus.js --compress --mangle --output ./dist/hyperlinksPlusPlus.min.js --source-map"
+        "minify": "uglifyjs ./dist/hyperlinksPlusPlus.js --compress --mangle --output ./dist/hyperlinksPlusPlus.min.js --source-map",
+        "lint": "eslint --fix src/*.ts && eslint --fix e2e-tests/*.ts",
+        "prepare": "husky install"
     },
     "repository": {
         "type": "git",
@@ -44,6 +46,7 @@
         "express": "^4.17.1",
         "express-useragent": "^1.0.15",
         "get-port": "^5.1.1",
+        "husky": "^7.0.2",
         "typescript": "^4.4.2",
         "uglify-js": "^3.14.1"
     }
