@@ -14,7 +14,7 @@ const config = {
 export default config;
 function initialize(root) {
     addClickListeners(root);
-    let autoloadingAnchors = root.querySelectorAll('a[data-init]');
+    let autoloadingAnchors = root.querySelectorAll('a[data-init][data-target]:not([data-target=""])');
     autoloadingAnchors.forEach((anchor) => anchor.click());
 }
 function addClickListeners(element) {
