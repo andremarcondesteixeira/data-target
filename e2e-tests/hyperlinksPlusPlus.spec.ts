@@ -1,4 +1,4 @@
-import { expect, Page, PlaywrightTestArgs, PlaywrightTestOptions, PlaywrightWorkerArgs, PlaywrightWorkerOptions, test, TestInfo } from '@playwright/test';
+import { expect, Page, PlaywrightTestArgs, PlaywrightTestOptions, test } from '@playwright/test';
 
 test.describe('basic functionality', () => {
     test('clicking an anchor with a data-target-id attribute will load the content inside the element whose id matches the attribute', prepare({
@@ -50,9 +50,6 @@ interface TestConfig {
     assertions: (page: Page) => void;
 }
 
-type PrepareReturn = (args: PrepareArgs, testInfo: TestInfo) => void | Promise<void>;
+type PrepareReturn = (args: PrepareArgs) => Promise<void>;
 
-type PrepareArgs = PlaywrightTestArgs
-    & PlaywrightTestOptions
-    & PlaywrightWorkerArgs
-    & PlaywrightWorkerOptions;
+type PrepareArgs = PlaywrightTestArgs & PlaywrightTestOptions;
