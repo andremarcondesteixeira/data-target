@@ -19,7 +19,7 @@ test.describe('basic functionality', () => {
         }
     }));
 
-    test('an anchor with a data-init atribute loads automatically', prepare({
+    test('an anchor with a data-autoload atribute loads automatically', prepare({
         pageContent: `
             <a id="link" href="content.html" data-target="content" data-init>load</a>
             <div id="content"></div>
