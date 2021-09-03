@@ -38,9 +38,9 @@ test.describe('basic functionality', () => {
 
 function prepare(config: TestConfig): (args: PlaywrightTestArgs & PlaywrightTestOptions) => Promise<void> {
     return async ({ page }) => {
-        await page.goto(`${process.env['URL']}`);
+        await page.goto(`/`);
         await page.setContent(config.pageContent);
-        await page.addScriptTag({ type: 'module', url: `${process.env['URL']}/build/hyperlinksPlusPlus.js` });
+        await page.addScriptTag({ type: 'module', url: `/build/hyperlinksPlusPlus.js` });
         await config.assertions(page);
     };
 }

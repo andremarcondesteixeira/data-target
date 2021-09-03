@@ -9,7 +9,7 @@ export default async function globalSetup() {
     isDebugMode && console.info('starting server');
 
     const port = await getPort();
-    process.env['URL'] = `http://${process.env['HOST']}:${port}`;
+    process.env['BASE_URL'] = `http://${process.env['HOST']}:${port}`;
 
     const server = express()
         .use(useragent.express())
@@ -19,7 +19,7 @@ export default async function globalSetup() {
         })
         .use(express.static(__dirname, { fallthrough: false }))
         .listen(port, process.env['HOST'] as string, () => {
-            isDebugMode && console.info(`server listening at ${process.env['URL']}`);
+            isDebugMode && console.info(`server listening at ${process.env['BASE_URL']}`);
         });
 
     return async () => {

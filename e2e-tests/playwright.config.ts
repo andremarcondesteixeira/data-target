@@ -1,8 +1,11 @@
-import { PlaywrightTestConfig, devices } from '@playwright/test';
+import { devices, PlaywrightTestConfig } from '@playwright/test';
 
 const config: PlaywrightTestConfig = {
     globalSetup: require.resolve('./globalSetup'),
-    use: { bypassCSP: true },
+    use: {
+        baseURL: process.env['BASE_URL'],
+        bypassCSP: true
+    },
     projects: [{
         name: 'Chrome Stable',
         use: {
