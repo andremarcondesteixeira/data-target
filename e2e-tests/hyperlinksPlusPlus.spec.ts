@@ -37,8 +37,8 @@ test.describe('basic functionality', () => {
     }));
 });
 
-function prepare(config: TestConfig): PrepareReturn {
-    return async ({ page }: PrepareArgs): Promise<void> => {
+function prepare(config: TestConfig): (args: PlaywrightTestArgs & PlaywrightTestOptions) => Promise<void> {
+    return async ({ page }) => {
         await page.goto(`${process.env['URL']}`);
         await page.setContent(config.pageContent)
         await page.addScriptTag({ type: 'module', url: `${process.env['URL']}/build/hyperlinksPlusPlus.js` })
@@ -51,7 +51,3 @@ interface TestConfig {
     pageContent: string;
     assertions: (page: Page) => Promise<void>;
 }
-
-type PrepareReturn = (args: PrepareArgs) => Promise<void>;
-
-type PrepareArgs = PlaywrightTestArgs & PlaywrightTestOptions;
