@@ -21,7 +21,7 @@ test.describe('basic functionality', () => {
 
     test('an anchor with a data-autoload atribute loads automatically', prepare({
         pageContent: `
-            <a id="link" href="content.html" data-target="content" data-autoload>load</a>
+            <a href="content.html" data-target="content" data-autoload>load</a>
             <div id="content"></div>
         `,
         assertions: async page => {
@@ -32,7 +32,6 @@ test.describe('basic functionality', () => {
             const loadedContent = await content?.waitForSelector('#loaded-content');
             const loadedContentText = await loadedContent?.innerText();
             expect(loadedContentText).toBe('loaded content');
-            page.pause();
         }
     }));
 });
@@ -40,9 +39,8 @@ test.describe('basic functionality', () => {
 function prepare(config: TestConfig): (args: PlaywrightTestArgs & PlaywrightTestOptions) => Promise<void> {
     return async ({ page }) => {
         await page.goto(`${process.env['URL']}`);
-        await page.setContent(config.pageContent)
-        await page.addScriptTag({ type: 'module', url: `${process.env['URL']}/build/hyperlinksPlusPlus.js` })
-        await page.waitForLoadState('load');
+        await page.setContent(config.pageContent);
+        await page.addScriptTag({ type: 'module', url: `${process.env['URL']}/build/hyperlinksPlusPlus.js` });
         await config.assertions(page);
     };
 }

@@ -1,6 +1,3 @@
-window.addEventListener('popstate', event => tryLoadContent(location.href, event.state.targetId));
-initialize(document.body);
-
 const config = {
     urlTransformer: (url: string) => url,
     errorHandler: (error: unknown) => console.error(error),
@@ -15,8 +12,10 @@ const config = {
 
 export default config;
 
+window.addEventListener('popstate', event => tryLoadContent(location.href, event.state.targetId));
+initialize(document.body);
+
 function initialize(root: HTMLElement) {;
-    debugger;
     addClickListeners(root);
     let autoloadingAnchors: NodeListOf<HTMLAnchorElement> = root.querySelectorAll('a[data-autoload][data-target]:not([data-target=""])');
     autoloadingAnchors.forEach((anchor: HTMLAnchorElement) => anchor.click());
@@ -79,7 +78,7 @@ function renderContentInsideTargetElement(targetElement: HTMLElement, html: stri
 }
 
 function dispatchContentLoadedEvent(targetElement: HTMLElement, detail: ContentLoadedEventDetail) {
-    targetElement.dispatchEvent(new CustomEvent('content-loaded', {
+    targetElement.dispatchEvent(new CustomEvent('HyperLinksPlusPlus:DOMContentLoaded', {
         bubbles: true,
         cancelable: true,
         detail: {
