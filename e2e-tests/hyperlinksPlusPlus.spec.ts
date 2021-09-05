@@ -1,31 +1,33 @@
 import { expect, Page, PlaywrightTestArgs, PlaywrightTestOptions, test } from '@playwright/test';
+import fs from 'fs';
+import path from 'path';
 
 test.describe('basic functionality', () => {
     test('clicking an anchor with a data-target attribute will load the content inside the element whose id matches the attribute', prepare({
-        pageContent: `
+        pageContent: /*html*/ `
             <a id="link" href="/pages/page1.html" data-target="content">click me!</a>
             <div id="content"></div>
         `,
         assertions: async page => {
             await page.click('#link');
-            await at(page).assertTarget('content').hasInnerText('loaded content');
+            await at(page).assertTarget('content').receivedContentFromFile('pages/page1.html');
         }
     }));
 
     test('an anchor with a data-autoload atribute loads automatically', prepare({
-        pageContent: `
+        pageContent: /*html*/ `
             <a href="/pages/page1.html" data-target="content" data-autoload>
                 I will make the request by myself after the page is rendered, but just 1 time
             </a>
             <div id="content"></div>
         `,
         assertions: async page => {
-            await at(page).assertTarget('content').hasInnerText('loaded content');
+            await at(page).assertTarget('content').receivedContentFromFile('pages/page1.html');
         }
     }));
 
     test('clicking an anchor with a data-target attribute works independently of the nesting level of the anchor', prepare({
-        pageContent: `
+        pageContent: /*html*/ `
             <header>
                 <nav>
                     <section class="books">
@@ -43,7 +45,7 @@ test.describe('basic functionality', () => {
         `,
         assertions: async page => {
             await page.click('#nested-anchor');
-            await at(page).assertTarget('main-content').hasInnerText('loaded content');
+            await at(page).assertTarget('main-content').receivedContentFromFile('pages/page1.html');
         }
     }));
 });
@@ -65,15 +67,30 @@ interface TestConfig {
 function at(page: Page) {
     return {
         assertTarget: (target: string) => ({
-            hasInnerText: async (innerText: string) => {
+            receivedContentFromFile: async (filename: string) => {
                 const targetElement = await page.$(`#${target}`);
-                let contentText = (await targetElement?.innerText())?.toLowerCase();
-                expect(contentText).not.toMatch(/(404)|(error)|(not found)|(enoent)|(no such file)/);
+                let actualInnerText = (await targetElement?.innerText())?.toLowerCase();
+                expect(actualInnerText).not.toMatch(/(404)|(error)|(not found)|(enoent)|(no such file)/);
 
-                const loadedContent = await targetElement?.waitForSelector('#loaded-content');
-                const loadedContentText = await loadedContent?.innerText();
-                expect(loadedContentText).toBe(innerText);
+                const actualInnerHTML = (await targetElement?.innerHTML()).trim();
+                const expectedInnerHTML = (await readFile(filename)).trim();
+                expect(actualInnerHTML).toBe(expectedInnerHTML);
             }
         })
     }
+}
+
+async function readFile(filename: string) {
+    const stream = fs.createReadStream(path.join(__dirname, ...filename.split('/')), {
+        autoClose: true,
+        encoding: 'utf-8'
+    });
+
+    let content = '';
+
+    for await (const chunk of stream) {
+        content += chunk;
+    }
+
+    return content;
 }
