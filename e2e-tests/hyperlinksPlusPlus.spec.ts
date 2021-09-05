@@ -3,7 +3,7 @@ import { expect, Page, PlaywrightTestArgs, PlaywrightTestOptions, test } from '@
 test.describe('basic functionality', () => {
     test('clicking an anchor with a data-target attribute will load the content inside the element whose id matches the attribute', prepare({
         pageContent: `
-            <a id="link" href="content.html" data-target="content">click me!</a>
+            <a id="link" href="/pages/page1.html" data-target="content">click me!</a>
             <div id="content"></div>
         `,
         assertions: async page => {
@@ -14,7 +14,7 @@ test.describe('basic functionality', () => {
 
     test('an anchor with a data-autoload atribute loads automatically', prepare({
         pageContent: `
-            <a href="content.html" data-target="content" data-autoload>
+            <a href="/pages/page1.html" data-target="content" data-autoload>
                 I will make the request by myself after the page is rendered, but just 1 time
             </a>
             <div id="content"></div>
@@ -31,7 +31,7 @@ test.describe('basic functionality', () => {
                     <section class="books">
                         <ul>
                             <li>
-                                <a id="nested-anchor" href="content.html" data-target="main-content">
+                                <a id="nested-anchor" href="/pages/page1.html" data-target="main-content">
                                     Anchors should work irrespective of where they are in the DOM
                                 </a>
                             </li>
