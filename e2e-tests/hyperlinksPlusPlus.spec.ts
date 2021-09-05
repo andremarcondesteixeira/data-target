@@ -69,9 +69,6 @@ function at(page: Page) {
         assertTarget: (target: string) => ({
             receivedContentFromFile: async (filename: string) => {
                 const targetElement = await page.$(`#${target}`);
-                let actualInnerText = (await targetElement?.innerText())?.toLowerCase();
-                expect(actualInnerText).not.toMatch(/(404)|(error)|(not found)|(enoent)|(no such file)/);
-
                 const actualInnerHTML = (await targetElement?.innerHTML()).trim();
                 const expectedInnerHTML = (await readFile(filename)).trim();
                 expect(actualInnerHTML).toBe(expectedInnerHTML);
