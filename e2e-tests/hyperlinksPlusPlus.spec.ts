@@ -14,7 +14,30 @@ test.describe('basic functionality', () => {
         }
     }));
 
-    test('an anchor with a "data-autoload" atribute loads automatically', prepare({
+    test('clicking an anchor with a data-target attribute works independently of the nesting level of the anchor', prepare({
+        pageContent: /*html*/ `
+            <header>
+                <nav>
+                    <section class="books">
+                        <ul>
+                            <li>
+                                <a id="nested-anchor" href="/pages/requested-from-nested-anchor.html" data-target="is-upper-in-the-dom-tree">
+                                    Anchors should work no matter where they are in the DOM
+                                </a>
+                            </li>
+                        </ul>
+                    </section>
+                </nav>
+            </header>
+            <main id="is-upper-in-the-dom-tree"></main>
+        `,
+        assertions: async page => {
+            await page.click('#nested-anchor');
+            await at(page).assertTarget('is-upper-in-the-dom-tree').receivedContentFromFile('pages/requested-from-nested-anchor.html');
+        }
+    }));
+
+    test('an anchor with a "data-autoload" attribute loads automatically', prepare({
         pageContent: /*html*/ `
             <a href="/pages/basic-automatic.html" data-target="will-get-content-automatically" data-autoload>
                 This anchor will dispatch the request automatically after initial page load
@@ -26,15 +49,15 @@ test.describe('basic functionality', () => {
         }
     }));
 
-    test('clicking an anchor with a data-target attribute works independently of the nesting level of the anchor', prepare({
+    test('an anchor with a "data-autoload" attribute loads automatically independently of the nesting level of the anchor', prepare({
         pageContent: /*html*/ `
             <header>
                 <nav>
                     <section class="books">
                         <ul>
                             <li>
-                                <a id="nested-anchor" href="/pages/requested-from-nested-anchor.html" data-target="is-upper-in-the-dom-tree">
-                                    Anchors should work irrespective of where they are in the DOM
+                                <a href="/pages/requested-from-nested-anchor.html" data-target="is-upper-in-the-dom-tree" data-autoload>
+                                   Autoload anchors should work no matter where they are in the DOM
                                 </a>
                             </li>
                         </ul>
@@ -44,7 +67,6 @@ test.describe('basic functionality', () => {
             <main id="is-upper-in-the-dom-tree"></main>
         `,
         assertions: async page => {
-            await page.click('#nested-anchor');
             await at(page).assertTarget('is-upper-in-the-dom-tree').receivedContentFromFile('pages/requested-from-nested-anchor.html');
         }
     }));
