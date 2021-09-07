@@ -70,6 +70,21 @@ test.describe('basic functionality', () => {
             await at(page).assertTarget('is-upper-in-the-dom-tree').receivedContentFromFile('pages/requested-from-nested-anchor.html');
         }
     }));
+
+    test('Multiple autoload anchors can be defined simultaneously as long as they do not point to the same target', prepare({
+        pageContent: /* html */ `
+            <a href="/pages/basic.html" data-target="content-1" data-autoload>Loads automatically inside #content-1</a>
+            <a href="/pages/basic-automatic.html" data-target="content-2" data-autoload>Loads automatically inside #content-2</a>
+            <div id="content-1"></div>
+            <div id="content-2"></div>
+        `,
+        assertions: async page => {
+            await Promise.all([
+                at(page).assertTarget('content-1').receivedContentFromFile('pages/basic.html'),
+                at(page).assertTarget('content-2').receivedContentFromFile('pages/basic-automatic.html'),
+            ]);
+        }
+    }));
 });
 
 function prepare(config: TestConfig): (args: PlaywrightTestArgs & PlaywrightTestOptions) => Promise<void> {
