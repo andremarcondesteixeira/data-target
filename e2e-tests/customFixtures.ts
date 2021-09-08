@@ -19,7 +19,7 @@ const test = base.extend<CustomFixtures>({
     withPageContent: async ({ page }, use) => {
         await use((html: string) => {
             const callbacks: PageConsumer[] = [];
-            const inner = {
+            const fixture = {
                 expectedThatTarget: (target: string) => ({
                     receivedContentFromFile: async (filename: string) => {
                         await page.goto(`/`);
@@ -38,11 +38,11 @@ const test = base.extend<CustomFixtures>({
                 }),
                 do: (callback: PageConsumer) => {
                     callbacks.push(callback);
-                    return inner;
+                    return fixture;
                 }
             };
 
-            return inner;
+            return fixture;
         });
     }
 });
