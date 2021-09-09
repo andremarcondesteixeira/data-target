@@ -10,7 +10,8 @@ test.describe('basic functionality', () => {
         await withPageContent(html)
             .do(async page => await page.click('#hyperlink'))
             .expectedThatTarget('target-element-id')
-            .receivedContentFromFile('pages/basic.html');
+            .receivedContentFromFile('pages/basic.html')
+            .test();
     });
 
     test('clicking an anchor with a data-target attribute works independently of the nesting level of the anchor', async ({ withPageContent }) => {
@@ -34,7 +35,8 @@ test.describe('basic functionality', () => {
         await withPageContent(html)
             .do(async page => await page.click('#nested-anchor'))
             .expectedThatTarget('is-upper-in-the-dom-tree')
-            .receivedContentFromFile('pages/requested-from-nested-anchor.html');
+            .receivedContentFromFile('pages/requested-from-nested-anchor.html')
+            .test();
     });
 
     test('an anchor with a "data-autoload" attribute loads automatically', async ({ withPageContent }) => {
@@ -47,7 +49,8 @@ test.describe('basic functionality', () => {
 
         await withPageContent(html)
             .expectedThatTarget('will-get-content-automatically')
-            .receivedContentFromFile('pages/basic-automatic.html');
+            .receivedContentFromFile('pages/basic-automatic.html')
+            .test();
     });
 
     test('an anchor with a "data-autoload" attribute loads automatically independently of the nesting level of the anchor', async ({ withPageContent }) => {
@@ -70,7 +73,8 @@ test.describe('basic functionality', () => {
 
         await withPageContent(html)
             .expectedThatTarget('is-upper-in-the-dom-tree')
-            .receivedContentFromFile('pages/requested-from-nested-anchor.html');
+            .receivedContentFromFile('pages/requested-from-nested-anchor.html')
+            .test();
     });
 
     test('Multiple autoload anchors can be defined simultaneously as long as they do not point to the same target', async ({ withPageContent }) => {
@@ -83,10 +87,12 @@ test.describe('basic functionality', () => {
 
         await withPageContent(html)
             .expectedThatTarget('content-1')
-            .receivedContentFromFile('pages/basic.html');
+            .receivedContentFromFile('pages/basic.html')
+            .test();
 
         await withPageContent(html)
             .expectedThatTarget('content-2')
-            .receivedContentFromFile('pages/basic-automatic.html');
+            .receivedContentFromFile('pages/basic-automatic.html')
+            .test();
     });
 });

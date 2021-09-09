@@ -8,7 +8,9 @@ type CustomFixtures = {
 
 type WithPageContentFixture = {
     expectedThatTarget: (target: string) => {
-        receivedContentFromFile: (filename: string) => Promise<void>;
+        receivedContentFromFile: (filename: string) => {
+            test: () => Promise<void>;
+        }
     };
     do: (callback: PageConsumer) => WithPageContentFixture
 };
@@ -21,20 +23,11 @@ const test = base.extend<CustomFixtures>({
             const callbacks: PageConsumer[] = [];
             const fixture = {
                 expectedThatTarget: (target: string) => ({
-                    receivedContentFromFile: async (filename: string) => {
-                        await page.goto(`/`);
-                        await page.setContent(html);
-                        await page.addScriptTag({ type: 'module', url: `/build/hyperlinksPlusPlus.js` });
-
-                        for (let cb of callbacks) {
-                            await cb(page);
+                    receivedContentFromFile: (filename: string) => ({
+                        test: async () => {
+                            await runTest({ page, pageHTMLContent: html, actions: callbacks, targetElementId: target, loadedFile: filename });
                         }
-
-                        const targetElement = await page.$(`#${target}`);
-                        const actualInnerHTML = (await targetElement?.innerHTML()).trim();
-                        const expectedInnerHTML = (await readFile(filename)).trim();
-                        expect(actualInnerHTML).toBe(expectedInnerHTML);
-                    }
+                    })
                 }),
                 do: (callback: PageConsumer) => {
                     callbacks.push(callback);
@@ -46,6 +39,29 @@ const test = base.extend<CustomFixtures>({
         });
     }
 });
+
+type TestDefinition = {
+    page: Page;
+    pageHTMLContent: string;
+    actions: PageConsumer[];
+    targetElementId: string;
+    loadedFile: string;
+};
+
+async function runTest({ page, pageHTMLContent, actions, targetElementId, loadedFile }: TestDefinition) {
+    await page.goto(`/`);
+    await page.setContent(pageHTMLContent);
+    await page.addScriptTag({ type: 'module', url: `/build/hyperlinksPlusPlus.js` });
+
+    for (let cb of actions) {
+        await cb(page);
+    }
+
+    const targetElement = await page.$(`#${targetElementId}`);
+    const actualInnerHTML = (await targetElement?.innerHTML()).trim();
+    const expectedInnerHTML = (await readFile(loadedFile)).trim();
+    expect(actualInnerHTML).toBe(expectedInnerHTML);
+}
 
 async function readFile(filename: string) {
     const stream = fs.createReadStream(path.join(__dirname, ...filename.split('/')), {
