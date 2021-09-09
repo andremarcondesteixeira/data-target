@@ -25,7 +25,13 @@ const test = base.extend<CustomFixtures>({
                 expectedThatTarget: (target: string) => ({
                     receivedContentFromFile: (filename: string) => ({
                         test: async () => {
-                            await runTest({ page, pageHTMLContent: html, actions: callbacks, targetElementId: target, loadedFile: filename });
+                            await runTest({
+                                page,
+                                pageHTMLContent: html,
+                                actions: callbacks,
+                                targetElementId: target,
+                                loadedFile: filename
+                            });
                         }
                     })
                 }),
