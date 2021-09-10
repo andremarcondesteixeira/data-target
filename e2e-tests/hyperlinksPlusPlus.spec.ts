@@ -1,4 +1,4 @@
-import test from './customFixtures';
+import { test } from './customFixtures';
 
 test.describe('basic functionality', () => {
     test('clicking an anchor with a "data-target" attribute will put the response of the http request inside the element with a matching "id" attribute', async ({ withPageContent }) => {
@@ -9,7 +9,7 @@ test.describe('basic functionality', () => {
 
         await withPageContent(html)
             .do(async page => await page.click('#hyperlink'))
-            .expectedThatTarget('target-element-id')
+            .expectThatTarget('target-element-id')
             .receivedContentFromFile('pages/basic.html')
             .test();
     });
@@ -34,7 +34,7 @@ test.describe('basic functionality', () => {
 
         await withPageContent(html)
             .do(async page => await page.click('#nested-anchor'))
-            .expectedThatTarget('is-upper-in-the-dom-tree')
+            .expectThatTarget('is-upper-in-the-dom-tree')
             .receivedContentFromFile('pages/requested-from-nested-anchor.html')
             .test();
     });
@@ -48,7 +48,7 @@ test.describe('basic functionality', () => {
         `;
 
         await withPageContent(html)
-            .expectedThatTarget('will-get-content-automatically')
+            .expectThatTarget('will-get-content-automatically')
             .receivedContentFromFile('pages/basic-automatic.html')
             .test();
     });
@@ -72,7 +72,7 @@ test.describe('basic functionality', () => {
         `;
 
         await withPageContent(html)
-            .expectedThatTarget('is-upper-in-the-dom-tree')
+            .expectThatTarget('is-upper-in-the-dom-tree')
             .receivedContentFromFile('pages/requested-from-nested-anchor.html')
             .test();
     });
@@ -86,12 +86,10 @@ test.describe('basic functionality', () => {
         `;
 
         await withPageContent(html)
-            .expectedThatTarget('content-1')
+            .expectThatTarget('content-1')
             .receivedContentFromFile('pages/basic.html')
-            .test();
-
-        await withPageContent(html)
-            .expectedThatTarget('content-2')
+            .and()
+            .expectThatTarget('content-2')
             .receivedContentFromFile('pages/basic-automatic.html')
             .test();
     });

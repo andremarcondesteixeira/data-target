@@ -67,6 +67,7 @@ async function loadContent(url: string, targetElement: HTMLElement) {
     initialize(targetElement);
     dispatchContentLoadedEvent(targetElement, {
         url,
+        targetElementId: targetElement.id,
         responseStatusCode: response.statusCode
     });
 }
@@ -81,17 +82,12 @@ function dispatchContentLoadedEvent(targetElement: HTMLElement, detail: ContentL
     targetElement.dispatchEvent(new CustomEvent('HyperLinksPlusPlus:DOMContentLoaded', {
         bubbles: true,
         cancelable: true,
-        detail: {
-            ...detail,
-            matchUrl: (urlRegex: RegExp, callback: Function) => {
-                if (urlRegex.test(detail.url))
-                    callback();
-            }
-        }
+        detail
     }));
 }
 
-type ContentLoadedEventDetail = {
+export type ContentLoadedEventDetail = {
     url: string;
+    targetElementId: string;
     responseStatusCode: number;
 };
