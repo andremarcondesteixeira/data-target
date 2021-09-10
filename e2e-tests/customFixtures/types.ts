@@ -1,4 +1,4 @@
-import { Page } from '@playwright/test';
+import { Page, PlaywrightTestArgs, PlaywrightTestOptions, PlaywrightWorkerArgs, PlaywrightWorkerOptions } from '@playwright/test';
 
 export type CustomFixtures = {
     withPageContent: (html: string) => WithPageContentFixture
@@ -12,6 +12,13 @@ export type HyperlinksPlusPlusDOMContentLoadedEventDetail = {
 
 export type PageConsumer = (page: Page) => Promise<void>;
 
+export type PlaywrightFixtures =
+    CustomFixtures
+    & PlaywrightTestArgs
+    & PlaywrightTestOptions
+    & PlaywrightWorkerArgs
+    & PlaywrightWorkerOptions;
+
 export type TargetElementIdVsLoadedFileName = {
     targetElementId: string;
     loadedFileName: string;
@@ -24,9 +31,9 @@ export type TestDefinition = {
     targetsLoadedFiles: TargetElementIdVsLoadedFileName[]
 };
 
-type WithPageContentFixture = {
+export type WithPageContentFixture = {
     expectThatTarget: (target: string) => {
-        receivedContentFromFile: (filename: string) => {
+        receivedContentFromPage: (filename: string) => {
             test: () => Promise<void>;
             and: () => WithPageContentFixture
         }

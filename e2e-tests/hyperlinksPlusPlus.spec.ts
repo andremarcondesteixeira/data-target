@@ -10,7 +10,7 @@ test.describe('basic functionality', () => {
         await withPageContent(html)
             .do(async page => await page.click('#hyperlink'))
             .expectThatTarget('target-element-id')
-            .receivedContentFromFile('pages/basic.html')
+            .receivedContentFromPage('basic.html')
             .test();
     });
 
@@ -35,7 +35,7 @@ test.describe('basic functionality', () => {
         await withPageContent(html)
             .do(async page => await page.click('#nested-anchor'))
             .expectThatTarget('is-upper-in-the-dom-tree')
-            .receivedContentFromFile('pages/requested-from-nested-anchor.html')
+            .receivedContentFromPage('requested-from-nested-anchor.html')
             .test();
     });
 
@@ -49,7 +49,7 @@ test.describe('basic functionality', () => {
 
         await withPageContent(html)
             .expectThatTarget('will-get-content-automatically')
-            .receivedContentFromFile('pages/basic-automatic.html')
+            .receivedContentFromPage('basic-automatic.html')
             .test();
     });
 
@@ -73,7 +73,7 @@ test.describe('basic functionality', () => {
 
         await withPageContent(html)
             .expectThatTarget('is-upper-in-the-dom-tree')
-            .receivedContentFromFile('pages/requested-from-nested-anchor.html')
+            .receivedContentFromPage('requested-from-nested-anchor.html')
             .test();
     });
 
@@ -87,10 +87,10 @@ test.describe('basic functionality', () => {
 
         await withPageContent(html)
             .expectThatTarget('content-1')
-            .receivedContentFromFile('pages/basic.html')
+            .receivedContentFromPage('basic.html')
             .and()
             .expectThatTarget('content-2')
-            .receivedContentFromFile('pages/basic-automatic.html')
+            .receivedContentFromPage('basic-automatic.html')
             .test();
     });
 });

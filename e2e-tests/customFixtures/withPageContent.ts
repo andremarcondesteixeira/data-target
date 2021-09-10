@@ -2,18 +2,23 @@ import { expect } from "@playwright/test";
 import {
     HyperlinksPlusPlusDOMContentLoadedEventDetail,
     PageConsumer,
+    PlaywrightFixtures,
     TargetElementIdVsLoadedFileName,
-    TestDefinition
+    TestDefinition,
+    WithPageContentFixture
 } from "./types";
-import { readFile } from "./util";
+import { readPageFileContent } from "./util";
 
-export default async function withPageContent({ page }, use) {
-    await use((html: string) => {
+export default async function withPageContent(
+    { page }: PlaywrightFixtures,
+    use: (r: (html: string) => WithPageContentFixture) => Promise<void>
+) {
+    await use((html: string): WithPageContentFixture => {
         const callbacks: PageConsumer[] = [];
         const targetsLoadedFiles: TargetElementIdVsLoadedFileName[] = [];
         const fixture = {
             expectThatTarget: (target: string) => ({
-                receivedContentFromFile: (filename: string) => {
+                receivedContentFromPage: (filename: string) => {
                     targetsLoadedFiles.push({
                         targetElementId: target,
                         loadedFileName: filename
@@ -66,7 +71,7 @@ async function runTest({ page, pageHTMLContent, actions, targetsLoadedFiles }: T
     await Promise.all(targetsLoadedFiles.map(({ targetElementId, loadedFileName }) => (async () => {
         const targetElement = await page.$(`#${targetElementId}`);
         const actualInnerHTML = (await targetElement?.innerHTML()).trim();
-        const expectedInnerHTML = (await readFile(loadedFileName)).trim();
+        const expectedInnerHTML = (await readPageFileContent(loadedFileName)).trim();
         expect(actualInnerHTML).toBe(expectedInnerHTML);
     })()));
 }
