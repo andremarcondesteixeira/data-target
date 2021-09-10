@@ -1,4 +1,4 @@
-import { test } from './customFixtures';
+import test from './customFixtures';
 
 test.describe('basic functionality', () => {
     test('clicking an anchor with a "data-target" attribute will put the response of the http request inside the element with a matching "id" attribute', async ({ withPageContent }) => {

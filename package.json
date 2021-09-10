@@ -5,7 +5,6 @@
     "main": "dist/hyperlinksPlusPlus.min.js",
     "type": "module",
     "scripts": {
-        "debug": "npm run transpile-for-tests && npx playwright test --config=e2e-tests/playwright.config.ts --project=\"Chrome Stable\" --headed",
         "test": "npm run transpile-for-tests && npm run run-tests",
         "transpile-for-tests": "tsc --project ./src/tsconfig.json --outDir ./e2e-tests/build",
         "run-tests": "npx playwright test --config=e2e-tests/playwright.config.ts",
