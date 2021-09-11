@@ -1,42 +1,46 @@
-import { Page, PlaywrightTestArgs, PlaywrightTestOptions, PlaywrightWorkerArgs, PlaywrightWorkerOptions } from '@playwright/test';
+import { Page, PlaywrightTestArgs, PlaywrightTestOptions, PlaywrightWorkerArgs, PlaywrightWorkerOptions } from '@playwright/test'
 
 export type CustomFixtures = {
     withPageContent: (html: string) => WithPageContentFixture
-};
+}
+
+export type EventLogObserver = {
+    notify: (eventDetail: HyperlinksPlusPlusDOMContentLoadedEventDetail) => void
+}
 
 export type HyperlinksPlusPlusDOMContentLoadedEventDetail = {
-    url: string;
-    targetElementId: string;
-    responseStatusCode: number;
-};
+    url: string
+    targetElementId: string
+    responseStatusCode: number
+}
 
-export type PageConsumer = (page: Page) => Promise<void>;
+export type PageConsumer = (page: Page) => Promise<void>
 
 export type PlaywrightFixtures =
     CustomFixtures
     & PlaywrightTestArgs
     & PlaywrightTestOptions
     & PlaywrightWorkerArgs
-    & PlaywrightWorkerOptions;
+    & PlaywrightWorkerOptions
 
 export type TargetElementIdVsLoadedFileName = {
-    targetElementId: string;
-    loadedFileName: string;
+    targetElementId: string
+    loadedFileName: string
 }
 
 export type TestDefinition = {
-    page: Page;
-    pageHTMLContent: string;
-    actions: PageConsumer[];
+    page: Page
+    pageHTMLContent: string
+    actions: PageConsumer[]
     targetsLoadedFiles: TargetElementIdVsLoadedFileName[]
-};
+}
 
 export type WithPageContentFixture = {
     expectThatTarget: (target: string) => {
         receivedContentFromPage: (filename: string) => {
-            test: () => Promise<void>;
+            test: () => Promise<void>
             and: () => WithPageContentFixture
         }
-    };
+    }
     do: (callback: PageConsumer) => WithPageContentFixture
-};
+}

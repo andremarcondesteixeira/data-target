@@ -7,7 +7,7 @@ import {
     TestDefinition,
     WithPageContentFixture
 } from "./types";
-import { readPageFileContent } from "./util";
+import { EventLogObservable, readPageFileContent, targetElementHasReceivedContent } from "./util";
 
 export default async function withPageContent(
     { page }: PlaywrightFixtures,
@@ -50,9 +50,9 @@ async function runTest({ page, pageHTMLContent, actions, targetsLoadedFiles }: T
     await page.goto(`/`);
     await page.setContent(pageHTMLContent);
 
-    const eventDetailLog: HyperlinksPlusPlusDOMContentLoadedEventDetail[] = [];
+    const notifier = new EventLogObservable();
     await page.exposeFunction('logEventDetail', (eventDetail: HyperlinksPlusPlusDOMContentLoadedEventDetail) => {
-        eventDetailLog.push(eventDetail);
+        notifier.push(eventDetail);
     });
     await page.addScriptTag({
         content: `
@@ -69,6 +69,7 @@ async function runTest({ page, pageHTMLContent, actions, targetsLoadedFiles }: T
     }
 
     await Promise.all(targetsLoadedFiles.map(({ targetElementId, loadedFileName }) => (async () => {
+        await targetElementHasReceivedContent(targetElementId, loadedFileName, notifier);
         const targetElement = await page.$(`#${targetElementId}`);
         const actualInnerHTML = (await targetElement?.innerHTML()).trim();
         const expectedInnerHTML = (await readPageFileContent(loadedFileName)).trim();
