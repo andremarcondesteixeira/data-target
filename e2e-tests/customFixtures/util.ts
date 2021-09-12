@@ -17,7 +17,7 @@ export async function readPageFileContent(filename: string) {
     return content;
 }
 
-export class EventLogObservable {
+export class EventLogger {
     eventDetailLog: HyperlinksPlusPlusDOMContentLoadedEventDetail[] = [];
     subscribers: EventLogObserver[] = [];
 
@@ -40,7 +40,7 @@ export class EventLogObservable {
     }
 }
 
-export function targetElementHasReceivedContent(targetElementId: string, loadedFileName: string, notifier: EventLogObservable) {
+export function targetElementHasReceivedContent(targetElementId: string, loadedFileName: string, notifier: EventLogger) {
     return new Promise<void>(resolve => {
         const observer: EventLogObserver = {
             notify: (eventDetail: HyperlinksPlusPlusDOMContentLoadedEventDetail) => {

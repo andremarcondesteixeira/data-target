@@ -7,7 +7,7 @@ import {
     TestDefinition,
     WithPageContentFixture
 } from "./types";
-import { EventLogObservable, readPageFileContent, targetElementHasReceivedContent } from "./util";
+import { EventLogger, readPageFileContent, targetElementHasReceivedContent } from "./util";
 
 export default async function withPageContent(
     { page }: PlaywrightFixtures,
@@ -50,7 +50,7 @@ async function runTest({ page, pageHTMLContent, actions, targetsLoadedFiles }: T
     await page.goto(`/`);
     await page.setContent(pageHTMLContent);
 
-    const notifier = new EventLogObservable();
+    const notifier = new EventLogger();
     await page.exposeFunction('logEventDetail', (eventDetail: HyperlinksPlusPlusDOMContentLoadedEventDetail) => {
         notifier.push(eventDetail);
     });
