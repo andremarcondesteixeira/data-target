@@ -1,4 +1,5 @@
 import { expect, Page } from "@playwright/test";
+import { EventLogger } from "./createEventLoggerFixture";
 import { PlaywrightFixtures } from "./sharedTypes";
 import { readFileContent, waitUntilTargetElementHasReceivedContent } from "./util";
 
@@ -20,7 +21,7 @@ export type WithPageContentFixture = {
 }
 
 export default async function withPageContent(
-    { prepareContext }: PlaywrightFixtures,
+    { prepareContext, createEventLogger }: PlaywrightFixtures,
     use: (r: (html: string) => WithPageContentFixture) => Promise<void>
 ) {
     await use((html: string): WithPageContentFixture => {
@@ -35,11 +36,15 @@ export default async function withPageContent(
                     });
                     return {
                         test: async () => {
-                            const context = await prepareContext(html);
+                            let eventLogger: EventLogger;
+                            const page = await prepareContext(html, async (page: Page) => {
+                                eventLogger = await createEventLogger(page);
+                            });
                             await runTest({
-                                context,
                                 actions: callbacks,
-                                targetElementIdsVsLoadedFileNames
+                                eventLogger,
+                                page,
+                                targetElementIdsVsLoadedFileNames,
                             });
                         },
                         and: () => fixture
@@ -56,14 +61,14 @@ export default async function withPageContent(
     });
 }
 
-async function runTest({ actions, context, targetElementIdsVsLoadedFileNames }) {
+async function runTest({ actions, eventLogger, page, targetElementIdsVsLoadedFileNames }) {
     for (let cb of actions) {
-        await cb(context.page);
+        await cb(page);
     }
 
     await Promise.all(targetElementIdsVsLoadedFileNames.map(({ targetElementId, loadedFileName }) => (async () => {
-        await waitUntilTargetElementHasReceivedContent(targetElementId, loadedFileName, context.eventLogger);
-        const targetElement = await context.page.$(`#${targetElementId}`);
+        await waitUntilTargetElementHasReceivedContent(targetElementId, loadedFileName, eventLogger);
+        const targetElement = await page.$(`#${targetElementId}`);
         const actualInnerHTML = (await targetElement?.innerHTML()).trim();
         const expectedInnerHTML = (await readFileContent(loadedFileName)).trim();
         expect(actualInnerHTML).toBe(expectedInnerHTML);

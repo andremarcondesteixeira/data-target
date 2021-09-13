@@ -1,3 +1,4 @@
+import { ConsoleMessage, Page } from '@playwright/test';
 import test from './customFixtures';
 
 test.describe('basic functionality', () => {
@@ -114,5 +115,11 @@ test.describe('basic functionality', () => {
             .expectThatTarget('content-2')
             .receivedContentFromPage('pages/basic-automatic.html')
             .test();
+    });
+
+    test('An HyperlinksPlusPlus:DOMContentLoaded event is fired after the target element has received content', async ({
+        prepareContext
+    }) => {
+
     });
 });
