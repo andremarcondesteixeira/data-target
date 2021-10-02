@@ -1,7 +1,7 @@
 import { expect, Page } from "@playwright/test";
-import { EventLogger } from "./createEventLoggerFixture";
+import { EventLogger, waitUntilTargetElementHasReceivedContent } from "./createEventLoggerFixture";
 import { PlaywrightFixtures } from "./sharedTypes";
-import { readFileContent, waitUntilTargetElementHasReceivedContent } from "./util";
+import { readFileContent } from "./util";
 
 type PageConsumer = (page: Page) => Promise<void>
 

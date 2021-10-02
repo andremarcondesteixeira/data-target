@@ -47,3 +47,24 @@ export class EventLogger {
 export type EventLogObserver = {
     notify: (eventDetail: HyperlinksPlusPlusDOMContentLoadedEventDetail) => void
 }
+
+export function waitUntilTargetElementHasReceivedContent(
+    targetElementId: string,
+    loadedFileName: string,
+    eventLogger: EventLogger
+) {
+    return new Promise<void>(resolve => {
+        const observer: EventLogObserver = {
+            notify: (eventDetail: HyperlinksPlusPlusDOMContentLoadedEventDetail) => {
+                if (
+                    eventDetail.responseStatusCode === 200
+                    && eventDetail.targetElementId === targetElementId
+                    && eventDetail.url.endsWith(loadedFileName)
+                ) {
+                    resolve();
+                }
+            }
+        };
+        eventLogger.subscribe(observer);
+    });
+}
