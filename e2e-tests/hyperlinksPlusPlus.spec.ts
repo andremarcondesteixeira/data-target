@@ -1,4 +1,3 @@
-import { ConsoleMessage, Page } from '@playwright/test';
 import test from './customFixtures';
 
 test.describe('basic functionality', () => {
