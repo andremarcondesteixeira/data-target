@@ -37,8 +37,11 @@ export default async function withPageContent(
                     return {
                         test: async () => {
                             let eventLogger: EventLogger;
-                            const page = await prepareContext(html, async (page: Page) => {
-                                eventLogger = await createEventLogger(page);
+                            const page = await prepareContext({
+                                pageContent: html,
+                                beforeLoadingLib: async (page: Page) => {
+                                   eventLogger = await createEventLogger(page);
+                                }
                             });
                             await runTest({
                                 actions: callbacks,

@@ -1,16 +1,21 @@
 import { Page } from "@playwright/test";
 import { PlaywrightFixtures } from "./sharedTypes";
 
+export type PrepareContextFixtureArgs = {
+    pageContent: string;
+    beforeLoadingLib?: (page: Page) => Promise<void>;
+}
+
 export default async function prepareContext(
     { page }: PlaywrightFixtures,
-    use: (r: (html: string, intermediateStep?: (page: Page) => Promise<void>) => Promise<Page>) => Promise<void>
+    use: (r: (args: PrepareContextFixtureArgs) => Promise<Page>) => Promise<void>
 ) {
-    await use(async (html: string, intermediateStep?: (page: Page) => Promise<void>): Promise<Page> => {
+    await use(async (args: PrepareContextFixtureArgs): Promise<Page> => {
         await page.goto(`/`);
-        await page.setContent(html);
+        await page.setContent(args.pageContent);
 
-        if (!!intermediateStep)
-            await intermediateStep(page);
+        if (!!args?.beforeLoadingLib)
+            await args.beforeLoadingLib(page);
 
         await page.addScriptTag({ type: 'module', url: `/build/hyperlinksPlusPlus.js` });
         return page;
