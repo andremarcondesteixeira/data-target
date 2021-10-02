@@ -12,7 +12,7 @@ type TargetElementIdVsLoadedFileName = {
 
 export type WithPageContentFixture = {
     expectThatTarget: (target: string) => {
-        receivedContentFromPage: (filename: string) => {
+        receivedContentFrom: (filename: string) => {
             test: () => Promise<void>
             and: () => WithPageContentFixture
         }
@@ -29,7 +29,7 @@ export default async function withPageContent(
         const targetElementIdsVsLoadedFileNames: TargetElementIdVsLoadedFileName[] = [];
         const fixture = {
             expectThatTarget: (target: string) => ({
-                receivedContentFromPage: (filename: string) => {
+                receivedContentFrom: (filename: string) => {
                     targetElementIdsVsLoadedFileNames.push({
                         targetElementId: target,
                         loadedFileName: filename
