@@ -147,9 +147,8 @@ test.describe('basic functionality', () => {
 
         await Promise.all([
             new Promise<void>(async resolve => {
-                while (eventLog.length === 0) {
+                while (eventLog.length === 0)
                     await waitOneSecond();
-                }
                 resolve();
             }),
             page.click('#hyperlink')
