@@ -15,3 +15,7 @@ export async function readFileContent(filename: string) {
 
     return content;
 }
+
+export function waitOneSecond() {
+    return new Promise(resolve => setTimeout(resolve, 1000));
+}

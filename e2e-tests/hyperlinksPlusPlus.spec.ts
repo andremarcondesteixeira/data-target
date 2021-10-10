@@ -1,7 +1,7 @@
 import { expect } from '@playwright/test';
 import test from './customFixtures';
 import { HyperlinksPlusPlusDOMContentLoadedEventDetail } from './customFixtures/sharedTypes';
-import { readFileContent } from './customFixtures/util';
+import { readFileContent, waitOneSecond } from './customFixtures/util';
 
 test.describe('basic functionality', () => {
     test('an anchor with a "data-target" attribute puts the response of the http request in the element with a matching id', async ({
@@ -161,7 +161,3 @@ test.describe('basic functionality', () => {
         expect(actualInnerHTML).toBe(expectedInnerHTML);
     });
 });
-
-function waitOneSecond() {
-    return new Promise(resolve => setTimeout(resolve, 1000));
-}
