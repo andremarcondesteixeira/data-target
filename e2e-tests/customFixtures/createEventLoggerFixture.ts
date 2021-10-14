@@ -1,5 +1,5 @@
 import { Page } from "@playwright/test";
-import { HyperlinksPlusPlusDOMContentLoadedEventDetail, PlaywrightFixtures } from "./sharedTypes";
+import { LoadEventDetail, PlaywrightFixtures } from "./sharedTypes";
 
 export default async function createEventLogger(
     { }: PlaywrightFixtures,
@@ -7,12 +7,12 @@ export default async function createEventLogger(
 ) {
     await use(async (page: Page): Promise<EventLogger> => {
         const eventLogger = new EventLogger();
-        await page.exposeFunction('logEventDetail', (eventDetail: HyperlinksPlusPlusDOMContentLoadedEventDetail) => {
+        await page.exposeFunction('logEventDetail', (eventDetail: LoadEventDetail) => {
             eventLogger.push(eventDetail);
         });
         await page.addScriptTag({
             content: `
-                addEventListener('HyperLinksPlusPlus:DOMContentLoaded', event => {
+                addEventListener('hlpp:load', event => {
                     logEventDetail(event.detail);
                 });
             `
@@ -22,15 +22,15 @@ export default async function createEventLogger(
 };
 
 export class EventLogger {
-    eventDetailLog: HyperlinksPlusPlusDOMContentLoadedEventDetail[] = [];
+    eventDetailLog: LoadEventDetail[] = [];
     subscribers: EventLogObserver[] = [];
 
-    push(eventDetail: HyperlinksPlusPlusDOMContentLoadedEventDetail) {
+    push(eventDetail: LoadEventDetail) {
         this.eventDetailLog.push(eventDetail);
         this.notifyAllSubscribers(eventDetail);
     }
 
-    notifyAllSubscribers(eventDetail: HyperlinksPlusPlusDOMContentLoadedEventDetail) {
+    notifyAllSubscribers(eventDetail: LoadEventDetail) {
         this.subscribers.forEach(subscriber => {
             subscriber.notify(eventDetail);
         });
@@ -45,7 +45,7 @@ export class EventLogger {
 }
 
 export type EventLogObserver = {
-    notify: (eventDetail: HyperlinksPlusPlusDOMContentLoadedEventDetail) => void;
+    notify: (eventDetail: LoadEventDetail) => void;
 };
 
 export function waitUntilTargetElementHasReceivedContent(
@@ -54,7 +54,7 @@ export function waitUntilTargetElementHasReceivedContent(
     eventLogger: EventLogger
 ) {
     return new Promise<void>(resolve => eventLogger.subscribe({
-        notify: (eventDetail: HyperlinksPlusPlusDOMContentLoadedEventDetail) => {
+        notify: (eventDetail: LoadEventDetail) => {
             if (
                 eventDetail.responseStatusCode === 200
                 && eventDetail.targetElementSelector === targetElementSelector

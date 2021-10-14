@@ -77,7 +77,7 @@ function renderContentInsideTargetElement(targetElement: HTMLElement, html: stri
 }
 
 function dispatchContentLoadedEvent(targetElement: HTMLElement, detail: ContentLoadedEventDetail) {
-    targetElement.dispatchEvent(new CustomEvent('HyperLinksPlusPlus:DOMContentLoaded', {
+    targetElement.dispatchEvent(new CustomEvent('hlpp:load', {
         bubbles: true,
         cancelable: true,
         detail

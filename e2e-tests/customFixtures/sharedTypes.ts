@@ -6,7 +6,7 @@ import {
 } from '@playwright/test'
 import { CustomFixtures } from '.'
 
-export type HyperlinksPlusPlusDOMContentLoadedEventDetail = {
+export type LoadEventDetail = {
     url: string;
     targetElementSelector: string;
     responseStatusCode: number;

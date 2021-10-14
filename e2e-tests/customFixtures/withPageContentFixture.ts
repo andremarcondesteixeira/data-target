@@ -1,6 +1,6 @@
 import { expect, Page } from "@playwright/test";
 import { EventLogger, waitUntilTargetElementHasReceivedContent } from "./createEventLoggerFixture";
-import { HyperlinksPlusPlusDOMContentLoadedEventDetail, PlaywrightFixtures } from "./sharedTypes";
+import { LoadEventDetail, PlaywrightFixtures } from "./sharedTypes";
 import { readFileContent } from "./util";
 
 export type WithPageContentFixture = WithPageContentFixtureActions & WithPageContentFixtureFirstAssertion;
@@ -19,8 +19,8 @@ type WithPageContentFixtureFirstAssertion = {
             hasSameContentOf: (filename: string) => WithPageContentFixtureAssertions;
         };
         browserURLEndsWith: (url: string) => WithPageContentFixtureAssertions;
-        hyperlinksPlusPlusDOMContentLoadedEvent: () => {
-            hasBeenDispatchedWithDetails: (details: HyperlinksPlusPlusDOMContentLoadedEventDetail) => WithPageContentFixtureAssertions;
+        loadEvent: () => {
+            hasBeenDispatchedWithDetails: (details: LoadEventDetail) => WithPageContentFixtureAssertions;
         };
     };
 };
@@ -67,12 +67,12 @@ export default async function withPageContent(
                         });
                         return chain;
                     },
-                    hyperlinksPlusPlusDOMContentLoadedEvent: () => ({
-                        hasBeenDispatchedWithDetails: (expectedDetails: HyperlinksPlusPlusDOMContentLoadedEventDetail) => {
+                    loadEvent: () => ({
+                        hasBeenDispatchedWithDetails: (expectedDetails: LoadEventDetail) => {
                             const assertion = async (_: Page, eventLogger: EventLogger) => {
-                                const eventDetail = await new Promise<HyperlinksPlusPlusDOMContentLoadedEventDetail>(resolve => {
+                                const eventDetail = await new Promise<LoadEventDetail>(resolve => {
                                     eventLogger.subscribe({
-                                        notify: (eventDetail: HyperlinksPlusPlusDOMContentLoadedEventDetail) => {
+                                        notify: (eventDetail: LoadEventDetail) => {
                                             resolve(eventDetail);
                                         },
                                     });

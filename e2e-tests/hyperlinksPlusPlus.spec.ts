@@ -103,7 +103,7 @@ test.describe('basic functionality', () => {
             .and().runTest();
     });
 
-    test('a HyperlinksPlusPlus:DOMContentLoaded event is fired after the target element has received content', async ({
+    test('an hlpp:load event is fired after the target element has received content', async ({
         withPageContent
     }) => {
         const html = /*html*/ `
@@ -115,7 +115,7 @@ test.describe('basic functionality', () => {
 
         await withPageContent(html)
             .click('#hyperlink')
-            .then().expectThat().hyperlinksPlusPlusDOMContentLoadedEvent().hasBeenDispatchedWithDetails({
+            .then().expectThat().loadEvent().hasBeenDispatchedWithDetails({
                 url: `${process.env['BASE_URL']}/pages/basic.html`,
                 targetElementSelector: '#target-element-id',
                 responseStatusCode: 200,
