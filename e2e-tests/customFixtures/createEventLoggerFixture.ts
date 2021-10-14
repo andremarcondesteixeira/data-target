@@ -49,7 +49,7 @@ export type EventLogObserver = {
 }
 
 export function waitUntilTargetElementHasReceivedContent(
-    targetElementId: string,
+    targetElementSelector: string,
     loadedFileName: string,
     eventLogger: EventLogger
 ) {
@@ -58,7 +58,7 @@ export function waitUntilTargetElementHasReceivedContent(
             notify: (eventDetail: HyperlinksPlusPlusDOMContentLoadedEventDetail) => {
                 if (
                     eventDetail.responseStatusCode === 200
-                    && eventDetail.targetElementId === targetElementId
+                    && eventDetail.targetElementSelector === targetElementSelector
                     && eventDetail.url.endsWith(loadedFileName)
                 ) {
                     resolve();

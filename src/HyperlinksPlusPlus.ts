@@ -22,17 +22,17 @@ function initialize(root: HTMLElement) {
 }
 
 function addClickListeners(element: HTMLElement) {
-    const links: NodeListOf<HTMLAnchorElement> = element.querySelectorAll('a[data-target]:not([data-target=""])');
-    links.forEach((a: HTMLAnchorElement) => {
-        a.addEventListener('click', handleClick);
+    const anchors: NodeListOf<HTMLAnchorElement> = element.querySelectorAll('a[data-target]:not([data-target=""])');
+    anchors.forEach((anchorElement: HTMLAnchorElement) => {
+        anchorElement.addEventListener('click', handleClick);
     });
 
     const elementsWithDefaultTargetId: NodeListOf<HTMLElement> = element.querySelectorAll('[data-default-target]:not([data-default-target=""])');
     elementsWithDefaultTargetId.forEach((parentElement: HTMLElement) => {
         const links: NodeListOf<HTMLAnchorElement> = parentElement.querySelectorAll('a:not([data-target])');
-        links.forEach((linkElement: HTMLAnchorElement) => {
-            linkElement.setAttribute('data-target', parentElement.getAttribute('data-default-target') as string);
-            linkElement.addEventListener('click', handleClick);
+        links.forEach((anchorElement: HTMLAnchorElement) => {
+            anchorElement.setAttribute('data-target', parentElement.getAttribute('data-default-target') as string);
+            anchorElement.addEventListener('click', handleClick);
         });
     });
 }
@@ -40,36 +40,34 @@ function addClickListeners(element: HTMLElement) {
 function handleClick(event: MouseEvent) {
     event.preventDefault();
     const target = event.target as HTMLAnchorElement;
-    const targetId = target.getAttribute('data-target') as string;
-    history.pushState({ targetId }, "", target.href);
-    tryLoadContent(target.href, targetId);
+    const targetElementSelector = target.getAttribute('data-target') as string;
+    history.pushState({ targetElementSelector }, "", target.href);
+    tryLoadContent(target.href, targetElementSelector);
 }
 
-function tryLoadContent(url: string, targetId: string) {
+function tryLoadContent(url: string, targetElementSelector: string) {
     try {
-        const targetElement = getTargetElement(url, targetId);
-        loadContent(url, targetElement);
+        loadContent(url, targetElementSelector);
     } catch (error) {
         config.errorHandler(error);
     }
 }
 
-function getTargetElement(url: string, targetId: string) {
-    const targetElement = document.querySelector(`#${targetId}`) as HTMLElement;
-    if (!targetElement)
-        throw new Error(`No element found with id "${targetId}" to render response from ${url}`);
-    return targetElement;
-}
-
-async function loadContent(url: string, targetElement: HTMLElement) {
-    const response = await config.httpRequestDispatcher(config.urlTransformer(url));
+async function loadContent(url: string, targetElementSelector: string) {
+    const targetElement = getTargetElement(url, targetElementSelector);
+    const transformedUrl = config.urlTransformer(url);
+    const response = await config.httpRequestDispatcher(transformedUrl);
     renderContentInsideTargetElement(targetElement, response.content);
     initialize(targetElement);
-    dispatchContentLoadedEvent(targetElement, {
-        url,
-        targetElementId: targetElement.id,
-        responseStatusCode: response.statusCode
-    });
+    const eventDetail: ContentLoadedEventDetail = { url, targetElementSelector, responseStatusCode: response.statusCode };
+    dispatchContentLoadedEvent(targetElement, eventDetail);
+}
+
+function getTargetElement(url: string, targetElementSelector: string) {
+    const targetElement = document.querySelector(targetElementSelector) as HTMLElement;
+    if (!targetElement)
+        throw new Error(`No element found for selector "${targetElementSelector}" to render response from ${url}`);
+    return targetElement;
 }
 
 function renderContentInsideTargetElement(targetElement: HTMLElement, html: string) {
@@ -88,6 +86,6 @@ function dispatchContentLoadedEvent(targetElement: HTMLElement, detail: ContentL
 
 export type ContentLoadedEventDetail = {
     url: string;
-    targetElementId: string;
+    targetElementSelector: string;
     responseStatusCode: number;
 };

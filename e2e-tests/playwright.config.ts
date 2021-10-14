@@ -6,6 +6,7 @@ const config: PlaywrightTestConfig = {
         baseURL: process.env['BASE_URL'],
         bypassCSP: true
     },
+    timeout: 3000,
     projects: [{
         name: 'Chrome Stable',
         use: {

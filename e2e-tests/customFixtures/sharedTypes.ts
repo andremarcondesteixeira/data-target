@@ -7,14 +7,14 @@ import {
 import { CustomFixtures } from '.'
 
 export type HyperlinksPlusPlusDOMContentLoadedEventDetail = {
-    url: string
-    targetElementId: string
-    responseStatusCode: number
-}
+    url: string;
+    targetElementSelector: string;
+    responseStatusCode: number;
+};
 
 export type PlaywrightFixtures =
     CustomFixtures
     & PlaywrightTestArgs
     & PlaywrightTestOptions
     & PlaywrightWorkerArgs
-    & PlaywrightWorkerOptions
+    & PlaywrightWorkerOptions;
