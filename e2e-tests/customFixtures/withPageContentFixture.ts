@@ -3,77 +3,122 @@ import { EventLogger, waitUntilTargetElementHasReceivedContent } from "./createE
 import { PlaywrightFixtures } from "./sharedTypes";
 import { readFileContent } from "./util";
 
-type PageConsumer = (page: Page) => Promise<void>
+export type WithPageContentFixture = WithPageContentFixtureActions & WithPageContentFixtureFirstAssertion;
+
+type WithPageContentFixtureActions = {
+    do: (callback: PageConsumer) => WithPageContentFixtureActions;
+    click: (selector: string) => WithPageContentFixtureActions;
+    then: () => WithPageContentFixtureFirstAssertion;
+};
+
+type PageConsumer = (page: Page) => Promise<void>;
+
+type WithPageContentFixtureFirstAssertion = {
+    expectThat: () => {
+        element: (target: string) => {
+            hasSameContentOf: (filename: string) => WithPageContentFixtureAssertions
+        };
+    };
+};
+
+type WithPageContentFixtureAssertions = {
+    and: () => WithPageContentFixtureFirstAssertion & {
+        runTest: () => Promise<void>;
+    };
+};
 
 type TargetElementIdVsLoadedFileName = {
     targetElementId: string
     loadedFileName: string
-}
-
-export type WithPageContentFixture = {
-    expectThatTarget: (target: string) => {
-        receivedContentFrom: (filename: string) => {
-            test: () => Promise<void>
-            and: () => WithPageContentFixture
-        }
-    }
-    do: (callback: PageConsumer) => WithPageContentFixture
-}
+};
 
 export default async function withPageContent(
     { prepareContext, createEventLogger }: PlaywrightFixtures,
     use: (r: (html: string) => WithPageContentFixture) => Promise<void>
 ) {
     await use((html: string): WithPageContentFixture => {
-        const callbacks: PageConsumer[] = [];
+        const actionCallbacks: PageConsumer[] = [];
         const targetElementIdsVsLoadedFileNames: TargetElementIdVsLoadedFileName[] = [];
-        const fixture = {
-            expectThatTarget: (target: string) => ({
-                receivedContentFrom: (filename: string) => {
-                    targetElementIdsVsLoadedFileNames.push({
-                        targetElementId: target,
-                        loadedFileName: filename
-                    });
-                    return {
-                        test: async () => {
-                            let eventLogger: EventLogger;
-                            const page = await prepareContext({
-                                pageContent: html,
-                                beforeLoadingLib: async (page: Page) => {
-                                   eventLogger = await createEventLogger(page);
-                                }
-                            });
-                            await runTest({
-                                actions: callbacks,
-                                eventLogger,
-                                page,
-                                targetElementIdsVsLoadedFileNames,
-                            });
-                        },
-                        and: () => fixture
-                    }
-                }
+
+        const assertions: WithPageContentFixtureFirstAssertion = {
+            expectThat: () => ({
+                element: (target: string) => ({
+                    hasSameContentOf: (filename: string) => {
+                        targetElementIdsVsLoadedFileNames.push({
+                            targetElementId: target,
+                            loadedFileName: filename
+                        });
+
+                        return {
+                            and: () => ({
+                                ...assertions,
+                                runTest: async () => {
+                                    let eventLogger: EventLogger;
+                                    const page = await prepareContext({
+                                        pageContent: html,
+                                        beforeLoadingLib: async (page: Page) => {
+                                            eventLogger = await createEventLogger(page);
+                                        }
+                                    });
+                                    await runTest(actionCallbacks, eventLogger, page, targetElementIdsVsLoadedFileNames);
+                                },
+                            }),
+                        };
+                    },
+                }),
             }),
-            do: (callback: PageConsumer) => {
-                callbacks.push(callback);
-                return fixture;
-            }
         };
 
-        return fixture;
+        const actions: WithPageContentFixtureActions = {
+            do: (callback: PageConsumer) => {
+                actionCallbacks.push(callback);
+                return actions;
+            },
+            click: (selector: string) => {
+                actionCallbacks.push(async (page: Page) => await page.click(selector));
+                return actions;
+            },
+            then: () => assertions,
+        };
+
+        return {
+            ...actions,
+            ...assertions,
+        };
     });
 }
 
-async function runTest({ actions, eventLogger, page, targetElementIdsVsLoadedFileNames }) {
-    for (let cb of actions) {
-        await cb(page);
-    }
+async function runTest(
+    actions: PageConsumer[],
+    eventLogger: EventLogger,
+    page: Page,
+    targetElementIdsVsLoadedFileNames: TargetElementIdVsLoadedFileName[]
+) {
+    await executeAllActions(actions, page);
+    await executeAllAssertions(targetElementIdsVsLoadedFileNames, eventLogger, page);
+}
 
-    await Promise.all(targetElementIdsVsLoadedFileNames.map(({ targetElementId, loadedFileName }) => (async () => {
+async function executeAllActions(actions: PageConsumer[], page: Page) {
+    for (let action of actions) {
+        await action(page);
+    }
+}
+
+async function executeAllAssertions(
+    targetElementIdsVsLoadedFileNames: TargetElementIdVsLoadedFileName[],
+    eventLogger: EventLogger,
+    page: Page
+) {
+    const createAssertion = (targetElementId: string, loadedFileName: string) => async () => {
         await waitUntilTargetElementHasReceivedContent(targetElementId, loadedFileName, eventLogger);
         const targetElement = await page.$(`#${targetElementId}`);
         const actualInnerHTML = (await targetElement?.innerHTML()).trim();
         const expectedInnerHTML = (await readFileContent(loadedFileName)).trim();
         expect(actualInnerHTML).toBe(expectedInnerHTML);
-    })()));
+    };
+    const assertions = targetElementIdsVsLoadedFileNames.map(({ targetElementId, loadedFileName }) => {
+        return createAssertion(targetElementId, loadedFileName)
+    });
+    const results = assertions.map(assertion => assertion());
+    await Promise.all(results);
 }

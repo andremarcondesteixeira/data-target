@@ -15,10 +15,9 @@ test.describe('basic functionality', () => {
         `;
 
         await withPageContent(html)
-            .do(async page => await page.click('#hyperlink'))
-            .expectThatTarget('target-element-id')
-            .receivedContentFrom('pages/basic.html')
-            .test();
+            .click('#hyperlink')
+            .then().expectThat().element('target-element-id').hasSameContentOf('pages/basic.html')
+            .and().runTest();
     });
 
     test('an anchor with a data-target attribute works independently of the nesting level of the anchor', async ({
@@ -32,9 +31,7 @@ test.describe('basic functionality', () => {
                             <li>
                                 <a id="nested-anchor"
                                    href="/pages/requested-from-nested-anchor.html"
-                                   data-target="is-upper-in-the-dom-tree">
-                                    Anchors should work no matter where they are in the DOM
-                                </a>
+                                   data-target="is-upper-in-the-dom-tree">Anchors should work no matter where they are in the DOM</a>
                             </li>
                         </ul>
                     </section>
@@ -44,10 +41,9 @@ test.describe('basic functionality', () => {
         `;
 
         await withPageContent(html)
-            .do(async page => await page.click('#nested-anchor'))
-            .expectThatTarget('is-upper-in-the-dom-tree')
-            .receivedContentFrom('pages/requested-from-nested-anchor.html')
-            .test();
+            .click('#nested-anchor')
+            .then().expectThat().element('is-upper-in-the-dom-tree').hasSameContentOf('pages/requested-from-nested-anchor.html')
+            .and().runTest();
     });
 
     test('an anchor with a "data-autoload" attribute loads automatically', async ({
@@ -56,16 +52,13 @@ test.describe('basic functionality', () => {
         const html = /*html*/ `
             <a href="/pages/basic-automatic.html"
                data-target="will-get-content-automatically"
-               data-autoload>
-                This anchor will dispatch the request automatically after initial page load
-            </a>
+               data-autoload>This anchor will dispatch the request automatically after initial page load</a>
             <div id="will-get-content-automatically"></div>
         `;
 
         await withPageContent(html)
-            .expectThatTarget('will-get-content-automatically')
-            .receivedContentFrom('pages/basic-automatic.html')
-            .test();
+            .expectThat().element('will-get-content-automatically').hasSameContentOf('pages/basic-automatic.html')
+            .and().runTest();
     });
 
     test(`an anchor with a "data-autoload" attribute loads automatically independently of the anchor's nesting level`, async ({
@@ -79,9 +72,7 @@ test.describe('basic functionality', () => {
                             <li>
                                 <a href="/pages/requested-from-nested-anchor.html"
                                    data-target="is-upper-in-the-dom-tree"
-                                   data-autoload>
-                                    Autoload anchors should work no matter where they are in the DOM
-                                </a>
+                                   data-autoload>Autoload anchors should work no matter where they are in the DOM</a>
                             </li>
                         </ul>
                     </section>
@@ -91,9 +82,8 @@ test.describe('basic functionality', () => {
         `;
 
         await withPageContent(html)
-            .expectThatTarget('is-upper-in-the-dom-tree')
-            .receivedContentFrom('pages/requested-from-nested-anchor.html')
-            .test();
+            .expectThat().element('is-upper-in-the-dom-tree').hasSameContentOf('pages/requested-from-nested-anchor.html')
+            .and().runTest();
     });
 
     test('Multiple autoload anchors can be defined simultaneously as long as they do not point to the same target', async ({
@@ -111,12 +101,9 @@ test.describe('basic functionality', () => {
         `;
 
         await withPageContent(html)
-            .expectThatTarget('content-1')
-            .receivedContentFrom('pages/basic.html')
-            .and()
-            .expectThatTarget('content-2')
-            .receivedContentFrom('pages/basic-automatic.html')
-            .test();
+            .expectThat().element('content-1').hasSameContentOf('pages/basic.html')
+            .and().expectThat().element('content-2').hasSameContentOf('pages/basic-automatic.html')
+            .and().runTest();
     });
 
     test('An HyperlinksPlusPlus:DOMContentLoaded event is fired after the target element has received content', async ({
