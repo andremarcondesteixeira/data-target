@@ -1,6 +1,6 @@
 import { expect, Page } from "@playwright/test";
 import { EventLogger, waitUntilTargetElementHasReceivedContent } from "./createEventLoggerFixture";
-import { PlaywrightFixtures } from "./sharedTypes";
+import { HyperlinksPlusPlusDOMContentLoadedEventDetail, PlaywrightFixtures } from "./sharedTypes";
 import { readFileContent } from "./util";
 
 export type WithPageContentFixture = WithPageContentFixtureActions & WithPageContentFixtureFirstAssertion;
@@ -16,9 +16,12 @@ type PageConsumer = (page: Page) => Promise<void>;
 type WithPageContentFixtureFirstAssertion = {
     expectThat: () => {
         element: (target: string) => {
-            hasSameContentOf: (filename: string) => WithPageContentFixtureAssertions
+            hasSameContentOf: (filename: string) => WithPageContentFixtureAssertions;
         };
-        browserURLEndsWith: (url: string) => WithPageContentFixtureAssertions
+        browserURLEndsWith: (url: string) => WithPageContentFixtureAssertions;
+        hyperlinksPlusPlusDOMContentLoadedEvent: () => {
+            hasBeenDispatchedWithDetails: (details: HyperlinksPlusPlusDOMContentLoadedEventDetail) => WithPageContentFixtureAssertions;
+        };
     };
 };
 
@@ -37,7 +40,14 @@ export default async function withPageContent(
         const assertions: ((page: Page, eventLogger: EventLogger) => Promise<void>)[] = [];
 
         const assertionChainStart: WithPageContentFixtureFirstAssertion = {
-            expectThat: function() {
+            expectThat: function () {
+                const chain = {
+                    and: () => ({
+                        ...this,
+                        runTest,
+                    }),
+                };
+
                 return {
                     element: (selector: string) => ({
                         hasSameContentOf: (filename: string) => {
@@ -48,25 +58,31 @@ export default async function withPageContent(
                                 const expectedInnerHTML = (await readFileContent(filename)).trim();
                                 expect(actualInnerHTML).toBe(expectedInnerHTML);
                             });
-                            return {
-                                and: () => ({
-                                    ...this,
-                                    runTest,
-                                }),
-                            };;
+                            return chain;
                         },
                     }),
                     browserURLEndsWith: (url: string) => {
                         assertions.push(async (page: Page) => {
                             expect(page.url().endsWith(url)).toBeTruthy();
                         });
-                        return {
-                            and: () => ({
-                                ...this,
-                                runTest,
-                            }),
-                        };;
+                        return chain;
                     },
+                    hyperlinksPlusPlusDOMContentLoadedEvent: () => ({
+                        hasBeenDispatchedWithDetails: (expectedDetails: HyperlinksPlusPlusDOMContentLoadedEventDetail) => {
+                            const assertion = async (_: Page, eventLogger: EventLogger) => {
+                                const eventDetail = await new Promise<HyperlinksPlusPlusDOMContentLoadedEventDetail>(resolve => {
+                                    eventLogger.subscribe({
+                                        notify: (eventDetail: HyperlinksPlusPlusDOMContentLoadedEventDetail) => {
+                                            resolve(eventDetail);
+                                        },
+                                    });
+                                });
+                                expect(eventDetail).toEqual(expectedDetails);
+                            };
+                            assertions.push(assertion);
+                            return chain;
+                        },
+                    }),
                 };
             },
         };

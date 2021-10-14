@@ -1,10 +1,7 @@
-import { expect } from '@playwright/test';
 import test from './customFixtures';
-import { HyperlinksPlusPlusDOMContentLoadedEventDetail } from './customFixtures/sharedTypes';
-import { readFileContent, waitOneSecond } from './customFixtures/util';
 
 test.describe('basic functionality', () => {
-    test('an anchor with a "data-target" attribute puts the response of the http request in the element with a matching id', async ({
+    test('an anchor with a "data-target" attribute puts the response of the http request in the first', async ({
         withPageContent
     }) => {
         const html = /*html*/ `
@@ -86,7 +83,7 @@ test.describe('basic functionality', () => {
             .and().runTest();
     });
 
-    test('Multiple autoload anchors can be defined simultaneously as long as they do not point to the same target', async ({
+    test('multiple autoload anchors can be defined simultaneously as long as they do not point to the same target', async ({
         withPageContent
     }) => {
         const html = /* html */ `
@@ -106,48 +103,27 @@ test.describe('basic functionality', () => {
             .and().runTest();
     });
 
-    test('An HyperlinksPlusPlus:DOMContentLoaded event is fired after the target element has received content', async ({
-        prepareContext
+    test('a HyperlinksPlusPlus:DOMContentLoaded event is fired after the target element has received content', async ({
+        withPageContent
     }) => {
-        const eventLog: HyperlinksPlusPlusDOMContentLoadedEventDetail[] = [];
+        const html = /*html*/ `
+            <a id="hyperlink"
+               href="/pages/basic.html"
+               data-target="#target-element-id">click me!</a>
+            <div id="target-element-id"></div>
+        `;
 
-        const page = await prepareContext({
-            pageContent: /*html*/ `
-                <a id="hyperlink"
-                   href="/pages/basic.html"
-                   data-target="#target-element-id">click me!</a>
-                <div id="target-element-id"></div>
-            `,
-            beforeLoadingLib: async (page) => {
-                await page.exposeFunction('logEventDetail', (eventDetail: HyperlinksPlusPlusDOMContentLoadedEventDetail) => {
-                    eventLog.push(eventDetail);
-                });
-                await page.addScriptTag({
-                    content: `
-                        addEventListener('HyperLinksPlusPlus:DOMContentLoaded', event => {
-                            logEventDetail(event.detail);
-                        });
-                    `
-                });
-            }
-        });
-
-        await Promise.all([
-            new Promise<void>(async resolve => {
-                while (eventLog.length === 0)
-                    await waitOneSecond();
-                resolve();
-            }),
-            page.click('#hyperlink')
-        ]);
-
-        const targetElement = await page.$(`#target-element-id`);
-        const actualInnerHTML = (await targetElement?.innerHTML()).trim();
-        const expectedInnerHTML = (await readFileContent('pages/basic.html')).trim();
-        expect(actualInnerHTML).toBe(expectedInnerHTML);
+        await withPageContent(html)
+            .click('#hyperlink')
+            .then().expectThat().hyperlinksPlusPlusDOMContentLoadedEvent().hasBeenDispatchedWithDetails({
+                url: `${process.env['BASE_URL']}/pages/basic.html`,
+                targetElementSelector: '#target-element-id',
+                responseStatusCode: 200,
+            })
+            .and().runTest();
     });
 
-    test(`The browser's url will be updated upon navigation according to the anchor's link`, async ({
+    test(`the browser's url will be updated upon navigation according to the anchor's link`, async ({
         withPageContent
     }) => {
         const html = /*html*/ `

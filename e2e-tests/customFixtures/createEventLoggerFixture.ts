@@ -31,40 +31,37 @@ export class EventLogger {
     }
 
     notifyAllSubscribers(eventDetail: HyperlinksPlusPlusDOMContentLoadedEventDetail) {
-        this.subscribers.forEach((subscriber: EventLogObserver) => {
+        this.subscribers.forEach(subscriber => {
             subscriber.notify(eventDetail);
         });
     }
 
     subscribe(subscriber: EventLogObserver) {
         this.subscribers.push(subscriber);
-        this.eventDetailLog.forEach((eventDetail: HyperlinksPlusPlusDOMContentLoadedEventDetail) => {
+        this.eventDetailLog.forEach(eventDetail => {
             subscriber.notify(eventDetail);
         });
     }
 }
 
 export type EventLogObserver = {
-    notify: (eventDetail: HyperlinksPlusPlusDOMContentLoadedEventDetail) => void
-}
+    notify: (eventDetail: HyperlinksPlusPlusDOMContentLoadedEventDetail) => void;
+};
 
 export function waitUntilTargetElementHasReceivedContent(
     targetElementSelector: string,
     loadedFileName: string,
     eventLogger: EventLogger
 ) {
-    return new Promise<void>(resolve => {
-        const observer: EventLogObserver = {
-            notify: (eventDetail: HyperlinksPlusPlusDOMContentLoadedEventDetail) => {
-                if (
-                    eventDetail.responseStatusCode === 200
-                    && eventDetail.targetElementSelector === targetElementSelector
-                    && eventDetail.url.endsWith(loadedFileName)
-                ) {
-                    resolve();
-                }
+    return new Promise<void>(resolve => eventLogger.subscribe({
+        notify: (eventDetail: HyperlinksPlusPlusDOMContentLoadedEventDetail) => {
+            if (
+                eventDetail.responseStatusCode === 200
+                && eventDetail.targetElementSelector === targetElementSelector
+                && eventDetail.url.endsWith(loadedFileName)
+            ) {
+                resolve();
             }
-        };
-        eventLogger.subscribe(observer);
-    });
+        },
+    }));
 }
