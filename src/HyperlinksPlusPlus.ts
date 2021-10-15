@@ -64,10 +64,10 @@ async function loadContent(url: string, targetElementSelector: string) {
 }
 
 function getTargetElement(url: string, targetElementSelector: string) {
-    const targetElement = document.querySelector(targetElementSelector) as HTMLElement;
+    const targetElement = document.querySelector(targetElementSelector);
     if (!targetElement)
         throw new Error(`No element found for selector "${targetElementSelector}" to render response from ${url}`);
-    return targetElement;
+    return targetElement as HTMLElement;
 }
 
 function renderContentInsideTargetElement(targetElement: HTMLElement, html: string) {

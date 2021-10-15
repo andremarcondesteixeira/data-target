@@ -52,7 +52,23 @@ export default async function withPageContent(
                     element: (selector: string) => ({
                         hasSameContentOf: (filename: string) => {
                             assertions.push(async (page: Page, eventLogger: EventLogger) => {
-                                await waitUntilTargetElementHasReceivedContent(selector, filename, eventLogger);
+                                const targetSelector = await page.evaluate(args => {
+                                    const [html, elementSelector] = args;
+                                    const div = window.document.createElement('div');
+                                    div.insertAdjacentHTML('afterbegin', html);
+                                    const desiredTarget = div.querySelector(elementSelector);
+                                    const anchors = Array.from(div.querySelectorAll('a[data-target]'));
+                                    const targetSelector = anchors.map(a => {
+                                        return a.getAttribute('data-target');
+                                    }).filter(targetSelector => {
+                                        const targetForThisAnchor = div.querySelector(targetSelector);
+                                        return targetForThisAnchor === desiredTarget;
+                                    })[0]
+                                    return targetSelector;
+                                }, [html, selector]);
+
+                                await waitUntilTargetElementHasReceivedContent(targetSelector, filename, eventLogger);
+
                                 const targetElement = await page.$(selector);
                                 const actualInnerHTML = (await targetElement.innerHTML()).trim();
                                 const expectedInnerHTML = (await readFileContent(filename)).trim();

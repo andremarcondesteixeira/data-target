@@ -1,19 +1,20 @@
 import test from './customFixtures';
 
-test.describe('basic functionality', () => {
-    test('an anchor with a "data-target" attribute puts the response of the http request in the first', async ({
+test.describe('without using data-autoload', () => {
+    test('an anchor with a "data-target" attribute puts the response of the http request in the first element matched by the selector in the attribute', async ({
         withPageContent
     }) => {
         const html = /*html*/ `
             <a id="hyperlink"
                href="/pages/basic.html"
-               data-target="#target-element-id">click me!</a>
-            <div id="target-element-id"></div>
+               data-target=".target">click me!</a>
+            <div id="first" class="target"></div>
+            <div class="target"></div>
         `;
 
         await withPageContent(html)
             .click('#hyperlink')
-            .then().expectThat().element('#target-element-id').hasSameContentOf('pages/basic.html')
+            .then().expectThat().element('#first').hasSameContentOf('pages/basic.html')
             .and().runTest();
     });
 
@@ -43,6 +44,44 @@ test.describe('basic functionality', () => {
             .and().runTest();
     });
 
+    test('an hlpp:load event is fired after the target element has received content', async ({
+        withPageContent
+    }) => {
+        const html = /*html*/ `
+            <a id="hyperlink"
+               href="/pages/basic.html"
+               data-target="#target-element-id">click me!</a>
+            <div id="target-element-id"></div>
+        `;
+
+        await withPageContent(html)
+            .click('#hyperlink')
+            .then().expectThat().loadEvent().hasBeenDispatchedWithDetails({
+                url: `${process.env['BASE_URL']}/pages/basic.html`,
+                targetElementSelector: '#target-element-id',
+                responseStatusCode: 200,
+            })
+            .and().runTest();
+    });
+
+    test(`the browser's url will be updated upon navigation according to the anchor's link`, async ({
+        withPageContent
+    }) => {
+        const html = /*html*/ `
+            <a id="hyperlink"
+               href="/pages/basic.html"
+               data-target="#target-element-id">click me!</a>
+            <div id="target-element-id"></div>
+        `;
+
+        await withPageContent(html)
+            .click('#hyperlink')
+            .then().expectThat().browserURLEndsWith('/pages/basic.html')
+            .and().runTest();
+    });
+});
+
+test.describe('using data-autoload', () => {
     test('an anchor with a "data-autoload" attribute loads automatically', async ({
         withPageContent
     }) => {
@@ -103,19 +142,18 @@ test.describe('basic functionality', () => {
             .and().runTest();
     });
 
-    test('an hlpp:load event is fired after the target element has received content', async ({
+    test('an hlpp:load event is fired after the target element has received content, when using autoload anchors', async ({
         withPageContent
     }) => {
         const html = /*html*/ `
-            <a id="hyperlink"
-               href="/pages/basic.html"
-               data-target="#target-element-id">click me!</a>
+            <a href="/pages/basic.html"
+               data-target="#target-element-id"
+               data-autoload>autoload</a>
             <div id="target-element-id"></div>
         `;
 
         await withPageContent(html)
-            .click('#hyperlink')
-            .then().expectThat().loadEvent().hasBeenDispatchedWithDetails({
+            .expectThat().loadEvent().hasBeenDispatchedWithDetails({
                 url: `${process.env['BASE_URL']}/pages/basic.html`,
                 targetElementSelector: '#target-element-id',
                 responseStatusCode: 200,
@@ -123,19 +161,18 @@ test.describe('basic functionality', () => {
             .and().runTest();
     });
 
-    test(`the browser's url will be updated upon navigation according to the anchor's link`, async ({
+    test(`the browser's url will be updated upon navigation according to the anchor's link, when using autoload anchors`, async ({
         withPageContent
     }) => {
         const html = /*html*/ `
-            <a id="hyperlink"
-               href="/pages/basic.html"
-               data-target="#target-element-id">click me!</a>
+            <a href="/pages/basic.html"
+               data-target="#target-element-id"
+               data-autoload>autoload</a>
             <div id="target-element-id"></div>
         `;
 
         await withPageContent(html)
-            .click('#hyperlink')
-            .then().expectThat().browserURLEndsWith('/pages/basic.html')
+            .expectThat().browserURLEndsWith('/pages/basic.html')
             .and().runTest();
     });
 });
