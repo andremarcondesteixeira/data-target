@@ -1,6 +1,6 @@
 import test from './customFixtures';
 
-test.describe('without using data-autoload', () => {
+test.describe('basic functionality:', () => {
     test('an anchor with a "data-target" attribute puts the response of the http request in the first element matched by the selector in the attribute', async ({
         withPageContent
     }) => {
@@ -18,7 +18,7 @@ test.describe('without using data-autoload', () => {
             .and().runTest();
     });
 
-    test('an anchor with a data-target attribute works independently of the nesting level of the anchor', async ({
+    test('an anchor with a "data-target" attribute works independently of the nesting level of the anchor', async ({
         withPageContent
     }) => {
         const html = /*html*/ `
@@ -81,7 +81,7 @@ test.describe('without using data-autoload', () => {
     });
 });
 
-test.describe('using data-autoload', () => {
+test.describe('data-autoload attribute:', () => {
     test('an anchor with a "data-autoload" attribute loads automatically', async ({
         withPageContent
     }) => {
@@ -139,40 +139,6 @@ test.describe('using data-autoload', () => {
         await withPageContent(html)
             .expectThat().element('#content-1').hasSameContentOf('pages/basic.html')
             .and().expectThat().element('#content-2').hasSameContentOf('pages/basic-automatic.html')
-            .and().runTest();
-    });
-
-    test('an hlpp:load event is fired after the target element has received content, when using autoload anchors', async ({
-        withPageContent
-    }) => {
-        const html = /*html*/ `
-            <a href="/pages/basic.html"
-               data-target="#target-element-id"
-               data-autoload>autoload</a>
-            <div id="target-element-id"></div>
-        `;
-
-        await withPageContent(html)
-            .expectThat().loadEvent().hasBeenDispatchedWithDetails({
-                url: `${process.env['BASE_URL']}/pages/basic.html`,
-                targetElementSelector: '#target-element-id',
-                responseStatusCode: 200,
-            })
-            .and().runTest();
-    });
-
-    test(`the browser's url will be updated upon navigation according to the anchor's link, when using autoload anchors`, async ({
-        withPageContent
-    }) => {
-        const html = /*html*/ `
-            <a href="/pages/basic.html"
-               data-target="#target-element-id"
-               data-autoload>autoload</a>
-            <div id="target-element-id"></div>
-        `;
-
-        await withPageContent(html)
-            .expectThat().browserURLEndsWith('/pages/basic.html')
             .and().runTest();
     });
 });
