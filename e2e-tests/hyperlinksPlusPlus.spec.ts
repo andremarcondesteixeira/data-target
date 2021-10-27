@@ -1,12 +1,28 @@
 import test from './customFixtures';
 
 test.describe('basic functionality:', () => {
+    test(`the browser's url will be updated upon navigation according to the anchor's link`, async ({
+        withPageContent
+    }) => {
+        const html = /*html*/ `
+            <a id="hyperlink"
+               href="/pages/the_road_not_taken.html"
+               data-target="#target-element-id">click me!</a>
+            <div id="target-element-id"></div>
+        `;
+
+        await withPageContent(html)
+            .click('#hyperlink')
+            .then().expectThat().browserURLEndsWith('/pages/the_road_not_taken.html')
+            .and().runTest();
+    });
+
     test('an anchor with a "data-target" attribute puts the response of the http request in the first element matched by the selector in the attribute', async ({
         withPageContent
     }) => {
         const html = /*html*/ `
             <a id="hyperlink"
-               href="/pages/basic.html"
+               href="/pages/the_road_not_taken.html"
                data-target=".target">click me!</a>
             <div id="first" class="target"></div>
             <div class="target"></div>
@@ -14,7 +30,8 @@ test.describe('basic functionality:', () => {
 
         await withPageContent(html)
             .click('#hyperlink')
-            .then().expectThat().element('#first').hasSameContentOf('pages/basic.html')
+            .then().expectThat().element('#first').hasSameContentOf('pages/the_road_not_taken.html')
+            .and().expectThat().browserURLEndsWith("/pages/the_road_not_taken.html")
             .and().runTest();
     });
 
@@ -28,7 +45,7 @@ test.describe('basic functionality:', () => {
                         <ul>
                             <li>
                                 <a id="nested-anchor"
-                                   href="/pages/requested-from-nested-anchor.html"
+                                   href="/pages/vida.html"
                                    data-target="#is-upper-in-the-dom-tree">Anchors should work no matter where they are in the DOM</a>
                             </li>
                         </ul>
@@ -40,16 +57,17 @@ test.describe('basic functionality:', () => {
 
         await withPageContent(html)
             .click('#nested-anchor')
-            .then().expectThat().element('#is-upper-in-the-dom-tree').hasSameContentOf('pages/requested-from-nested-anchor.html')
+            .then().expectThat().element('#is-upper-in-the-dom-tree').hasSameContentOf('pages/vida.html')
+            .and().expectThat().browserURLEndsWith("/pages/vida.html")
             .and().runTest();
     });
 
-    test('an hlpp:load event is fired after the target element has received content', async ({
+    test('an "hlpp:load" event is fired after the target element has received content', async ({
         withPageContent
     }) => {
         const html = /*html*/ `
             <a id="hyperlink"
-               href="/pages/basic.html"
+               href="/pages/the_road_not_taken.html"
                data-target="#target-element-id">click me!</a>
             <div id="target-element-id"></div>
         `;
@@ -57,26 +75,36 @@ test.describe('basic functionality:', () => {
         await withPageContent(html)
             .click('#hyperlink')
             .then().expectThat().loadEvent().hasBeenDispatchedWithDetails({
-                url: `${process.env['BASE_URL']}/pages/basic.html`,
+                url: `${process.env['BASE_URL']}/pages/the_road_not_taken.html`,
                 targetElementSelector: '#target-element-id',
                 responseStatusCode: 200,
             })
             .and().runTest();
     });
+});
 
-    test(`the browser's url will be updated upon navigation according to the anchor's link`, async ({
+test.describe('data-default-target attribute:', () => {
+    test('a node with a "data-default-target" attribute sets the the "data-target" attribute of all descendant anchors', async ({
         withPageContent
     }) => {
         const html = /*html*/ `
-            <a id="hyperlink"
-               href="/pages/basic.html"
-               data-target="#target-element-id">click me!</a>
+            <header>
+                <nav data-default-target=".content">
+                    <ul>
+                        <li><a href="/pages/the_road_not_taken.html">click me!</a></li>
+                        <li><a href="/pages/no_meio_do_caminho.html">click me!</a></li>
+                        <li><a href="/pages/vida.html">click me!</a></li>
+                    </ul>
+                </nav>
+            </header>
+            <main class="content"></main>
+
             <div id="target-element-id"></div>
         `;
 
         await withPageContent(html)
-            .click('#hyperlink')
-            .then().expectThat().browserURLEndsWith('/pages/basic.html')
+            .click('nav a:first-of-type')
+            .then().expectThat().browserURLEndsWith('/pages/the_road_not_taken.html')
             .and().runTest();
     });
 });
@@ -86,14 +114,15 @@ test.describe('data-autoload attribute:', () => {
         withPageContent
     }) => {
         const html = /*html*/ `
-            <a href="/pages/basic-automatic.html"
+            <a href="/pages/no_meio_do_caminho.html"
                data-target="#will-get-content-automatically"
                data-autoload>This anchor will dispatch the request automatically after initial page load</a>
             <div id="will-get-content-automatically"></div>
         `;
 
         await withPageContent(html)
-            .expectThat().element('#will-get-content-automatically').hasSameContentOf('pages/basic-automatic.html')
+            .expectThat().element('#will-get-content-automatically').hasSameContentOf('pages/no_meio_do_caminho.html')
+            .and().expectThat().browserURLEndsWith("/pages/no_meio_do_caminho.html")
             .and().runTest();
     });
 
@@ -106,7 +135,7 @@ test.describe('data-autoload attribute:', () => {
                     <section class="books">
                         <ul>
                             <li>
-                                <a href="/pages/requested-from-nested-anchor.html"
+                                <a href="/pages/vida.html"
                                    data-target="#is-upper-in-the-dom-tree"
                                    data-autoload>Autoload anchors should work no matter where they are in the DOM</a>
                             </li>
@@ -118,7 +147,8 @@ test.describe('data-autoload attribute:', () => {
         `;
 
         await withPageContent(html)
-            .expectThat().element('#is-upper-in-the-dom-tree').hasSameContentOf('pages/requested-from-nested-anchor.html')
+            .expectThat().element('#is-upper-in-the-dom-tree').hasSameContentOf('pages/vida.html')
+            .and().expectThat().browserURLEndsWith("/pages/vida.html")
             .and().runTest();
     });
 
@@ -126,10 +156,10 @@ test.describe('data-autoload attribute:', () => {
         withPageContent
     }) => {
         const html = /* html */ `
-            <a href="/pages/basic.html"
+            <a href="/pages/the_road_not_taken.html"
                data-target="#content-1"
                data-autoload>Loads automatically inside #content-1</a>
-            <a href="/pages/basic-automatic.html"
+            <a href="/pages/no_meio_do_caminho.html"
                data-target="#content-2"
                data-autoload>Loads automatically inside #content-2</a>
             <div id="content-1"></div>
@@ -137,8 +167,8 @@ test.describe('data-autoload attribute:', () => {
         `;
 
         await withPageContent(html)
-            .expectThat().element('#content-1').hasSameContentOf('pages/basic.html')
-            .and().expectThat().element('#content-2').hasSameContentOf('pages/basic-automatic.html')
+            .expectThat().element('#content-1').hasSameContentOf('pages/the_road_not_taken.html')
+            .and().expectThat().element('#content-2').hasSameContentOf('pages/no_meio_do_caminho.html')
             .and().runTest();
     });
 });
