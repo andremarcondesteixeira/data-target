@@ -139,31 +139,38 @@ class ElementAssertionsChain {
 
     hasSameContentOf(filename: string) {
         this.assertions.push(async (page: Page, eventLogger: EventLogger) => {
-            await this._hasSameContentOf(page, filename, eventLogger);
+            await this.comparePageContentAgainstFile(page, filename, eventLogger);
         });
         return this.continuation;
     }
 
-    private async _hasSameContentOf(page: Page, filename: string, eventLogger: EventLogger) {
-        const targetSelector = await page.evaluate(args => {
-            const [html, elementSelector] = args;
-            const div = window.document.createElement('div');
-            div.insertAdjacentHTML('afterbegin', html);
-            const desiredTarget = div.querySelector(elementSelector);
-            const anchors = Array.from(div.querySelectorAll('a[data-target]'));
-            const targetSelector = anchors.map(a => a.getAttribute('data-target')).filter(targetSelector => {
-                const targetForThisAnchor = div.querySelector(targetSelector);
-                return targetForThisAnchor === desiredTarget;
-            })[0];
-            return targetSelector;
-        }, [this.html, this.selector]);
-
+    private async comparePageContentAgainstFile(page: Page, filename: string, eventLogger: EventLogger) {
+        const targetSelector = await this.usePageToExtractTargetSelectorFromHTML(page);
         await waitUntilTargetElementHasReceivedContent(targetSelector, filename, eventLogger);
-
         const targetElement = await page.$(this.selector);
         const actualInnerHTML = (await targetElement.innerHTML()).trim();
         const expectedInnerHTML = (await readFileContent(filename)).trim();
         expect(actualInnerHTML).toBe(expectedInnerHTML);
+    }
+
+    private async usePageToExtractTargetSelectorFromHTML(page: Page) {
+        return await page.evaluate(args => {
+            const [html, selector] = args;
+
+            const div = window.document.createElement('div');
+            div.insertAdjacentHTML('afterbegin', html);
+            const desiredTarget = div.querySelector(selector);
+
+            const anchors = div.querySelectorAll('a[data-target]');
+            const dataTargets = Array.from(anchors).map(a => a.getAttribute('data-target'));
+
+            const targetSelector = dataTargets.filter(targetSelector => {
+                const targetForThisAnchor = div.querySelector(targetSelector);
+                return targetForThisAnchor === desiredTarget;
+            })[0];
+
+            return targetSelector;
+        }, [this.html, this.selector]);
     }
 }
 
