@@ -1,8 +1,8 @@
 import { Page, expect } from "@playwright/test";
 import { EventLogger } from "../createEventLoggerFixture";
-import { LoadEventDetail } from "../sharedTypes";
 import { ContinuationChain } from "./ContinuationChain";
-import { ElementAssertion } from "./ElementAssertion";
+import { ElementAssertions } from "./ElementAssertion";
+import { LoadEventAssertions } from "./LoadEventAssertions";
 
 export class AssertionsChain {
     constructor(
@@ -12,7 +12,7 @@ export class AssertionsChain {
     ) { }
 
     element(selector: string) {
-        return new ElementAssertion(this.html, this.assertions, selector, this.continuation);
+        return new ElementAssertions(this.html, this.assertions, selector, this.continuation);
     }
 
     browserURLEndsWith(url: string) {
@@ -23,23 +23,6 @@ export class AssertionsChain {
     }
 
     loadEvent() {
-        return {
-            hasBeenDispatchedWithDetails: (expectedDetails: LoadEventDetail) => {
-                const assertion = async (_: Page, eventLogger: EventLogger) => {
-                    const eventDetail = await new Promise<LoadEventDetail>(resolve => {
-                        eventLogger.subscribe({
-                            notify: (eventDetail: LoadEventDetail) => {
-                                resolve(eventDetail);
-                            },
-                        });
-                    });
-                    expect(eventDetail).toEqual(expectedDetails);
-                };
-
-                this.assertions.push(assertion);
-
-                return this.continuation;
-            },
-        };
+        return new LoadEventAssertions(this.assertions, this.continuation);
     }
 }

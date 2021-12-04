@@ -3,14 +3,6 @@ import { EventLogger } from "../createEventLoggerFixture";
 import { PrepareContextFixtureArgs } from "../prepareContextFixture";
 import { LoadEventDetail } from "../sharedTypes";
 
-export type WithPageContentFixture = WithPageContentFixtureActions & WithPageContentFixtureFirstAssertion;
-
-export type WithPageContentFixtureActions = {
-    do: (callback: PageConsumer) => WithPageContentFixtureActions;
-    click: (selector: string) => WithPageContentFixtureActions;
-    then: () => WithPageContentFixtureFirstAssertion;
-};
-
 export type PageConsumer = (page: Page) => Promise<void>;
 
 export type WithPageContentFixtureFirstAssertion = {

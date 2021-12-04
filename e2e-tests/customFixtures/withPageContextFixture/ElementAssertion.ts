@@ -3,7 +3,7 @@ import { EventLogger, waitUntilTargetElementHasReceivedContent } from "../create
 import { readFileContent } from "../util";
 import { ContinuationChain } from "./ContinuationChain";
 
-export class ElementAssertion {
+export class ElementAssertions {
     constructor(
         private html: string,
         private assertions: ((page: Page, eventLogger: EventLogger) => Promise<void>)[] = [],
