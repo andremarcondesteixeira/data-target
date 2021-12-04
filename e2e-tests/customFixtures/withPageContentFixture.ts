@@ -1,5 +1,4 @@
 import { expect, Page } from "@playwright/test";
-import { strict } from "assert/strict";
 import { EventLogger, waitUntilTargetElementHasReceivedContent } from "./createEventLoggerFixture";
 import { PrepareContextFixtureArgs } from "./prepareContextFixture";
 import { LoadEventDetail, PlaywrightFixtures } from "./sharedTypes";
@@ -55,8 +54,8 @@ export default async function withPageContent(
 function makeFixture(html: string, fixtures: CustomFixtures): WithPageContentFixture {
     const state: State = { actions: [], assertions: [] };
     const testRunner = new TestRunner(html, state, fixtures);
-    const assertionChainStart = new AssertionChainStart(html, state.assertions, testRunner);
-    const actionChain = new ActionChain(state.actions, assertionChainStart);
+    const assertionChainStart = new Assertions(html, state.assertions, testRunner);
+    const actionChain = new Actions(state.actions, assertionChainStart);
 
     return {
         do: (callback: PageConsumer) => actionChain.do(callback),
@@ -90,7 +89,7 @@ class TestRunner {
     }
 }
 
-class AssertionChainStart implements WithPageContentFixtureFirstAssertion {
+class Assertions implements WithPageContentFixtureFirstAssertion {
     constructor(
         private html: string,
         private assertions: ((page: Page, eventLogger: EventLogger) => Promise<void>)[] = [],
@@ -98,12 +97,7 @@ class AssertionChainStart implements WithPageContentFixtureFirstAssertion {
     ) { }
 
     expectThat() {
-        const chain = {
-            and: () => ({
-                expectThat: () => this.expectThat(),
-                runTest: () => this.testRunner.run(),
-            }),
-        };
+        const continuation = new Continuation(this, this.testRunner);
 
         return {
             element: (selector: string) => ({
@@ -131,14 +125,14 @@ class AssertionChainStart implements WithPageContentFixtureFirstAssertion {
                         const expectedInnerHTML = (await readFileContent(filename)).trim();
                         expect(actualInnerHTML).toBe(expectedInnerHTML);
                     });
-                    return chain;
+                    return continuation;
                 },
             }),
             browserURLEndsWith: (url: string) => {
                 this.assertions.push(async (page: Page) => {
                     expect(page.url().endsWith(url)).toBeTruthy();
                 });
-                return chain;
+                return continuation;
             },
             loadEvent: () => ({
                 hasBeenDispatchedWithDetails: (expectedDetails: LoadEventDetail) => {
@@ -153,17 +147,31 @@ class AssertionChainStart implements WithPageContentFixtureFirstAssertion {
                         expect(eventDetail).toEqual(expectedDetails);
                     };
                     this.assertions.push(assertion);
-                    return chain;
+                    return continuation;
                 },
             }),
         };
     }
 }
 
-class ActionChain {
+class Continuation {
+    constructor(
+        private assertions: Assertions,
+        private testRunner: TestRunner,
+    ) { }
+
+    and() {
+        return {
+            expectThat: () => this.assertions.expectThat(),
+            runTest: () => this.testRunner.run(),
+        };
+    }
+}
+
+class Actions {
     constructor(
         private actions: PageConsumer[],
-        private assertionChainStart: AssertionChainStart,
+        private assertionChainStart: Assertions,
     ) { }
 
     do(callback: PageConsumer) {
