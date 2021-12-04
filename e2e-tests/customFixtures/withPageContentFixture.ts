@@ -100,34 +100,9 @@ class AssertionsChain implements WithPageContentFixtureFirstAssertion {
         const continuation = new ContinuationChain(this, this.testRunner);
 
         return {
-            element: (selector: string) => ({
-                hasSameContentOf: (filename: string) => {
-                    this.assertions.push(async (page: Page, eventLogger: EventLogger) => {
-                        const targetSelector = await page.evaluate(args => {
-                            const [html, elementSelector] = args;
-                            const div = window.document.createElement('div');
-                            div.insertAdjacentHTML('afterbegin', html);
-                            const desiredTarget = div.querySelector(elementSelector);
-                            const anchors = Array.from(div.querySelectorAll('a[data-target]'));
-                            const targetSelector = anchors.map(a => {
-                                return a.getAttribute('data-target');
-                            }).filter(targetSelector => {
-                                const targetForThisAnchor = div.querySelector(targetSelector);
-                                return targetForThisAnchor === desiredTarget;
-                            })[0];
-                            return targetSelector;
-                        }, [this.html, selector]);
-
-                        await waitUntilTargetElementHasReceivedContent(targetSelector, filename, eventLogger);
-
-                        const targetElement = await page.$(selector);
-                        const actualInnerHTML = (await targetElement.innerHTML()).trim();
-                        const expectedInnerHTML = (await readFileContent(filename)).trim();
-                        expect(actualInnerHTML).toBe(expectedInnerHTML);
-                    });
-                    return continuation;
-                },
-            }),
+            element: (selector: string) => {
+                return new ElementAssertionsChain(this.html, this.assertions, selector, continuation);
+            },
             browserURLEndsWith: (url: string) => {
                 this.assertions.push(async (page: Page) => {
                     expect(page.url().endsWith(url)).toBeTruthy();
@@ -151,6 +126,44 @@ class AssertionsChain implements WithPageContentFixtureFirstAssertion {
                 },
             }),
         };
+    }
+}
+
+class ElementAssertionsChain {
+    constructor(
+        private html: string,
+        private assertions: ((page: Page, eventLogger: EventLogger) => Promise<void>)[] = [],
+        private selector: string,
+        private continuation: ContinuationChain,
+    ) { }
+
+    hasSameContentOf(filename: string) {
+        this.assertions.push(async (page: Page, eventLogger: EventLogger) => {
+            await this._hasSameContentOf(page, filename, eventLogger);
+        });
+        return this.continuation;
+    }
+
+    private async _hasSameContentOf(page: Page, filename: string, eventLogger: EventLogger) {
+        const targetSelector = await page.evaluate(args => {
+            const [html, elementSelector] = args;
+            const div = window.document.createElement('div');
+            div.insertAdjacentHTML('afterbegin', html);
+            const desiredTarget = div.querySelector(elementSelector);
+            const anchors = Array.from(div.querySelectorAll('a[data-target]'));
+            const targetSelector = anchors.map(a => a.getAttribute('data-target')).filter(targetSelector => {
+                const targetForThisAnchor = div.querySelector(targetSelector);
+                return targetForThisAnchor === desiredTarget;
+            })[0];
+            return targetSelector;
+        }, [this.html, this.selector]);
+
+        await waitUntilTargetElementHasReceivedContent(targetSelector, filename, eventLogger);
+
+        const targetElement = await page.$(this.selector);
+        const actualInnerHTML = (await targetElement.innerHTML()).trim();
+        const expectedInnerHTML = (await readFileContent(filename)).trim();
+        expect(actualInnerHTML).toBe(expectedInnerHTML);
     }
 }
 
