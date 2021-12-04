@@ -1,4 +1,5 @@
 import { expect, Page } from "@playwright/test";
+import { strict } from "assert/strict";
 import { EventLogger, waitUntilTargetElementHasReceivedContent } from "./createEventLoggerFixture";
 import { PrepareContextFixtureArgs } from "./prepareContextFixture";
 import { LoadEventDetail, PlaywrightFixtures } from "./sharedTypes";
@@ -32,32 +33,30 @@ type WithPageContentFixtureAssertions = {
     };
 };
 
+type CustomFixtures = {
+    prepareContext: (args: PrepareContextFixtureArgs) => Promise<Page>;
+    createEventLogger: (page: Page) => Promise<EventLogger>;
+};
+
+type State = {
+    actions: PageConsumer[];
+    assertions: ((page: Page, eventLogger: EventLogger) => Promise<void>)[];
+};
+
 export default async function withPageContent(
     { prepareContext, createEventLogger }: PlaywrightFixtures,
     use: (r: (html: string) => WithPageContentFixture) => Promise<void>
 ): Promise<void> {
     await use((html: string): WithPageContentFixture => {
-        return makeFixture(html, prepareContext, createEventLogger);
+        return makeFixture(html, { prepareContext, createEventLogger });
     });
 }
 
-function makeFixture(
-    html: string,
-    prepareContext: (args: PrepareContextFixtureArgs) => Promise<Page>,
-    createEventLogger: (page: Page) => Promise<EventLogger>
-): WithPageContentFixture {
-    const actions: PageConsumer[] = [];
-    const assertions: ((page: Page, eventLogger: EventLogger) => Promise<void>)[] = [];
-    const testRunner = new TestRunner(
-        html,
-        actions,
-        assertions,
-        prepareContext,
-        createEventLogger,
-    );
-
-    const assertionChainStart = new AssertionChainStart(html, assertions, testRunner);
-    const actionChain = new ActionChain(actions, assertionChainStart);
+function makeFixture(html: string, fixtures: CustomFixtures): WithPageContentFixture {
+    const state: State = { actions: [], assertions: [] };
+    const testRunner = new TestRunner(html, state, fixtures);
+    const assertionChainStart = new AssertionChainStart(html, state.assertions, testRunner);
+    const actionChain = new ActionChain(state.actions, assertionChainStart);
 
     return {
         do: (callback: PageConsumer) => actionChain.do(callback),
@@ -70,26 +69,24 @@ function makeFixture(
 class TestRunner {
     constructor(
         private html: string,
-        private actions: PageConsumer[],
-        private assertions: ((page: Page, eventLogger: EventLogger) => Promise<void>)[],
-        private prepareContext: (args: PrepareContextFixtureArgs) => Promise<Page>,
-        private createEventLogger: (page: Page) => Promise<EventLogger>,
+        private state: State,
+        private fixtures: CustomFixtures,
     ) { }
 
     async run() {
         let eventLogger: EventLogger;
 
-        const page = await this.prepareContext({
+        const page = await this.fixtures.prepareContext({
             pageContent: this.html,
             beforeLoadingLib: async (page: Page) => {
-                eventLogger = await this.createEventLogger(page);
+                eventLogger = await this.fixtures.createEventLogger(page);
             },
         });
 
-        for (let action of this.actions)
+        for (let action of this.state.actions)
             await action(page);
 
-        await Promise.all(this.assertions.map(fn => fn(page, eventLogger)));
+        await Promise.all(this.state.assertions.map(fn => fn(page, eventLogger)));
     }
 }
 
