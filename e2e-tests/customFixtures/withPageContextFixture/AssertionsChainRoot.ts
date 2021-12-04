@@ -3,9 +3,8 @@ import { EventLogger } from "../createEventLoggerFixture";
 import { AssertionsChain } from "./AssertionsChain";
 import { ContinuationChain } from "./ContinuationChain";
 import { TestRunner } from "./TestRunner";
-import { WithPageContentFixtureFirstAssertion } from "./types";
 
-export class AssertionsChainRoot implements WithPageContentFixtureFirstAssertion {
+export class AssertionsChainRoot {
     constructor(
         private html: string,
         private assertions: ((page: Page, eventLogger: EventLogger) => Promise<void>)[] = [],
