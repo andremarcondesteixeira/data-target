@@ -54,7 +54,7 @@ export default async function withPageContent(
 function makeFixture(html: string, fixtures: CustomFixtures): WithPageContentFixture {
     const state: State = { actions: [], assertions: [] };
     const testRunner = new TestRunner(html, state, fixtures);
-    const assertionChainStart = new AssertionsChain(html, state.assertions, testRunner);
+    const assertionChainStart = new AssertionsChainRoot(html, state.assertions, testRunner);
     const actionChain = new ActionsChain(state.actions, assertionChainStart);
 
     return {
@@ -89,7 +89,7 @@ class TestRunner {
     }
 }
 
-class AssertionsChain implements WithPageContentFixtureFirstAssertion {
+class AssertionsChainRoot implements WithPageContentFixtureFirstAssertion {
     constructor(
         private html: string,
         private assertions: ((page: Page, eventLogger: EventLogger) => Promise<void>)[] = [],
@@ -101,7 +101,7 @@ class AssertionsChain implements WithPageContentFixtureFirstAssertion {
 
         return {
             element: (selector: string) => {
-                return new ElementAssertionsChain(this.html, this.assertions, selector, continuation);
+                return new ElementAssertion(this.html, this.assertions, selector, continuation);
             },
             browserURLEndsWith: (url: string) => {
                 this.assertions.push(async (page: Page) => {
@@ -129,7 +129,7 @@ class AssertionsChain implements WithPageContentFixtureFirstAssertion {
     }
 }
 
-class ElementAssertionsChain {
+class ElementAssertion {
     constructor(
         private html: string,
         private assertions: ((page: Page, eventLogger: EventLogger) => Promise<void>)[] = [],
@@ -139,13 +139,13 @@ class ElementAssertionsChain {
 
     hasSameContentOf(filename: string) {
         this.assertions.push(async (page: Page, eventLogger: EventLogger) => {
-            await this.comparePageContentAgainstFile(page, filename, eventLogger);
+            await this.compareElementContentAgainstFile(page, filename, eventLogger);
         });
         return this.continuation;
     }
 
-    private async comparePageContentAgainstFile(page: Page, filename: string, eventLogger: EventLogger) {
-        const targetSelector = await this.usePageToExtractTargetSelectorFromHTML(page);
+    private async compareElementContentAgainstFile(page: Page, filename: string, eventLogger: EventLogger) {
+        const targetSelector = await this.usePageToExtractTargetSelector(page);
         await waitUntilTargetElementHasReceivedContent(targetSelector, filename, eventLogger);
         const targetElement = await page.$(this.selector);
         const actualInnerHTML = (await targetElement.innerHTML()).trim();
@@ -153,7 +153,7 @@ class ElementAssertionsChain {
         expect(actualInnerHTML).toBe(expectedInnerHTML);
     }
 
-    private async usePageToExtractTargetSelectorFromHTML(page: Page) {
+    private async usePageToExtractTargetSelector(page: Page) {
         return await page.evaluate(args => {
             const [html, selector] = args;
 
@@ -175,10 +175,10 @@ class ElementAssertionsChain {
 }
 
 class ContinuationChain {
-    private assertionsOrRunTest: FinalizableAssertionsChain;
+    private assertionsOrRunTest: FinalizableAssertionsChainRoot;
 
-    constructor(assertions: AssertionsChain, testRunner: TestRunner) {
-        this.assertionsOrRunTest = new FinalizableAssertionsChain(assertions, testRunner);
+    constructor(assertions: AssertionsChainRoot, testRunner: TestRunner) {
+        this.assertionsOrRunTest = new FinalizableAssertionsChainRoot(assertions, testRunner);
     }
 
     and() {
@@ -186,14 +186,14 @@ class ContinuationChain {
     }
 }
 
-class FinalizableAssertionsChain {
+class FinalizableAssertionsChainRoot {
     constructor(
-        private assertions: AssertionsChain,
+        private assertionsChainRoot: AssertionsChainRoot,
         private testRunner: TestRunner,
     ) { }
 
     expectThat() {
-        return this.assertions.expectThat();
+        return this.assertionsChainRoot.expectThat();
     }
 
     runTest() {
@@ -204,7 +204,7 @@ class FinalizableAssertionsChain {
 class ActionsChain {
     constructor(
         private actions: PageConsumer[],
-        private assertionChainStart: AssertionsChain,
+        private assertionsChainRoot: AssertionsChainRoot,
     ) { }
 
     do(callback: PageConsumer) {
@@ -218,6 +218,6 @@ class ActionsChain {
     }
 
     then() {
-        return this.assertionChainStart;
+        return this.assertionsChainRoot;
     }
 }
