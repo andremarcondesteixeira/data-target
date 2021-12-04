@@ -1,7 +1,7 @@
 import { Page, test as base } from '@playwright/test';
 import createEventLogger, { EventLogger } from './createEventLoggerFixture';
 import prepareContext, { PrepareContextFixtureArgs } from './prepareContextFixture';
-import withPageContent, { WithPageContentFixture } from './withPageContentFixture';
+import withPageContent, { WithPageContentFixture } from './withPageContextFixture/withPageContentFixture';
 
 export type CustomFixtures = {
     createEventLogger: (page: Page) => Promise<EventLogger>
