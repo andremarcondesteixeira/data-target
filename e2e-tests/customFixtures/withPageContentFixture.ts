@@ -51,71 +51,13 @@ class WithPageContentFixtureFactory {
         private createEventLogger: (page: Page) => Promise<EventLogger>
     ) { }
 
-    create() {
+    create(): WithPageContentFixture {
         const self = this;
-        const assertionChainStart: WithPageContentFixtureFirstAssertion = {
-            expectThat: function () {
-                const chain = {
-                    and: () => ({
-                        ...assertionChainStart,
-                       runTest: self.runTest.bind(self),
-                    }),
-                };
-
-                return {
-                    element: (selector: string) => ({
-                        hasSameContentOf: (filename: string) => {
-                            self.assertions.push(async (page: Page, eventLogger: EventLogger) => {
-                                const targetSelector = await page.evaluate(args => {
-                                    const [html, elementSelector] = args;
-                                    const div = window.document.createElement('div');
-                                    div.insertAdjacentHTML('afterbegin', html);
-                                    const desiredTarget = div.querySelector(elementSelector);
-                                    const anchors = Array.from(div.querySelectorAll('a[data-target]'));
-                                    const targetSelector = anchors.map(a => {
-                                        return a.getAttribute('data-target');
-                                    }).filter(targetSelector => {
-                                        const targetForThisAnchor = div.querySelector(targetSelector);
-                                        return targetForThisAnchor === desiredTarget;
-                                    })[0];
-                                    return targetSelector;
-                                }, [self.html, selector]);
-
-                                await waitUntilTargetElementHasReceivedContent(targetSelector, filename, eventLogger);
-
-                                const targetElement = await page.$(selector);
-                                const actualInnerHTML = (await targetElement.innerHTML()).trim();
-                                const expectedInnerHTML = (await readFileContent(filename)).trim();
-                                expect(actualInnerHTML).toBe(expectedInnerHTML);
-                            });
-                            return chain;
-                        },
-                    }),
-                    browserURLEndsWith: (url: string) => {
-                        self.assertions.push(async (page: Page) => {
-                            expect(page.url().endsWith(url)).toBeTruthy();
-                        });
-                        return chain;
-                    },
-                    loadEvent: () => ({
-                        hasBeenDispatchedWithDetails: (expectedDetails: LoadEventDetail) => {
-                            const assertion = async (_: Page, eventLogger: EventLogger) => {
-                                const eventDetail = await new Promise<LoadEventDetail>(resolve => {
-                                    eventLogger.subscribe({
-                                        notify: (eventDetail: LoadEventDetail) => {
-                                            resolve(eventDetail);
-                                        },
-                                    });
-                                });
-                                expect(eventDetail).toEqual(expectedDetails);
-                            };
-                            self.assertions.push(assertion);
-                            return chain;
-                        },
-                    }),
-                };
-            },
-        };
+        const assertionChainStart = new AssertionChainStart(
+            () => this.runTest(),
+            this.html,
+            this.assertions
+        );
 
         const actionChain: WithPageContentFixtureActions = {
             do: (callback: PageConsumer) => {
@@ -129,10 +71,12 @@ class WithPageContentFixtureFactory {
             then: () => assertionChainStart,
         };
 
-        return {
+        const result = {
             ...actionChain,
-            ...assertionChainStart,
+            expectThat: () => assertionChainStart.expectThat(),
         };
+
+        return result;
     }
 
     async runTest() {
@@ -149,5 +93,75 @@ class WithPageContentFixtureFactory {
             await action(page);
 
         await Promise.all(this.assertions.map(fn => fn(page, eventLogger)));
+    }
+}
+
+class AssertionChainStart implements WithPageContentFixtureFirstAssertion {
+    constructor(
+        private testRunner: () => Promise<void>,
+        private html: string,
+        private assertions: ((page: Page, eventLogger: EventLogger) => Promise<void>)[] = [],
+    ) {}
+
+    expectThat() {
+        const chain = {
+            and: () => ({
+                expectThat: () => this.expectThat(),
+                runTest: () => this.testRunner(),
+            }),
+        };
+
+        return {
+            element: (selector: string) => ({
+                hasSameContentOf: (filename: string) => {
+                    this.assertions.push(async (page: Page, eventLogger: EventLogger) => {
+                        const targetSelector = await page.evaluate(args => {
+                            const [html, elementSelector] = args;
+                            const div = window.document.createElement('div');
+                            div.insertAdjacentHTML('afterbegin', html);
+                            const desiredTarget = div.querySelector(elementSelector);
+                            const anchors = Array.from(div.querySelectorAll('a[data-target]'));
+                            const targetSelector = anchors.map(a => {
+                                return a.getAttribute('data-target');
+                            }).filter(targetSelector => {
+                                const targetForThisAnchor = div.querySelector(targetSelector);
+                                return targetForThisAnchor === desiredTarget;
+                            })[0];
+                            return targetSelector;
+                        }, [this.html, selector]);
+
+                        await waitUntilTargetElementHasReceivedContent(targetSelector, filename, eventLogger);
+
+                        const targetElement = await page.$(selector);
+                        const actualInnerHTML = (await targetElement.innerHTML()).trim();
+                        const expectedInnerHTML = (await readFileContent(filename)).trim();
+                        expect(actualInnerHTML).toBe(expectedInnerHTML);
+                    });
+                    return chain;
+                },
+            }),
+            browserURLEndsWith: (url: string) => {
+                this.assertions.push(async (page: Page) => {
+                    expect(page.url().endsWith(url)).toBeTruthy();
+                });
+                return chain;
+            },
+            loadEvent: () => ({
+                hasBeenDispatchedWithDetails: (expectedDetails: LoadEventDetail) => {
+                    const assertion = async (_: Page, eventLogger: EventLogger) => {
+                        const eventDetail = await new Promise<LoadEventDetail>(resolve => {
+                            eventLogger.subscribe({
+                                notify: (eventDetail: LoadEventDetail) => {
+                                    resolve(eventDetail);
+                                },
+                            });
+                        });
+                        expect(eventDetail).toEqual(expectedDetails);
+                    };
+                    this.assertions.push(assertion);
+                    return chain;
+                },
+            }),
+        };
     }
 }
