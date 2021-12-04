@@ -42,19 +42,30 @@ export default async function withPageContent(
 }
 
 class WithPageContentFixtureFactory {
-    private actions: PageConsumer[] = [];
-    private assertions: ((page: Page, eventLogger: EventLogger) => Promise<void>)[] = [];
+    private actions: PageConsumer[];
+    private assertions: ((page: Page, eventLogger: EventLogger) => Promise<void>)[];
+    private testRunner: TestRunner;
 
     constructor(
         private html: string,
         private prepareContext: (args: PrepareContextFixtureArgs) => Promise<Page>,
         private createEventLogger: (page: Page) => Promise<EventLogger>
-    ) { }
+    ) {
+        this.actions = [];
+        this.assertions = [];
+        this.testRunner = new TestRunner(
+            this.html,
+            this.actions,
+            this.assertions,
+            this.prepareContext,
+            this.createEventLogger,
+        );
+    }
 
     create(): WithPageContentFixture {
         const self = this;
         const assertionChainStart = new AssertionChainStart(
-            () => this.runTest(),
+            this.testRunner,
             this.html,
             this.assertions
         );
@@ -78,8 +89,18 @@ class WithPageContentFixtureFactory {
 
         return result;
     }
+}
 
-    async runTest() {
+class TestRunner {
+    constructor(
+        private html: string,
+        private actions: PageConsumer[],
+        private assertions: ((page: Page, eventLogger: EventLogger) => Promise<void>)[],
+        private prepareContext: (args: PrepareContextFixtureArgs) => Promise<Page>,
+        private createEventLogger: (page: Page) => Promise<EventLogger>,
+    ) { }
+
+    async run() {
         let eventLogger: EventLogger;
 
         const page = await this.prepareContext({
@@ -98,7 +119,7 @@ class WithPageContentFixtureFactory {
 
 class AssertionChainStart implements WithPageContentFixtureFirstAssertion {
     constructor(
-        private testRunner: () => Promise<void>,
+        private testRunner: TestRunner,
         private html: string,
         private assertions: ((page: Page, eventLogger: EventLogger) => Promise<void>)[] = [],
     ) {}
@@ -107,7 +128,7 @@ class AssertionChainStart implements WithPageContentFixtureFirstAssertion {
         const chain = {
             and: () => ({
                 expectThat: () => this.expectThat(),
-                runTest: () => this.testRunner(),
+                runTest: () => this.testRunner.run(),
             }),
         };
 
