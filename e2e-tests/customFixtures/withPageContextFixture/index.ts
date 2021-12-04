@@ -1,8 +1,10 @@
+import { Page } from "@playwright/test";
+import { EventLogger } from "../createEventLoggerFixture";
+import { PrepareContextFixtureArgs } from "../prepareContextFixture";
 import { PlaywrightFixtures } from "../sharedTypes";
 import { ActionsChain } from "./ActionsChain";
 import { AssertionsChainRoot } from "./AssertionsChainRoot";
 import { TestRunner } from "./TestRunner";
-import { CustomFixtures, State } from "./types";
 import { WithPageContentFixture } from "./withPageContentFixture";
 
 export default async function withPageContent(
@@ -10,14 +12,19 @@ export default async function withPageContent(
     use: (r: (html: string) => WithPageContentFixture) => Promise<void>
 ): Promise<void> {
     await use((html: string): WithPageContentFixture => {
-        return makeFixture(html, { prepareContext, createEventLogger });
+        return makeFixture(html, prepareContext, createEventLogger);
     });
 }
 
-function makeFixture(html: string, fixtures: CustomFixtures): WithPageContentFixture {
-    const state: State = { actions: [], assertions: [] };
-    const testRunner = new TestRunner(html, state, fixtures);
-    const assertionsChainRoot = new AssertionsChainRoot(html, state.assertions, testRunner);
-    const actionsChain = new ActionsChain(state.actions, assertionsChainRoot);
+function makeFixture(
+    html: string,
+    prepareContext: (args: PrepareContextFixtureArgs) => Promise<Page>,
+    createEventLogger: (page: Page) => Promise<EventLogger>,
+): WithPageContentFixture {
+    const actions: ((page: Page) => Promise<void>)[] = [];
+    const assertions: ((page: Page, eventLogger: EventLogger) => Promise<void>)[] = [];
+    const testRunner = new TestRunner(html, actions, assertions, prepareContext, createEventLogger);
+    const assertionsChainRoot = new AssertionsChainRoot(html, assertions, testRunner);
+    const actionsChain = new ActionsChain(actions, assertionsChainRoot);
     return new WithPageContentFixture(actionsChain, assertionsChainRoot);
 }

@@ -1,14 +1,13 @@
 import { Page } from "@playwright/test";
 import { AssertionsChainRoot } from "./AssertionsChainRoot";
-import { PageConsumer } from "./types";
 
 export class ActionsChain {
     constructor(
-        private actions: PageConsumer[],
+        private actions: ((page: Page) => Promise<void>)[],
         private assertionsChainRoot: AssertionsChainRoot,
     ) { }
 
-    do(callback: PageConsumer) {
+    do(callback: (page: Page) => Promise<void>) {
         this.actions.push(callback);
         return this;
     }
