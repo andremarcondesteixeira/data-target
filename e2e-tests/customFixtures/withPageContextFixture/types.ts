@@ -2,24 +2,19 @@ import { Page } from "@playwright/test";
 import { EventLogger } from "../createEventLoggerFixture";
 import { PrepareContextFixtureArgs } from "../prepareContextFixture";
 import { LoadEventDetail } from "../sharedTypes";
+import { ContinuationChain } from "./ContinuationChain";
 
 export type PageConsumer = (page: Page) => Promise<void>;
 
 export type WithPageContentFixtureFirstAssertion = {
     expectThat: () => {
         element: (target: string) => {
-            hasSameContentOf: (filename: string) => WithPageContentFixtureAssertions;
+            hasSameContentOf: (filename: string) => ContinuationChain;
         };
-        browserURLEndsWith: (url: string) => WithPageContentFixtureAssertions;
+        browserURLEndsWith: (url: string) => ContinuationChain;
         loadEvent: () => {
-            hasBeenDispatchedWithDetails: (details: LoadEventDetail) => WithPageContentFixtureAssertions;
+            hasBeenDispatchedWithDetails: (details: LoadEventDetail) => ContinuationChain;
         };
-    };
-};
-
-export type WithPageContentFixtureAssertions = {
-    and: () => WithPageContentFixtureFirstAssertion & {
-        runTest: () => Promise<void>;
     };
 };
 
