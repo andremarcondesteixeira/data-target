@@ -54,8 +54,8 @@ export default async function withPageContent(
 function makeFixture(html: string, fixtures: CustomFixtures): WithPageContentFixture {
     const state: State = { actions: [], assertions: [] };
     const testRunner = new TestRunner(html, state, fixtures);
-    const assertionChainStart = new Assertions(html, state.assertions, testRunner);
-    const actionChain = new Actions(state.actions, assertionChainStart);
+    const assertionChainStart = new AssertionsChain(html, state.assertions, testRunner);
+    const actionChain = new ActionsChain(state.actions, assertionChainStart);
 
     return {
         do: (callback: PageConsumer) => actionChain.do(callback),
@@ -89,7 +89,7 @@ class TestRunner {
     }
 }
 
-class Assertions implements WithPageContentFixtureFirstAssertion {
+class AssertionsChain implements WithPageContentFixtureFirstAssertion {
     constructor(
         private html: string,
         private assertions: ((page: Page, eventLogger: EventLogger) => Promise<void>)[] = [],
@@ -97,7 +97,7 @@ class Assertions implements WithPageContentFixtureFirstAssertion {
     ) { }
 
     expectThat() {
-        const continuation = new Continuation(this, this.testRunner);
+        const continuation = new ContinuationChain(this, this.testRunner);
 
         return {
             element: (selector: string) => ({
@@ -154,24 +154,37 @@ class Assertions implements WithPageContentFixtureFirstAssertion {
     }
 }
 
-class Continuation {
-    constructor(
-        private assertions: Assertions,
-        private testRunner: TestRunner,
-    ) { }
+class ContinuationChain {
+    private assertionsOrRunTest: FinalizableAssertionsChain;
+
+    constructor(assertions: AssertionsChain, testRunner: TestRunner) {
+        this.assertionsOrRunTest = new FinalizableAssertionsChain(assertions, testRunner);
+    }
 
     and() {
-        return {
-            expectThat: () => this.assertions.expectThat(),
-            runTest: () => this.testRunner.run(),
-        };
+        return this.assertionsOrRunTest;
     }
 }
 
-class Actions {
+class FinalizableAssertionsChain {
+    constructor(
+        private assertions: AssertionsChain,
+        private testRunner: TestRunner,
+    ) { }
+
+    expectThat() {
+        return this.assertions.expectThat();
+    }
+
+    runTest() {
+        return this.testRunner.run();
+    }
+}
+
+class ActionsChain {
     constructor(
         private actions: PageConsumer[],
-        private assertionChainStart: Assertions,
+        private assertionChainStart: AssertionsChain,
     ) { }
 
     do(callback: PageConsumer) {
