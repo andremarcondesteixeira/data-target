@@ -37,58 +37,34 @@ export default async function withPageContent(
     use: (r: (html: string) => WithPageContentFixture) => Promise<void>
 ): Promise<void> {
     await use((html: string): WithPageContentFixture => {
-        return new WithPageContentFixtureFactory(html,  prepareContext, createEventLogger).create();
+        return makeFixture(html, prepareContext, createEventLogger);
     });
 }
 
-class WithPageContentFixtureFactory {
-    private actions: PageConsumer[];
-    private assertions: ((page: Page, eventLogger: EventLogger) => Promise<void>)[];
-    private testRunner: TestRunner;
+function makeFixture(
+    html: string,
+    prepareContext: (args: PrepareContextFixtureArgs) => Promise<Page>,
+    createEventLogger: (page: Page) => Promise<EventLogger>
+): WithPageContentFixture {
+    const actions: PageConsumer[] = [];
+    const assertions: ((page: Page, eventLogger: EventLogger) => Promise<void>)[] = [];
+    const testRunner = new TestRunner(
+        html,
+        actions,
+        assertions,
+        prepareContext,
+        createEventLogger,
+    );
 
-    constructor(
-        private html: string,
-        private prepareContext: (args: PrepareContextFixtureArgs) => Promise<Page>,
-        private createEventLogger: (page: Page) => Promise<EventLogger>
-    ) {
-        this.actions = [];
-        this.assertions = [];
-        this.testRunner = new TestRunner(
-            this.html,
-            this.actions,
-            this.assertions,
-            this.prepareContext,
-            this.createEventLogger,
-        );
-    }
+    const assertionChainStart = new AssertionChainStart(html, assertions, testRunner);
+    const actionChain = new ActionChain(actions, assertionChainStart);
 
-    create(): WithPageContentFixture {
-        const self = this;
-        const assertionChainStart = new AssertionChainStart(
-            this.testRunner,
-            this.html,
-            this.assertions
-        );
-
-        const actionChain: WithPageContentFixtureActions = {
-            do: (callback: PageConsumer) => {
-                self.actions.push(callback);
-                return actionChain;
-            },
-            click: (selector: string) => {
-                self.actions.push(async (page: Page) => await page.click(selector));
-                return actionChain;
-            },
-            then: () => assertionChainStart,
-        };
-
-        const result = {
-            ...actionChain,
-            expectThat: () => assertionChainStart.expectThat(),
-        };
-
-        return result;
-    }
+    return {
+        do: (callback: PageConsumer) => actionChain.do(callback),
+        click: (selector: string) => actionChain.click(selector),
+        then: () => actionChain.then(),
+        expectThat: () => assertionChainStart.expectThat(),
+    };
 }
 
 class TestRunner {
@@ -119,10 +95,10 @@ class TestRunner {
 
 class AssertionChainStart implements WithPageContentFixtureFirstAssertion {
     constructor(
-        private testRunner: TestRunner,
         private html: string,
         private assertions: ((page: Page, eventLogger: EventLogger) => Promise<void>)[] = [],
-    ) {}
+        private testRunner: TestRunner,
+    ) { }
 
     expectThat() {
         const chain = {
@@ -184,5 +160,26 @@ class AssertionChainStart implements WithPageContentFixtureFirstAssertion {
                 },
             }),
         };
+    }
+}
+
+class ActionChain {
+    constructor(
+        private actions: PageConsumer[],
+        private assertionChainStart: AssertionChainStart,
+    ) { }
+
+    do(callback: PageConsumer) {
+        this.actions.push(callback);
+        return this;
+    }
+
+    click(selector: string) {
+        this.actions.push(async (page: Page) => await page.click(selector));
+        return this;
+    }
+
+    then() {
+        return this.assertionChainStart;
     }
 }
