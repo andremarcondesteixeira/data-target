@@ -1,5 +1,6 @@
 import { Page, expect } from "@playwright/test";
-import { EventLogger, waitUntilTargetElementHasReceivedContent } from "../createEventLoggerFixture";
+import { EventLogger } from "../createEventLoggerFixture";
+import { LoadEventDetail } from "../sharedTypes";
 import { readFileContent } from "../util";
 import { ContinuationChain } from "./ContinuationChain";
 
@@ -19,31 +20,53 @@ export class ElementAssertions {
     }
 
     private async compareElementContentAgainstFile(page: Page, filename: string, eventLogger: EventLogger) {
-        const targetSelector = await this.usePageToExtractTargetSelector(page);
-        await waitUntilTargetElementHasReceivedContent(targetSelector, filename, eventLogger);
+        await this.waitUntilElementHasReceivedContent(page, filename, eventLogger);
         const targetElement = await page.$(this.selector);
         const actualInnerHTML = (await targetElement.innerHTML()).trim();
         const expectedInnerHTML = (await readFileContent(filename)).trim();
         expect(actualInnerHTML).toBe(expectedInnerHTML);
     }
 
-    private async usePageToExtractTargetSelector(page: Page) {
+    private waitUntilElementHasReceivedContent(
+        page: Page,
+        loadedFileName: string,
+        eventLogger: EventLogger
+    ): Promise<void> {
+        return new Promise<void>(resolve => {
+            this.get_dataTarget_attribute_value_that_points_to_this_same_element(page)
+                .then((targetElementSelector: string) => {
+                    eventLogger.subscribe({
+                        notify: (eventDetail: LoadEventDetail) => {
+                            if (
+                                eventDetail.responseStatusCode === 200
+                                && eventDetail.targetElementSelector === targetElementSelector
+                                && eventDetail.url.endsWith(loadedFileName)
+                            ) {
+                                resolve();
+                            }
+                        },
+                    });
+                });
+        });
+    }
+
+    private async get_dataTarget_attribute_value_that_points_to_this_same_element(page: Page): Promise<string> {
         return await page.evaluate(args => {
-            const [html, selector] = args;
+            const [html, selector_maybe_not_equal_to_dataTarget_attribute_value] = args;
 
-            const div = window.document.createElement('div');
-            div.insertAdjacentHTML('afterbegin', html);
-            const desiredTarget = div.querySelector(selector);
+            const wrapper = window.document.createElement('div');
+            wrapper.insertAdjacentHTML('afterbegin', html);
+            const desiredTargetElement = wrapper.querySelector(selector_maybe_not_equal_to_dataTarget_attribute_value);
 
-            const anchors = div.querySelectorAll('a[data-target]');
-            const dataTargets = Array.from(anchors).map(a => a.getAttribute('data-target'));
+            const anchors = Array.from(wrapper.querySelectorAll('a[data-target]'));
+            const dataTargetAttributeValues = anchors.map(a => a.getAttribute('data-target'));
 
-            const targetSelector = dataTargets.filter(targetSelector => {
-                const targetForThisAnchor = div.querySelector(targetSelector);
-                return targetForThisAnchor === desiredTarget;
+            const dataTargetAttributeValue = dataTargetAttributeValues.filter(dataTargetAttributeValue => {
+                const element_pointed_to_by_dataTarget_attribute_value = wrapper.querySelector(dataTargetAttributeValue);
+                return element_pointed_to_by_dataTarget_attribute_value === desiredTargetElement;
             })[0];
 
-            return targetSelector;
+            return dataTargetAttributeValue;
         }, [this.html, this.selector]);
     }
 }

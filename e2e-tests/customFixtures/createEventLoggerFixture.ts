@@ -47,21 +47,3 @@ export class EventLogger {
 export type EventLogObserver = {
     notify: (eventDetail: LoadEventDetail) => void;
 };
-
-export function waitUntilTargetElementHasReceivedContent(
-    targetElementSelector: string,
-    loadedFileName: string,
-    eventLogger: EventLogger
-) {
-    return new Promise<void>(resolve => eventLogger.subscribe({
-        notify: (eventDetail: LoadEventDetail) => {
-            if (
-                eventDetail.responseStatusCode === 200
-                && eventDetail.targetElementSelector === targetElementSelector
-                && eventDetail.url.endsWith(loadedFileName)
-            ) {
-                resolve();
-            }
-        },
-    }));
-}

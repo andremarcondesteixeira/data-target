@@ -1,11 +1,11 @@
 import { Page } from "@playwright/test";
 import { ActionsChain } from "./ActionsChain";
-import { AssertionsChainRoot } from "./AssertionsChainRoot";
+import { AssertionsChainStart } from "./AssertionsChainStart";
 
 export class WithPageContentFixture {
     constructor(
         private actionsChain: ActionsChain,
-        private assertionsChainRoot: AssertionsChainRoot,
+        private assertionsChainRoot: AssertionsChainStart,
     ) { }
 
     do(callback: (page: Page) => Promise<void>) {

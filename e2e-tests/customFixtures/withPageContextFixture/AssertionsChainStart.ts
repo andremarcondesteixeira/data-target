@@ -4,7 +4,7 @@ import { AssertionsChain } from "./AssertionsChain";
 import { ContinuationChain } from "./ContinuationChain";
 import { TestRunner } from "./TestRunner";
 
-export class AssertionsChainRoot {
+export class AssertionsChainStart {
     constructor(
         private html: string,
         private assertions: ((page: Page, eventLogger: EventLogger) => Promise<void>)[] = [],

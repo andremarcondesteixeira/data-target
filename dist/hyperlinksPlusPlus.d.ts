@@ -7,4 +7,9 @@ declare const config: {
     }>;
 };
 export default config;
+export declare type ContentLoadedEventDetail = {
+    url: string;
+    targetElementSelector: string;
+    responseStatusCode: number;
+};
 //# sourceMappingURL=HyperlinksPlusPlus.d.ts.map

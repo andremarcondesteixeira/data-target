@@ -1,10 +1,10 @@
 import { Page } from "@playwright/test";
-import { AssertionsChainRoot } from "./AssertionsChainRoot";
+import { AssertionsChainStart } from "./AssertionsChainStart";
 
 export class ActionsChain {
     constructor(
         private actions: ((page: Page) => Promise<void>)[],
-        private assertionsChainRoot: AssertionsChainRoot,
+        private assertionsChainRoot: AssertionsChainStart,
     ) { }
 
     do(callback: (page: Page) => Promise<void>) {

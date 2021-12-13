@@ -1,9 +1,9 @@
-import { AssertionsChainRoot } from "./AssertionsChainRoot";
+import { AssertionsChainStart } from "./AssertionsChainStart";
 import { TestRunner } from "./TestRunner";
 
 export class FinalizableAssertionsChainRoot {
     constructor(
-        private assertionsChainRoot: AssertionsChainRoot,
+        private assertionsChainRoot: AssertionsChainStart,
         private testRunner: TestRunner,
     ) { }
 

@@ -1,5 +1,3 @@
-window.addEventListener('popstate', event => tryLoadContent(location.href, event.state.targetId));
-initialize(document.body);
 const config = {
     urlTransformer: (url) => url,
     errorHandler: (error) => console.error(error),
@@ -12,56 +10,56 @@ const config = {
     }
 };
 export default config;
+window.addEventListener('popstate', event => tryLoadContent(location.href, event.state.targetId));
+initialize(document.body);
 function initialize(root) {
-    debugger;
     addClickListeners(root);
-    let autoloadingAnchors = root.querySelectorAll('a[data-autoload][data-target]:not([data-target=""])');
+    let autoloadingAnchors = root.querySelectorAll('a[data-autoload][data-target]:not([data-target=""]), [data-default-target]:not([data-default-target=""]) a[data-autoload]');
     autoloadingAnchors.forEach((anchor) => anchor.click());
 }
 function addClickListeners(element) {
-    const links = element.querySelectorAll('a[data-target]:not([data-target=""])');
-    links.forEach((a) => {
-        a.addEventListener('click', handleClick);
+    const anchors = element.querySelectorAll('a[data-target]:not([data-target=""])');
+    anchors.forEach((anchorElement) => {
+        anchorElement.addEventListener('click', handleClick);
     });
     const elementsWithDefaultTargetId = element.querySelectorAll('[data-default-target]:not([data-default-target=""])');
     elementsWithDefaultTargetId.forEach((parentElement) => {
         const links = parentElement.querySelectorAll('a:not([data-target])');
-        links.forEach((linkElement) => {
-            linkElement.setAttribute('data-target', parentElement.getAttribute('data-default-target'));
-            linkElement.addEventListener('click', handleClick);
+        links.forEach((anchorElement) => {
+            anchorElement.setAttribute('data-target', parentElement.getAttribute('data-default-target'));
+            anchorElement.addEventListener('click', handleClick);
         });
     });
 }
 function handleClick(event) {
     event.preventDefault();
     const target = event.target;
-    const targetId = target.getAttribute('data-target');
-    history.pushState({ targetId }, "", target.href);
-    tryLoadContent(target.href, targetId);
+    const targetElementSelector = target.getAttribute('data-target');
+    history.pushState({ targetElementSelector }, "", target.href);
+    tryLoadContent(target.href, targetElementSelector);
 }
-function tryLoadContent(url, targetId) {
+function tryLoadContent(url, targetElementSelector) {
     try {
-        const targetElement = getTargetElement(url, targetId);
-        loadContent(url, targetElement);
+        loadContent(url, targetElementSelector);
     }
     catch (error) {
         config.errorHandler(error);
     }
 }
-function getTargetElement(url, targetId) {
-    const targetElement = document.querySelector(`#${targetId}`);
-    if (!targetElement)
-        throw new Error(`No element found with id "${targetId}" to render response from ${url}`);
-    return targetElement;
-}
-async function loadContent(url, targetElement) {
-    const response = await config.httpRequestDispatcher(config.urlTransformer(url));
+async function loadContent(url, targetElementSelector) {
+    const targetElement = getTargetElement(url, targetElementSelector);
+    const transformedUrl = config.urlTransformer(url);
+    const response = await config.httpRequestDispatcher(transformedUrl);
     renderContentInsideTargetElement(targetElement, response.content);
     initialize(targetElement);
-    dispatchContentLoadedEvent(targetElement, {
-        url,
-        responseStatusCode: response.statusCode
-    });
+    const eventDetail = { url, targetElementSelector, responseStatusCode: response.statusCode };
+    dispatchContentLoadedEvent(targetElement, eventDetail);
+}
+function getTargetElement(url, targetElementSelector) {
+    const targetElement = document.querySelector(targetElementSelector);
+    if (!targetElement)
+        throw new Error(`No element found for selector "${targetElementSelector}" to render response from ${url}`);
+    return targetElement;
 }
 function renderContentInsideTargetElement(targetElement, html) {
     while (targetElement.lastChild)
@@ -69,16 +67,10 @@ function renderContentInsideTargetElement(targetElement, html) {
     targetElement.insertAdjacentHTML('afterbegin', html);
 }
 function dispatchContentLoadedEvent(targetElement, detail) {
-    targetElement.dispatchEvent(new CustomEvent('content-loaded', {
+    targetElement.dispatchEvent(new CustomEvent('hlpp:load', {
         bubbles: true,
         cancelable: true,
-        detail: {
-            ...detail,
-            matchUrl: (urlRegex, callback) => {
-                if (urlRegex.test(detail.url))
-                    callback();
-            }
-        }
+        detail
     }));
 }
 //# sourceMappingURL=HyperlinksPlusPlus.js.map
