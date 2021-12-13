@@ -14,6 +14,10 @@ export default async function prepareContext(
         await page.goto(`/`);
         await page.setContent(args.pageContent);
 
+        page.on('console', message => {
+            console.log(message.text());
+        });
+
         if (!!args?.beforeLoadingLib)
             await args.beforeLoadingLib(page);
 
