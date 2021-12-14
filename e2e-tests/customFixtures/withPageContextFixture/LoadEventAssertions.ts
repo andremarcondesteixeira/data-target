@@ -1,12 +1,12 @@
 import { Page, expect } from "@playwright/test";
 import { EventLogger } from "../createEventLoggerFixture";
 import { LoadEventDetail } from "../sharedTypes";
-import { ContinuationChain } from "./ContinuationChain";
+import { Continuation } from "./Continuation";
 
 export class LoadEventAssertions {
     constructor(
         private assertions: ((page: Page, eventLogger: EventLogger) => Promise<void>)[] = [],
-        private continuation: ContinuationChain
+        private continuation: Continuation
     ) { }
 
     hasBeenDispatchedWithDetails(expectedDetails: LoadEventDetail) {

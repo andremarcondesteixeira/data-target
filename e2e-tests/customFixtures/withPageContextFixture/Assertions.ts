@@ -1,14 +1,14 @@
 import { Page, expect } from "@playwright/test";
 import { EventLogger } from "../createEventLoggerFixture";
-import { ContinuationChain } from "./ContinuationChain";
+import { Continuation } from "./Continuation";
 import { ElementAssertions } from "./ElementAssertion";
 import { LoadEventAssertions } from "./LoadEventAssertions";
 
-export class AssertionsChain {
+export class Assertions {
     constructor(
         private html: string,
         private assertions: ((page: Page, eventLogger: EventLogger) => Promise<void>)[] = [],
-        private continuation: ContinuationChain
+        private continuation: Continuation
     ) { }
 
     element(selector: string) {

@@ -1,26 +1,26 @@
 import { Page } from "@playwright/test";
-import { ActionsChain } from "./ActionsChain";
-import { AssertionsChainStart } from "./AssertionsChainStart";
+import { Actions } from "./Actions";
+import { AssertionsEntryPoint } from "./AssertionsEntryPoint";
 
 export class WithPageContentFixture {
     constructor(
-        private actionsChain: ActionsChain,
-        private assertionsChainRoot: AssertionsChainStart,
+        private actions: Actions,
+        private entryPoint: AssertionsEntryPoint,
     ) { }
 
     do(callback: (page: Page) => Promise<void>) {
-        return this.actionsChain.do(callback);
+        return this.actions.do(callback);
     }
 
     click(selector: string) {
-        return this.actionsChain.click(selector);
+        return this.actions.click(selector);
     }
 
     then() {
-        return this.actionsChain.then();
+        return this.actions.then();
     }
 
     expectThat() {
-        return this.assertionsChainRoot.expectThat();
+        return this.entryPoint.expectThat();
     }
 }

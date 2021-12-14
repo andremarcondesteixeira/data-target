@@ -2,8 +2,8 @@ import { Page } from "@playwright/test";
 import { EventLogger } from "../createEventLoggerFixture";
 import { PrepareContextFixtureArgs } from "../prepareContextFixture";
 import { PlaywrightFixtures } from "../sharedTypes";
-import { ActionsChain } from "./ActionsChain";
-import { AssertionsChainStart } from "./AssertionsChainStart";
+import { Actions } from "./Actions";
+import { AssertionsEntryPoint } from "./AssertionsEntryPoint";
 import { TestRunner } from "./TestRunner";
 import { WithPageContentFixture } from "./withPageContentFixture";
 
@@ -24,7 +24,7 @@ function makeFixture(
     const actions: ((page: Page) => Promise<void>)[] = [];
     const assertions: ((page: Page, eventLogger: EventLogger) => Promise<void>)[] = [];
     const testRunner = new TestRunner(html, actions, assertions, prepareContext, createEventLogger);
-    const assertionsChainRoot = new AssertionsChainStart(html, assertions, testRunner);
-    const actionsChain = new ActionsChain(actions, assertionsChainRoot);
-    return new WithPageContentFixture(actionsChain, assertionsChainRoot);
+    const entryPoint = new AssertionsEntryPoint(html, assertions, testRunner);
+    const actionsChain = new Actions(actions, entryPoint);
+    return new WithPageContentFixture(actionsChain, entryPoint);
 }

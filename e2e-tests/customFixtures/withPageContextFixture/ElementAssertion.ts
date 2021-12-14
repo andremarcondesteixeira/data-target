@@ -2,52 +2,48 @@ import { Page, expect } from "@playwright/test";
 import { EventLogger } from "../createEventLoggerFixture";
 import { LoadEventDetail } from "../sharedTypes";
 import { readFileContent } from "../util";
-import { ContinuationChain } from "./ContinuationChain";
+import { Continuation } from "./Continuation";
 
 export class ElementAssertions {
     constructor(
         private html: string,
         private assertions: ((page: Page, eventLogger: EventLogger) => Promise<void>)[] = [],
         private selector: string,
-        private continuation: ContinuationChain,
+        private continuation: Continuation,
     ) { }
 
     hasSameContentOf(filename: string) {
         this.assertions.push(async (page: Page, eventLogger: EventLogger) => {
-            await this.compareElementContentAgainstFile(page, filename, eventLogger);
+            await this.compare_element_inner_html_against_file(page, filename, eventLogger);
         });
         return this.continuation;
     }
 
-    private async compareElementContentAgainstFile(page: Page, filename: string, eventLogger: EventLogger) {
-        await this.waitUntilElementHasReceivedContent(page, filename, eventLogger);
+    private async compare_element_inner_html_against_file(page: Page, filename: string, eventLogger: EventLogger) {
+        await this.wait_until_element_has_received_content(page, filename, eventLogger);
         const targetElement = await page.$(this.selector);
         const actualInnerHTML = (await targetElement.innerHTML()).trim();
         const expectedInnerHTML = (await readFileContent(filename)).trim();
         expect(actualInnerHTML).toBe(expectedInnerHTML);
     }
 
-    private waitUntilElementHasReceivedContent(
-        page: Page,
-        loadedFileName: string,
-        eventLogger: EventLogger
-    ): Promise<void> {
-        return new Promise<void>(resolve => {
-            this.get_dataTarget_attribute_value_that_points_to_this_same_element(page)
-                .then((targetElementSelector: string) => {
-                    eventLogger.subscribe({
-                        notify: (eventDetail: LoadEventDetail) => {
-                            if (
-                                eventDetail.responseStatusCode === 200
-                                && eventDetail.targetElementSelector === targetElementSelector
-                                && eventDetail.url.endsWith(loadedFileName)
-                            ) {
-                                resolve();
-                            }
-                        },
-                    });
+    private wait_until_element_has_received_content(page: Page, loadedFileName: string, eventLogger: EventLogger): Promise<void> {
+        return new Promise<void>(resolve => this
+            .get_dataTarget_attribute_value_that_points_to_this_same_element(page)
+            .then((targetElementSelector: string) => {
+                eventLogger.subscribe({
+                    notify: (eventDetail: LoadEventDetail) => {
+                        if (
+                            eventDetail.responseStatusCode === 200
+                            && eventDetail.targetElementSelector === targetElementSelector
+                            && eventDetail.url.endsWith(loadedFileName)
+                        ) {
+                            resolve();
+                        }
+                    },
                 });
-        });
+            })
+        );
     }
 
     private async get_dataTarget_attribute_value_that_points_to_this_same_element(page: Page): Promise<string> {
