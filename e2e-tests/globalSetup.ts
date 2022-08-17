@@ -1,14 +1,11 @@
 import 'dotenv/config';
 import express from 'express';
 import useragent from 'express-useragent';
-import getPort from 'get-port';
 
 export default async function globalSetup() {
     const isDebugMode = process.env['DEBUG_MODE'] === '1';
-
     isDebugMode && console.info('starting server');
-
-    const port = await getPort();
+    const port = 8321;
     process.env['BASE_URL'] = `http://${process.env['HOST']}:${port}`;
 
     const server = express()

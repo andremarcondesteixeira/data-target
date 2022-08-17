@@ -1,4 +1,23 @@
-const config = {
+export type ContentLoadedEventDetail = {
+    url: string;
+    targetElementSelector: string;
+    responseStatusCode: number;
+};
+
+export type HyperlinksPlusPlusConfig = {
+    urlTransformer: (url: string) => string;
+    errorHandler: (error: unknown) => void;
+    httpRequestDispatcher: (url: string) => Promise<{
+        content: string;
+        statusCode: number;
+    }>;
+}
+
+declare global {
+    interface Window { hyperlinksPlusPlusConfig: HyperlinksPlusPlusConfig }
+}
+
+window.hyperlinksPlusPlusConfig = {
     urlTransformer: (url: string) => url,
     errorHandler: (error: unknown) => console.error(error),
     httpRequestDispatcher: async (url: string) => {
@@ -9,8 +28,6 @@ const config = {
         };
     }
 };
-
-export default config;
 
 window.addEventListener('popstate', event => tryLoadContent(location.href, event.state.targetId));
 initialize(document.body);
@@ -49,14 +66,14 @@ function tryLoadContent(url: string, targetElementSelector: string) {
     try {
         loadContent(url, targetElementSelector);
     } catch (error) {
-        config.errorHandler(error);
+        window.hyperlinksPlusPlusConfig.errorHandler(error);
     }
 }
 
 async function loadContent(url: string, targetElementSelector: string) {
     const targetElement = getTargetElement(url, targetElementSelector);
-    const transformedUrl = config.urlTransformer(url);
-    const response = await config.httpRequestDispatcher(transformedUrl);
+    const transformedUrl = window.hyperlinksPlusPlusConfig.urlTransformer(url);
+    const response = await window.hyperlinksPlusPlusConfig.httpRequestDispatcher(transformedUrl);
     renderContentInsideTargetElement(targetElement, response.content);
     initialize(targetElement);
     const eventDetail: ContentLoadedEventDetail = { url, targetElementSelector, responseStatusCode: response.statusCode };
@@ -84,8 +101,4 @@ function dispatchContentLoadedEvent(targetElement: HTMLElement, detail: ContentL
     }));
 }
 
-export type ContentLoadedEventDetail = {
-    url: string;
-    targetElementSelector: string;
-    responseStatusCode: number;
-};
+
