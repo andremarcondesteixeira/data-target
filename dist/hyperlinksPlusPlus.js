@@ -1,4 +1,6 @@
-const config = {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+window.hyperlinksPlusPlusConfig = {
     urlTransformer: (url) => url,
     errorHandler: (error) => console.error(error),
     httpRequestDispatcher: async (url) => {
@@ -9,12 +11,11 @@ const config = {
         };
     }
 };
-export default config;
 window.addEventListener('popstate', event => tryLoadContent(location.href, event.state.targetId));
 initialize(document.body);
 function initialize(root) {
     addClickListeners(root);
-    let autoloadingAnchors = root.querySelectorAll('a[data-autoload][data-target]:not([data-target=""]), [data-default-target]:not([data-default-target=""]) a[data-autoload]');
+    let autoloadingAnchors = root.querySelectorAll('a[data-autoload][data-target]:not([data-target=""])');
     autoloadingAnchors.forEach((anchor) => anchor.click());
 }
 function addClickListeners(element) {
@@ -43,13 +44,13 @@ function tryLoadContent(url, targetElementSelector) {
         loadContent(url, targetElementSelector);
     }
     catch (error) {
-        config.errorHandler(error);
+        window.hyperlinksPlusPlusConfig.errorHandler(error);
     }
 }
 async function loadContent(url, targetElementSelector) {
     const targetElement = getTargetElement(url, targetElementSelector);
-    const transformedUrl = config.urlTransformer(url);
-    const response = await config.httpRequestDispatcher(transformedUrl);
+    const transformedUrl = window.hyperlinksPlusPlusConfig.urlTransformer(url);
+    const response = await window.hyperlinksPlusPlusConfig.httpRequestDispatcher(transformedUrl);
     renderContentInsideTargetElement(targetElement, response.content);
     initialize(targetElement);
     const eventDetail = { url, targetElementSelector, responseStatusCode: response.statusCode };

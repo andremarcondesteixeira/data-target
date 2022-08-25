@@ -5,7 +5,14 @@ import useragent from 'express-useragent';
 export default async function globalSetup() {
     const isDebugMode = process.env['DEBUG_MODE'] === '1';
     isDebugMode && console.info('starting server');
-    const port = 8321;
+
+    const portFromEnvFile = process.env['E2E_TESTS_SERVER_PORT'];
+
+    if (!portFromEnvFile) {
+        throw new Error('Please define a value for the E2E_TESTS_SERVER_PORT environment variable to define a port for the end-to-end tests server');
+    }
+
+    const port = parseInt(portFromEnvFile);
     process.env['BASE_URL'] = `http://${process.env['HOST']}:${port}`;
 
     const server = express()

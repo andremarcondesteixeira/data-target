@@ -15,7 +15,7 @@ const config: PlaywrightTestConfig = {
             // Test against Chrome Stable channel.
             channel: 'chrome',
         },
-    }, {
+    }/*, {
         name: 'Desktop Safari',
         use: {
             browserName: 'webkit',
@@ -33,7 +33,7 @@ const config: PlaywrightTestConfig = {
             browserName: 'firefox',
             viewport: { width: 800, height: 600 },
         }
-    }],
+    }*/],
 };
 
 export default config;
