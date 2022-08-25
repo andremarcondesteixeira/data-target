@@ -21,10 +21,10 @@ export class ElementAssertions {
 
     private async compare_element_inner_html_against_file(page: Page, filename: string, eventLogger: EventLogger) {
         await this.wait_until_element_has_received_content(page, filename, eventLogger);
-        const targetElement = await page.$(this.selector);
-        const actualInnerHTML = (await targetElement.innerHTML()).trim();
-        const expectedInnerHTML = (await readFileContent(filename)).trim();
-        expect(actualInnerHTML).toBe(expectedInnerHTML);
+        const locator = page.locator(this.selector);
+        const actualInnerHTML = (await locator.innerHTML()).trim().replace(/\r\n/g, '\n');
+        const expectedInnerHTML = (await readFileContent(filename)).trim().replace(/\r\n/g, '\n');
+        expect(actualInnerHTML).toEqual(expectedInnerHTML);
     }
 
     private wait_until_element_has_received_content(page: Page, loadedFileName: string, eventLogger: EventLogger): Promise<void> {
@@ -47,7 +47,7 @@ export class ElementAssertions {
     }
 
     private async get_dataTarget_attribute_value_that_points_to_this_same_element(page: Page): Promise<string> {
-        return await page.evaluate(args => {
+        return page.evaluate(args => {
             const [html, selector_maybe_not_equal_to_dataTarget_attribute_value] = args;
 
             const wrapper = window.document.createElement('div');
@@ -55,7 +55,7 @@ export class ElementAssertions {
             const desiredTargetElement = wrapper.querySelector(selector_maybe_not_equal_to_dataTarget_attribute_value);
 
             const anchors = Array.from(wrapper.querySelectorAll('a[data-target]'));
-            const dataTargetAttributeValues = anchors.map(a => a.getAttribute('data-target'));
+            const dataTargetAttributeValues = anchors.map(a => a.getAttribute('data-target') as string);
 
             const dataTargetAttributeValue = dataTargetAttributeValues.filter(dataTargetAttributeValue => {
                 const element_pointed_to_by_dataTarget_attribute_value = wrapper.querySelector(dataTargetAttributeValue);

@@ -17,7 +17,7 @@ test.describe('basic functionality:', () => {
         }
     );
 
-    test.only('an anchor with a "data-target" attribute puts the response of the http request in '
+    test('an anchor with a "data-target" attribute puts the response of the http request in '
         + "the first element matched by the selector in the attribute's value",
         async ({ withPageContent }) => {
             const html = /*html*/ `
