@@ -77,7 +77,7 @@
     }
 
     function dispatchContentLoadedEvent(targetElement: HTMLElement, detail: ContentLoadedEventDetail) {
-        targetElement.dispatchEvent(new CustomEvent('hlpp:load', {
+        targetElement.dispatchEvent(new CustomEvent('anchor-data-target:load', {
             bubbles: true,
             cancelable: true,
             detail

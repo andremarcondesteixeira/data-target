@@ -12,7 +12,7 @@ export default async function createEventLogger(
         });
         await page.addScriptTag({
             content: `
-                addEventListener('hlpp:load', event => {
+                addEventListener('anchor-data-target:load', event => {
                     logEventDetail(event.detail);
                 });
             `

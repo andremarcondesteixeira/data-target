@@ -64,7 +64,7 @@ test.describe('basic functionality:', () => {
         }
     );
 
-    test('an "hlpp:load" event is fired after the target element has received content',
+    test('an "anchor-data-target:load" event is fired after the target element has received content',
         async ({ withPageContent }) => {
             const html = /*html*/ `
                 <a id="hyperlink"

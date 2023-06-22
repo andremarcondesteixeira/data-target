@@ -68,7 +68,7 @@
         targetElement.insertAdjacentHTML('afterbegin', html);
     }
     function dispatchContentLoadedEvent(targetElement, detail) {
-        targetElement.dispatchEvent(new CustomEvent('hlpp:load', {
+        targetElement.dispatchEvent(new CustomEvent('anchor-data-target:load', {
             bubbles: true,
             cancelable: true,
             detail
