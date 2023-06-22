@@ -1,7 +1,7 @@
-/// <reference path="../src/HyperlinksPlusPlus.d.ts" />
+/// <reference path="../src/anchor-data-target.d.ts" />
 declare type ContentLoadedEventDetail = {
     url: string;
     targetElementSelector: string;
     responseStatusCode: number;
 };
-//# sourceMappingURL=HyperlinksPlusPlus.d.ts.map
+//# sourceMappingURL=anchor-data-target.d.ts.map

@@ -1,4 +1,4 @@
-export declare type HyperlinksPlusPlusConfig = {
+export declare type AnchorDataTargetConfig = {
     urlTransformer: (url: string) => string;
     errorHandler: (error: unknown) => void;
     httpRequestDispatcher: (url: string) => Promise<{
@@ -9,6 +9,6 @@ export declare type HyperlinksPlusPlusConfig = {
 
 declare global {
     interface Window {
-        hyperlinksPlusPlusConfig: HyperlinksPlusPlusConfig;
+        anchorDataTargetConfig: AnchorDataTargetConfig;
     }
 }

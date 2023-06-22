@@ -21,7 +21,7 @@ export default async function prepareContext(
         if (!!args?.beforeLoadingLib)
             await args.beforeLoadingLib(page);
 
-        await page.addScriptTag({ url: `/build/hyperlinksPlusPlus.js` });
+        await page.addScriptTag({ url: `/build/anchorDataTarget.js` });
         return page;
     });
 }

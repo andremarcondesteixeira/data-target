@@ -1,6 +1,6 @@
 "use strict";
 (() => {
-    window.hyperlinksPlusPlusConfig = {
+    window.anchorDataTargetConfig = {
         urlTransformer: (url) => url,
         errorHandler: (error) => console.error(error),
         httpRequestDispatcher: async (url) => {
@@ -44,13 +44,13 @@
             loadContent(url, targetElementSelector);
         }
         catch (error) {
-            window.hyperlinksPlusPlusConfig.errorHandler(error);
+            window.anchorDataTargetConfig.errorHandler(error);
         }
     }
     async function loadContent(url, targetElementSelector) {
         const targetElement = getTargetElement(url, targetElementSelector);
-        const transformedUrl = window.hyperlinksPlusPlusConfig.urlTransformer(url);
-        const response = await window.hyperlinksPlusPlusConfig.httpRequestDispatcher(transformedUrl);
+        const transformedUrl = window.anchorDataTargetConfig.urlTransformer(url);
+        const response = await window.anchorDataTargetConfig.httpRequestDispatcher(transformedUrl);
         renderContentInsideTargetElement(targetElement, response.content);
         initialize(targetElement);
         const eventDetail = { url, targetElementSelector, responseStatusCode: response.statusCode };
@@ -75,4 +75,4 @@
         }));
     }
 })();
-//# sourceMappingURL=HyperlinksPlusPlus.js.map
+//# sourceMappingURL=anchor-data-target.js.map

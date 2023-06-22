@@ -1,21 +1,21 @@
 {
-    "name": "hyperlinksplusplus",
+    "name": "anchor-data-target",
     "version": "0.0.1",
     "description": "Allows an HTML anchor element to render the response inside another element through the usage of a data-target attribute",
-    "main": "dist/hyperlinksPlusPlus.min.js",
+    "main": "dist/anchor-data-target.min.js",
     "scripts": {
         "test": "npm run transpile-for-tests && npm run run-tests",
         "transpile-for-tests": "tsc --project ./src/tsconfig.json --outDir ./e2e-tests/build",
         "run-tests": "npx playwright test --config=e2e-tests/playwright.config.ts",
         "build": "npm run transpile && npm run minify",
         "transpile": "tsc --project ./src/tsconfig.json",
-        "minify": "uglifyjs ./dist/hyperlinksPlusPlus.js --compress --mangle --output ./dist/hyperlinksPlusPlus.min.js --source-map",
+        "minify": "uglifyjs ./dist/anchor-data-target.js --compress --mangle --output ./dist/anchor-data-target.min.js --source-map",
         "lint": "eslint --fix src/*.ts && eslint --fix e2e-tests/*.ts",
         "prepare": "husky install"
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/andremarcondesteixeira/HyperlinksPlusPlus"
+        "url": "https://github.com/andremarcondesteixeira/anchor-data-target"
     },
     "keywords": [
         "navigation",
@@ -27,9 +27,9 @@
     "author": "André Marcondes Teixeira",
     "license": "MIT",
     "bugs": {
-        "url": "https://github.com/andremarcondesteixeira/HyperlinksPlusPlus/issues"
+        "url": "https://github.com/andremarcondesteixeira/anchor-data-target/issues"
     },
-    "homepage": "https://andremarcondesteixeira.github.io/HyperlinksPlusPlus/",
+    "homepage": "https://andremarcondesteixeira.github.io/anchor-data-target/",
     "dependencies": {},
     "devDependencies": {
         "@playwright/test": "^1.25.0",

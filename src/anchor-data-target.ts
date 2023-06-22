@@ -1,6 +1,6 @@
-/// <reference path="HyperlinksPlusPlus.d.ts" />
+/// <reference path="anchor-data-target.d.ts" />
 (() => {
-    window.hyperlinksPlusPlusConfig = {
+    window.anchorDataTargetConfig = {
         urlTransformer: (url: string) => url,
         errorHandler: (error: unknown) => console.error(error),
         httpRequestDispatcher: async (url: string) => {
@@ -49,14 +49,14 @@
         try {
             loadContent(url, targetElementSelector);
         } catch (error) {
-            window.hyperlinksPlusPlusConfig.errorHandler(error);
+            window.anchorDataTargetConfig.errorHandler(error);
         }
     }
 
     async function loadContent(url: string, targetElementSelector: string) {
         const targetElement = getTargetElement(url, targetElementSelector);
-        const transformedUrl = window.hyperlinksPlusPlusConfig.urlTransformer(url);
-        const response = await window.hyperlinksPlusPlusConfig.httpRequestDispatcher(transformedUrl);
+        const transformedUrl = window.anchorDataTargetConfig.urlTransformer(url);
+        const response = await window.anchorDataTargetConfig.httpRequestDispatcher(transformedUrl);
         renderContentInsideTargetElement(targetElement, response.content);
         initialize(targetElement);
         const eventDetail: ContentLoadedEventDetail = { url, targetElementSelector, responseStatusCode: response.statusCode };
