@@ -1,7 +1,5 @@
 import { Page } from "@playwright/test";
-import { AnchorDataTargetLoadEventObserver, AnchorDataTargetLoadEventObserverFixture } from "../anchorDataTargetLoadEventObserver";
-import { PreparePageFixture } from "../preparePage";
-import { Assertion } from "../types";
+import { AnchorDataTargetLoadEventObserverFixture, Assertion, Observer, PreparePageFixture } from "../types";
 
 export class TestRunner {
     constructor(
@@ -13,7 +11,7 @@ export class TestRunner {
     ) { }
 
     async run() {
-        let observer: AnchorDataTargetLoadEventObserver;
+        let observer: Observer;
 
         const page = await this.preparePage({
             pageContent: this.withPageContentHtml,

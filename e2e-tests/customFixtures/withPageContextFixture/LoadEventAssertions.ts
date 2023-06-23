@@ -1,6 +1,5 @@
 import { Page, expect } from "@playwright/test";
-import { AnchorDataTargetLoadEventObserver } from "../anchorDataTargetLoadEventObserver";
-import { Assertion, ContinuationInterface, LoadEventAssertionsInterface, LoadEventDetail } from "../types";
+import { Assertion, ContinuationInterface, LoadEventAssertionsInterface, LoadEventDetail, Observer } from "../types";
 
 export class LoadEventAssertions implements LoadEventAssertionsInterface {
     constructor(
@@ -9,9 +8,9 @@ export class LoadEventAssertions implements LoadEventAssertionsInterface {
     ) { }
 
     hasBeenDispatchedWithDetails(expectedDetails: LoadEventDetail) {
-        const assertion = async (_: Page, eventLogger: AnchorDataTargetLoadEventObserver) => {
+        const assertion = async (_: Page, observer: Observer) => {
             const eventDetail = await new Promise<LoadEventDetail>(resolve => {
-                eventLogger.subscribe((eventDetail: LoadEventDetail) => {
+                observer.subscribe((eventDetail: LoadEventDetail) => {
                     resolve(eventDetail);
                 });
             });

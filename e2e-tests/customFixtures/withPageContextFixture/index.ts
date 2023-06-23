@@ -1,28 +1,26 @@
 import { Page } from "@playwright/test";
-import { AnchorDataTargetLoadEventObserver } from "../anchorDataTargetLoadEventObserver";
-import { PreparePageFixtureArgs } from "../preparePage";
-import { PlaywrightFixtures } from "../types";
+import { AnchorDataTargetLoadEventObserverFixture, Assertion, PlaywrightFixtures, PreparePageFixture } from "../types";
 import { Actions } from "./Actions";
 import { AssertionsEntryPoint } from "./AssertionsEntryPoint";
 import { TestRunner } from "./TestRunner";
 
 export async function withPageContent(
-    { preparePage: prepareContext, createAnchorDataTargetLoadEventObserver: createAnchorDataTargetLoadEventListener }: PlaywrightFixtures,
+    { preparePage, createAnchorDataTargetLoadEventObserver }: PlaywrightFixtures,
     use: (r: (withPageContentHtml: string) => Actions) => Promise<void>
 ): Promise<void> {
     await use((withPageContentHtml: string): Actions => {
-        return makeFixture(withPageContentHtml, prepareContext, createAnchorDataTargetLoadEventListener);
+        return makeFixture(withPageContentHtml, preparePage, createAnchorDataTargetLoadEventObserver);
     });
 }
 
 function makeFixture(
     withPageContentHtml: string,
-    prepareContext: (args: PreparePageFixtureArgs) => Promise<Page>,
-    createAnchorDataTargetLoadEventListener: (page: Page) => Promise<AnchorDataTargetLoadEventObserver>,
+    preparePage: PreparePageFixture,
+    createAnchorDataTargetLoadEventListener: AnchorDataTargetLoadEventObserverFixture,
 ): Actions {
     const actions: ((page: Page) => Promise<void>)[] = [];
-    const assertions: ((page: Page, eventLogger: AnchorDataTargetLoadEventObserver) => Promise<void>)[] = [];
-    const testRunner = new TestRunner(withPageContentHtml, actions, assertions, prepareContext, createAnchorDataTargetLoadEventListener);
-    const entryPoint = new AssertionsEntryPoint(withPageContentHtml, assertions, testRunner);
+    const assertions: Assertion[] = [];
+    const testRunner = new TestRunner(withPageContentHtml, actions, assertions, preparePage, createAnchorDataTargetLoadEventListener);
+    const entryPoint = new AssertionsEntryPoint(assertions, testRunner);
     return new Actions(actions, entryPoint);
 }

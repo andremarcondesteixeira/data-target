@@ -4,13 +4,12 @@ import { LoadEventAssertions } from "./LoadEventAssertions";
 
 export class Assertions implements AssertionsInterface {
     constructor(
-        private withPageContentHtml: string,
         private assertions: Assertion[] = [],
         private continuation: ContinuationInterface
     ) { }
 
     element(selector: string) {
-        return new ElementAssertions(this.withPageContentHtml, this.assertions, selector, this.continuation);
+        return new ElementAssertions(this.assertions, selector, this.continuation);
     }
 
     loadEvent() {
