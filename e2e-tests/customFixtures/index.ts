@@ -1,7 +1,7 @@
 import { test as base } from '@playwright/test';
 import { createAnchorDataTargetLoadEventObserver } from './anchorDataTargetLoadEventObserver';
 import { preparePage } from './preparePage';
-import { withPageContent } from './withPageContextFixture';
+import { withPageContent } from './withPageContentFixture';
 import type { CustomFixtures } from './types';
 
 const test = base.extend<CustomFixtures>({
