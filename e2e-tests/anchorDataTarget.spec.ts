@@ -127,22 +127,22 @@ test.describe('data-autoload attribute:', () => {
         }
     );
 
-    // test('an anchor with a "data-autoload" attribute can have its target defined by a parent element', async ({
-    //     withPageContent
-    // }) => {
-    //     const html = /*html*/ `
-    //         <nav data-default-target="#will-get-content-automatically">
-    //             <a href="/pages/no_meio_do_caminho.html"
-    //                data-autoload>This anchor will dispatch the request automatically after initial page load</a>
-    //         </nav>
-    //         <div id="will-get-content-automatically"></div>
-    //     `;
+    test('an anchor with a "data-autoload" attribute can have its target defined by a parent element', async ({
+        withPageContent
+    }) => {
+        const html = /*html*/ `
+            <nav data-default-target="#will-get-content-automatically">
+                <a href="/pages/no_meio_do_caminho.html"
+                   data-autoload>This anchor will dispatch the request automatically after initial page load</a>
+            </nav>
+            <div id="will-get-content-automatically"></div>
+        `;
 
-    //     await withPageContent(html)
-    //         .expectThat().element('#will-get-content-automatically').hasSameContentOf('pages/no_meio_do_caminho.html')
-    //         .and().expectThat().browserURLEndsWith("/pages/no_meio_do_caminho.html")
-    //         .and().runTest();
-    // });
+        await withPageContent(html)
+            .expectThat().element('#will-get-content-automatically').hasSameContentOf('pages/no_meio_do_caminho.html')
+            .and().expectThat().browserURLEndsWith("/pages/no_meio_do_caminho.html")
+            .and().runTest();
+    });
 
     test(`an anchor with a "data-autoload" attribute loads automatically independently of the anchor's nesting level`,
         async ({ withPageContent }) => {
