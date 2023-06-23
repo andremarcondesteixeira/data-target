@@ -1,7 +1,7 @@
 import test from './customFixtures';
 
 test.describe('basic functionality:', () => {
-    test(`"data-target" indicates the target element ID that will receive the response`,
+    test(`"data-target" indicates the ID of the target element that will receive the response`,
         async ({ withPageContent }) => {
             const html = /*html*/ `
                 <a id="hyperlink"
