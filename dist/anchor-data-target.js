@@ -1,9 +1,11 @@
 "use strict";
 (() => {
     window.anchorDataTargetConfig = {
-        errorHandler: (error) => console.error(error),
-        httpRequestDispatcher: async (url) => {
-            const response = await fetch(url);
+        errorHandler: (error, anchor) => {
+            console.error({ error, anchor });
+        },
+        httpRequestDispatcher: async (anchor) => {
+            const response = await fetch(anchor.href);
             return {
                 content: await response.text(),
                 statusCode: response.status
@@ -20,29 +22,32 @@
     function handleClick(event) {
         event.preventDefault();
         const target = event.target;
-        const targetElementId = target.getAttribute('data-target');
-        tryLoadContent(target.href, targetElementId);
+        tryLoadContent(target);
     }
-    function tryLoadContent(url, targetElementId) {
+    function tryLoadContent(anchor) {
         try {
-            loadContent(url, targetElementId);
+            loadContent(anchor);
         }
         catch (error) {
-            window.anchorDataTargetConfig.errorHandler(error);
+            window.anchorDataTargetConfig.errorHandler(error, anchor);
         }
     }
-    async function loadContent(url, targetElementId) {
-        const targetElement = getTargetElement(url, targetElementId);
-        const response = await window.anchorDataTargetConfig.httpRequestDispatcher(url);
+    async function loadContent(anchor) {
+        const targetElementId = anchor.getAttribute('data-target');
+        const targetElement = getTargetElement(targetElementId);
+        const response = await window.anchorDataTargetConfig.httpRequestDispatcher(anchor);
         renderContentInsideTargetElement(targetElement, response.content);
         addClickListeners(targetElement);
-        const eventDetail = { url, targetElementId, responseStatusCode: response.statusCode };
-        dispatchContentLoadedEvent(targetElement, eventDetail);
+        dispatchContentLoadedEvent(targetElement, {
+            url: anchor.href,
+            targetElementId,
+            responseStatusCode: response.statusCode
+        });
     }
-    function getTargetElement(url, targetElementId) {
+    function getTargetElement(targetElementId) {
         const targetElement = document.getElementById(targetElementId);
         if (!targetElement)
-            throw new Error(`No element found with ID "${targetElementId}" to render response from ${url}`);
+            throw new Error(`Anchor data-target: No element found with ID "${targetElementId}"`);
         return targetElement;
     }
     function renderContentInsideTargetElement(targetElement, html) {
