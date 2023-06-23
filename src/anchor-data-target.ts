@@ -37,9 +37,9 @@
     }
 
     async function loadContent(anchor: HTMLAnchorElement) {
-        const response = await window.anchorDataTargetConfig.httpRequestDispatcher(anchor);
         const targetElementId = anchor.getAttribute('data-target') as string;
         const targetElement = getTargetElement(targetElementId);
+        const response = await window.anchorDataTargetConfig.httpRequestDispatcher(anchor);
         renderContentInsideTargetElement(targetElement, response.content);
         addClickListeners(targetElement);
         dispatchContentLoadedEvent(targetElement, {
