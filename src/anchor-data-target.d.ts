@@ -1,6 +1,6 @@
 export declare type AnchorDataTargetConfig = {
-    errorHandler: (error: unknown) => void;
-    httpRequestDispatcher: (url: string) => Promise<{
+    errorHandler: (error: unknown, anchor: HTMLAnchorElement) => void;
+    httpRequestDispatcher: (anchor: HTMLAnchorElement) => Promise<{
         content: string;
         statusCode: number;
     }>;
