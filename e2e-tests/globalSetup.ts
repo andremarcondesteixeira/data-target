@@ -1,6 +1,5 @@
 import 'dotenv/config';
 import express from 'express';
-import useragent from 'express-useragent';
 
 export default async function globalSetup() {
     const host = process.env['E2E_TESTS_SERVER_HOST'];
@@ -20,11 +19,6 @@ export default async function globalSetup() {
     isDebugMode && console.info('starting server');
 
     const server = express()
-        .use(useragent.express())
-        .use((req, _, next) => {
-            isDebugMode && console.info(`${req.useragent?.browser} -> ${req.method} ${req.url}`);
-            next();
-        })
         .use(express.static(__dirname, { fallthrough: false }))
         .listen(port, host as string, () => {
             isDebugMode && console.info(`server listening at ${process.env['BASE_URL']}`);
