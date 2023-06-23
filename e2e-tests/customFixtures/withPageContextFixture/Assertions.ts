@@ -1,18 +1,18 @@
 import { Page } from "@playwright/test";
-import { EventLogger } from "../createEventLoggerFixture";
+import { AnchorDataTargetLoadEventObserver } from "../anchorDataTargetLoadEventListener";
 import { Continuation } from "./Continuation";
 import { ElementAssertions } from "./ElementAssertion";
 import { LoadEventAssertions } from "./LoadEventAssertions";
 
 export class Assertions {
     constructor(
-        private html: string,
-        private assertions: ((page: Page, eventLogger: EventLogger) => Promise<void>)[] = [],
+        private withPageContentHtml: string,
+        private assertions: ((page: Page, eventLogger: AnchorDataTargetLoadEventObserver) => Promise<void>)[] = [],
         private continuation: Continuation
     ) { }
 
     element(selector: string) {
-        return new ElementAssertions(this.html, this.assertions, selector, this.continuation);
+        return new ElementAssertions(this.withPageContentHtml, this.assertions, selector, this.continuation);
     }
 
     loadEvent() {

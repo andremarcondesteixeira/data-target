@@ -1,25 +1,25 @@
 import { Page, expect } from "@playwright/test";
-import { EventLogger } from "../createEventLoggerFixture";
+import { AnchorDataTargetLoadEventObserver } from "../anchorDataTargetLoadEventListener";
 import { LoadEventDetail } from "../sharedTypes";
 import { readFileContent } from "../util";
 import { Continuation } from "./Continuation";
 
 export class ElementAssertions {
     constructor(
-        private html: string,
-        private assertions: ((page: Page, eventLogger: EventLogger) => Promise<void>)[] = [],
+        private withPageContentHtml: string,
+        private assertions: ((page: Page, eventLogger: AnchorDataTargetLoadEventObserver) => Promise<void>)[] = [],
         private selector: string,
         private continuation: Continuation,
     ) { }
 
     hasSameContentOf(filename: string) {
-        this.assertions.push(async (page: Page, eventLogger: EventLogger) => {
+        this.assertions.push(async (page: Page, eventLogger: AnchorDataTargetLoadEventObserver) => {
             await this.compare_element_inner_html_against_file(page, filename, eventLogger);
         });
         return this.continuation;
     }
 
-    private async compare_element_inner_html_against_file(page: Page, filename: string, eventLogger: EventLogger) {
+    private async compare_element_inner_html_against_file(page: Page, filename: string, eventLogger: AnchorDataTargetLoadEventObserver) {
         await this.wait_until_element_has_received_content(page, filename, eventLogger);
         const locator = page.locator(this.selector);
         const actualInnerHTML = (await locator.innerHTML()).trim().replace(/\r\n/g, '\n');
@@ -27,7 +27,7 @@ export class ElementAssertions {
         expect(actualInnerHTML).toEqual(expectedInnerHTML);
     }
 
-    private wait_until_element_has_received_content(page: Page, loadedFileName: string, eventLogger: EventLogger): Promise<void> {
+    private wait_until_element_has_received_content(page: Page, loadedFileName: string, eventLogger: AnchorDataTargetLoadEventObserver): Promise<void> {
         return new Promise<void>(resolve => this
             .get_dataTarget_attribute_value_that_points_to_this_same_element(page)
             .then((targetElementId: string) => {
@@ -63,6 +63,6 @@ export class ElementAssertions {
             })[0];
 
             return dataTargetAttributeValue;
-        }, [this.html, this.selector]);
+        }, [this.withPageContentHtml, this.selector]);
     }
 }

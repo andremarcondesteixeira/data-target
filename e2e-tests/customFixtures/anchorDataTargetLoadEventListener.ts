@@ -1,14 +1,14 @@
 import { Page } from "@playwright/test";
 import { LoadEventDetail, PlaywrightFixtures } from "./sharedTypes";
 
-export default async function createEventLogger(
+export async function createAnchorDataTargetLoadEventListener(
     { }: PlaywrightFixtures,
-    use: (r: (page: Page) => Promise<EventLogger>) => Promise<void>
+    use: (r: (page: Page) => Promise<AnchorDataTargetLoadEventObserver>) => Promise<void>
 ) {
-    await use(async (page: Page): Promise<EventLogger> => {
-        const eventLogger = new EventLogger();
+    await use(async (page: Page): Promise<AnchorDataTargetLoadEventObserver> => {
+        const observer = new AnchorDataTargetLoadEventObserver();
         await page.exposeFunction('logEventDetail', (eventDetail: LoadEventDetail) => {
-            eventLogger.push(eventDetail);
+            observer.push(eventDetail);
         });
         await page.addScriptTag({
             content: `
@@ -17,13 +17,13 @@ export default async function createEventLogger(
                 });
             `
         });
-        return eventLogger;
+        return observer;
     });
 };
 
-export class EventLogger {
+export class AnchorDataTargetLoadEventObserver {
     eventDetailLog: LoadEventDetail[] = [];
-    subscribers: EventLogObserver[] = [];
+    subscribers: AnchorDataTargetLoadEventSubscriber[] = [];
 
     push(eventDetail: LoadEventDetail) {
         this.eventDetailLog.push(eventDetail);
@@ -36,7 +36,7 @@ export class EventLogger {
         });
     }
 
-    subscribe(subscriber: EventLogObserver) {
+    subscribe(subscriber: AnchorDataTargetLoadEventSubscriber) {
         this.subscribers.push(subscriber);
         this.eventDetailLog.forEach(eventDetail => {
             subscriber.notify(eventDetail);
@@ -44,6 +44,6 @@ export class EventLogger {
     }
 }
 
-export type EventLogObserver = {
+export type AnchorDataTargetLoadEventSubscriber = {
     notify: (eventDetail: LoadEventDetail) => void;
 };
