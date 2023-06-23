@@ -1,7 +1,7 @@
 import { Page } from "@playwright/test";
-import { LoadEventDetail, PlaywrightFixtures } from "./sharedTypes";
+import { AnchorDataTargetLoadEventSubscriber, LoadEventDetail, Observer, PlaywrightFixtures } from "./types";
 
-export async function createAnchorDataTargetLoadEventListener(
+export async function createAnchorDataTargetLoadEventObserver(
     { }: PlaywrightFixtures,
     use: (r: (page: Page) => Promise<AnchorDataTargetLoadEventObserver>) => Promise<void>
 ) {
@@ -21,7 +21,7 @@ export async function createAnchorDataTargetLoadEventListener(
     });
 };
 
-export class AnchorDataTargetLoadEventObserver {
+export class AnchorDataTargetLoadEventObserver implements Observer {
     eventDetailLog: LoadEventDetail[] = [];
     subscribers: AnchorDataTargetLoadEventSubscriber[] = [];
 
@@ -31,19 +31,15 @@ export class AnchorDataTargetLoadEventObserver {
     }
 
     notifyAllSubscribers(eventDetail: LoadEventDetail) {
-        this.subscribers.forEach(subscriber => {
-            subscriber.notify(eventDetail);
+        this.subscribers.forEach(callback => {
+            callback(eventDetail);
         });
     }
 
-    subscribe(subscriber: AnchorDataTargetLoadEventSubscriber) {
-        this.subscribers.push(subscriber);
+    subscribe(callback: AnchorDataTargetLoadEventSubscriber) {
+        this.subscribers.push(callback);
         this.eventDetailLog.forEach(eventDetail => {
-            subscriber.notify(eventDetail);
+            callback(eventDetail);
         });
     }
 }
-
-export type AnchorDataTargetLoadEventSubscriber = {
-    notify: (eventDetail: LoadEventDetail) => void;
-};

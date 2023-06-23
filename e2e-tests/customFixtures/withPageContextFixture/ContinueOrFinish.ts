@@ -1,9 +1,9 @@
-import { AssertionsEntryPoint } from "./AssertionsEntryPoint";
+import { AssertionsEntryPointInterface, ContinueOrFinishInterface } from "../types";
 import { TestRunner } from "./TestRunner";
 
-export class ContinueOrFinish {
+export class ContinueOrFinish implements ContinueOrFinishInterface {
     constructor(
-        private entryPoint: AssertionsEntryPoint,
+        private entryPoint: AssertionsEntryPointInterface,
         private testRunner: TestRunner,
     ) { }
 

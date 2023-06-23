@@ -1,10 +1,10 @@
 import { Page } from "@playwright/test";
-import { AssertionsEntryPoint } from "./AssertionsEntryPoint";
+import { ActionsInterface, AssertionsEntryPointInterface } from "../types";
 
-export class Actions {
+export class Actions implements ActionsInterface {
     constructor(
         private actions: ((page: Page) => Promise<void>)[],
-        private entryPoint: AssertionsEntryPoint,
+        private entryPoint: AssertionsEntryPointInterface,
     ) { }
 
     do(callback: (page: Page) => Promise<void>) {

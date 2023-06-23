@@ -1,11 +1,11 @@
-import { AssertionsEntryPoint } from "./AssertionsEntryPoint";
+import { AssertionsEntryPointInterface, ContinuationInterface, ContinueOrFinishInterface } from "../types";
 import { ContinueOrFinish } from "./ContinueOrFinish";
 import { TestRunner } from "./TestRunner";
 
-export class Continuation {
-    private continueOrFinish: ContinueOrFinish;
+export class Continuation implements ContinuationInterface {
+    private continueOrFinish: ContinueOrFinishInterface;
 
-    constructor(assertions: AssertionsEntryPoint, testRunner: TestRunner) {
+    constructor(assertions: AssertionsEntryPointInterface, testRunner: TestRunner) {
         this.continueOrFinish = new ContinueOrFinish(assertions, testRunner);
     }
 

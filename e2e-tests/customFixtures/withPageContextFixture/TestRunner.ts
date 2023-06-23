@@ -1,23 +1,24 @@
 import { Page } from "@playwright/test";
-import { AnchorDataTargetLoadEventObserver } from "../anchorDataTargetLoadEventListener";
-import { PrepareContextFixtureArgs } from "../prepareContext";
+import { AnchorDataTargetLoadEventObserver, AnchorDataTargetLoadEventObserverFixture } from "../anchorDataTargetLoadEventObserver";
+import { PreparePageFixture } from "../preparePage";
+import { Assertion } from "../types";
 
 export class TestRunner {
     constructor(
         private withPageContentHtml: string,
         private actions: ((page: Page) => Promise<void>)[],
-        private assertions: ((page: Page, eventLogger: AnchorDataTargetLoadEventObserver) => Promise<void>)[],
-        private prepareContext: (args: PrepareContextFixtureArgs) => Promise<Page>,
-        private createEventLogger: (page: Page) => Promise<AnchorDataTargetLoadEventObserver>,
+        private assertions: Assertion[],
+        private preparePage: PreparePageFixture,
+        private createAnchorDataTargetLoadEventObserver: AnchorDataTargetLoadEventObserverFixture,
     ) { }
 
     async run() {
-        let eventLogger: AnchorDataTargetLoadEventObserver;
+        let observer: AnchorDataTargetLoadEventObserver;
 
-        const page = await this.prepareContext({
+        const page = await this.preparePage({
             pageContent: this.withPageContentHtml,
             beforeLoadingLib: async (page: Page) => {
-                eventLogger = await this.createEventLogger(page);
+                observer = await this.createAnchorDataTargetLoadEventObserver(page);
             },
         });
 
@@ -25,6 +26,6 @@ export class TestRunner {
             await action(page);
         }
 
-        await Promise.all(this.assertions.map(fn => fn(page, eventLogger)));
+        await Promise.all(this.assertions.map(fn => fn(page, observer)));
     }
 }

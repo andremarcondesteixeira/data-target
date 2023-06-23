@@ -1,21 +1,18 @@
 import { Page, expect } from "@playwright/test";
-import { AnchorDataTargetLoadEventObserver } from "../anchorDataTargetLoadEventListener";
-import { LoadEventDetail } from "../sharedTypes";
-import { Continuation } from "./Continuation";
+import { AnchorDataTargetLoadEventObserver } from "../anchorDataTargetLoadEventObserver";
+import { Assertion, ContinuationInterface, LoadEventAssertionsInterface, LoadEventDetail } from "../types";
 
-export class LoadEventAssertions {
+export class LoadEventAssertions implements LoadEventAssertionsInterface {
     constructor(
-        private assertions: ((page: Page, eventLogger: AnchorDataTargetLoadEventObserver) => Promise<void>)[] = [],
-        private continuation: Continuation
+        private assertions: Assertion[] = [],
+        private continuation: ContinuationInterface
     ) { }
 
     hasBeenDispatchedWithDetails(expectedDetails: LoadEventDetail) {
         const assertion = async (_: Page, eventLogger: AnchorDataTargetLoadEventObserver) => {
             const eventDetail = await new Promise<LoadEventDetail>(resolve => {
-                eventLogger.subscribe({
-                    notify: (eventDetail: LoadEventDetail) => {
-                        resolve(eventDetail);
-                    },
+                eventLogger.subscribe((eventDetail: LoadEventDetail) => {
+                    resolve(eventDetail);
                 });
             });
             expect(eventDetail).toEqual(expectedDetails);

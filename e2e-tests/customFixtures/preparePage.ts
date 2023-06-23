@@ -1,16 +1,11 @@
 import { Page } from "@playwright/test";
-import { PlaywrightFixtures } from "./sharedTypes";
+import { PlaywrightFixtures, PreparePageFixture, PreparePageFixtureArgs } from "./types";
 
-export type PrepareContextFixtureArgs = {
-    pageContent: string;
-    beforeLoadingLib?: (page: Page) => Promise<void>;
-}
-
-export default async function prepareContext(
+export async function preparePage(
     { page }: PlaywrightFixtures,
-    use: (r: (args: PrepareContextFixtureArgs) => Promise<Page>) => Promise<void>
+    use: (r: PreparePageFixture) => Promise<void>
 ) {
-    await use(async (args: PrepareContextFixtureArgs): Promise<Page> => {
+    await use(async (args: PreparePageFixtureArgs): Promise<Page> => {
         await page.goto(`/`);
         await page.setContent(args.pageContent);
 

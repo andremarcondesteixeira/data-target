@@ -1,14 +1,12 @@
-import { Page } from "@playwright/test";
-import { AnchorDataTargetLoadEventObserver } from "../anchorDataTargetLoadEventListener";
-import { Continuation } from "./Continuation";
+import { Assertion, AssertionsInterface, ContinuationInterface } from "../types";
 import { ElementAssertions } from "./ElementAssertion";
 import { LoadEventAssertions } from "./LoadEventAssertions";
 
-export class Assertions {
+export class Assertions implements AssertionsInterface {
     constructor(
         private withPageContentHtml: string,
-        private assertions: ((page: Page, eventLogger: AnchorDataTargetLoadEventObserver) => Promise<void>)[] = [],
-        private continuation: Continuation
+        private assertions: Assertion[] = [],
+        private continuation: ContinuationInterface
     ) { }
 
     element(selector: string) {

@@ -1,15 +1,14 @@
 import { Page, expect } from "@playwright/test";
-import { AnchorDataTargetLoadEventObserver } from "../anchorDataTargetLoadEventListener";
-import { LoadEventDetail } from "../sharedTypes";
+import { AnchorDataTargetLoadEventObserver } from "../anchorDataTargetLoadEventObserver";
+import { Assertion, ContinuationInterface, ElementAssertionsInterface, LoadEventDetail } from "../types";
 import { readFileContent } from "../util";
-import { Continuation } from "./Continuation";
 
-export class ElementAssertions {
+export class ElementAssertions implements ElementAssertionsInterface {
     constructor(
         private withPageContentHtml: string,
-        private assertions: ((page: Page, eventLogger: AnchorDataTargetLoadEventObserver) => Promise<void>)[] = [],
+        private assertions: Assertion[] = [],
         private selector: string,
-        private continuation: Continuation,
+        private continuation: ContinuationInterface,
     ) { }
 
     hasSameContentOf(filename: string) {
@@ -31,16 +30,14 @@ export class ElementAssertions {
         return new Promise<void>(resolve => this
             .get_dataTarget_attribute_value_that_points_to_this_same_element(page)
             .then((targetElementId: string) => {
-                eventLogger.subscribe({
-                    notify: (eventDetail: LoadEventDetail) => {
-                        if (
-                            eventDetail.responseStatusCode === 200
-                            && eventDetail.targetElementId === targetElementId
-                            && eventDetail.url.endsWith(loadedFileName)
-                        ) {
-                            resolve();
-                        }
-                    },
+                eventLogger.subscribe((eventDetail: LoadEventDetail) => {
+                    if (
+                        eventDetail.responseStatusCode === 200
+                        && eventDetail.targetElementId === targetElementId
+                        && eventDetail.url.endsWith(loadedFileName)
+                    ) {
+                        resolve();
+                    }
                 });
             })
         );
