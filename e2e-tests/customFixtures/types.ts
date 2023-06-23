@@ -33,6 +33,7 @@ export type ContinuationInterface = {
 
 export type ContinueOrFinishInterface = {
     expectThat(): AssertionsInterface;
+    runTest(): Promise<void>;
 }
 
 export type CustomFixtures = {
