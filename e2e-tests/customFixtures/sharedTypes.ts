@@ -8,7 +8,7 @@ import { CustomFixtures } from '.'
 
 export type LoadEventDetail = {
     url: string;
-    targetElementSelector: string;
+    targetElementId: string;
     responseStatusCode: number;
 };
 

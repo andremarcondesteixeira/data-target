@@ -1,7 +1,6 @@
 "use strict";
 (() => {
     window.anchorDataTargetConfig = {
-        urlTransformer: (url) => url,
         errorHandler: (error) => console.error(error),
         httpRequestDispatcher: async (url) => {
             const response = await fetch(url);
@@ -11,55 +10,39 @@
             };
         }
     };
-    window.addEventListener('popstate', event => tryLoadContent(location.href, event.state.targetId));
-    initialize(document.body);
-    function initialize(root) {
-        addClickListeners(root);
-        let autoloadingAnchors = root.querySelectorAll('a[data-autoload][data-target]:not([data-target=""])');
-        autoloadingAnchors.forEach((anchor) => anchor.click());
-    }
+    addClickListeners(document.body);
     function addClickListeners(element) {
         const anchors = element.querySelectorAll('a[data-target]:not([data-target=""])');
         anchors.forEach((anchorElement) => {
             anchorElement.addEventListener('click', handleClick);
         });
-        const elementsWithDefaultTargetId = element.querySelectorAll('[data-default-target]:not([data-default-target=""])');
-        elementsWithDefaultTargetId.forEach((parentElement) => {
-            const links = parentElement.querySelectorAll('a:not([data-target])');
-            links.forEach((anchorElement) => {
-                anchorElement.setAttribute('data-target', parentElement.getAttribute('data-default-target'));
-                anchorElement.addEventListener('click', handleClick);
-            });
-        });
     }
     function handleClick(event) {
         event.preventDefault();
         const target = event.target;
-        const targetElementSelector = target.getAttribute('data-target');
-        history.pushState({ targetElementSelector }, "", target.href);
-        tryLoadContent(target.href, targetElementSelector);
+        const targetElementId = target.getAttribute('data-target');
+        tryLoadContent(target.href, targetElementId);
     }
-    function tryLoadContent(url, targetElementSelector) {
+    function tryLoadContent(url, targetElementId) {
         try {
-            loadContent(url, targetElementSelector);
+            loadContent(url, targetElementId);
         }
         catch (error) {
             window.anchorDataTargetConfig.errorHandler(error);
         }
     }
-    async function loadContent(url, targetElementSelector) {
-        const targetElement = getTargetElement(url, targetElementSelector);
-        const transformedUrl = window.anchorDataTargetConfig.urlTransformer(url);
-        const response = await window.anchorDataTargetConfig.httpRequestDispatcher(transformedUrl);
+    async function loadContent(url, targetElementId) {
+        const targetElement = getTargetElement(url, targetElementId);
+        const response = await window.anchorDataTargetConfig.httpRequestDispatcher(url);
         renderContentInsideTargetElement(targetElement, response.content);
-        initialize(targetElement);
-        const eventDetail = { url, targetElementSelector, responseStatusCode: response.statusCode };
+        addClickListeners(targetElement);
+        const eventDetail = { url, targetElementId, responseStatusCode: response.statusCode };
         dispatchContentLoadedEvent(targetElement, eventDetail);
     }
-    function getTargetElement(url, targetElementSelector) {
-        const targetElement = document.querySelector(targetElementSelector);
+    function getTargetElement(url, targetElementId) {
+        const targetElement = document.getElementById(targetElementId);
         if (!targetElement)
-            throw new Error(`No element found for selector "${targetElementSelector}" to render response from ${url}`);
+            throw new Error(`No element found with ID "${targetElementId}" to render response from ${url}`);
         return targetElement;
     }
     function renderContentInsideTargetElement(targetElement, html) {

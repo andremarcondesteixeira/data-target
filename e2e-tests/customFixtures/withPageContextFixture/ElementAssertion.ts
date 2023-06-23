@@ -30,12 +30,12 @@ export class ElementAssertions {
     private wait_until_element_has_received_content(page: Page, loadedFileName: string, eventLogger: EventLogger): Promise<void> {
         return new Promise<void>(resolve => this
             .get_dataTarget_attribute_value_that_points_to_this_same_element(page)
-            .then((targetElementSelector: string) => {
+            .then((targetElementId: string) => {
                 eventLogger.subscribe({
                     notify: (eventDetail: LoadEventDetail) => {
                         if (
                             eventDetail.responseStatusCode === 200
-                            && eventDetail.targetElementSelector === targetElementSelector
+                            && eventDetail.targetElementId === targetElementId
                             && eventDetail.url.endsWith(loadedFileName)
                         ) {
                             resolve();
