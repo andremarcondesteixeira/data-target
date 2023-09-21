@@ -9,6 +9,16 @@ export class ElementAssertions implements ElementAssertionsInterface {
         private continuation: ContinuationInterface,
     ) { }
 
+    hasContent(content: string) {
+        this.assertions.push(async (page: Page, observer: Observer) => {
+            await this.wait_until_target_element_has_received_content(observer);
+            const locator = page.locator(this.selector);
+            const innerHTML = (await locator.innerHTML()).trim().replace(/\r\n/g, '\n');
+            expect(innerHTML).toEqual(content);
+        });
+        return this.continuation;
+    }
+
     hasSameContentOf(filename: string) {
         this.assertions.push(async (page: Page, observer: Observer) => {
             await this.compare_element_inner_html_against_file(page, filename, observer);

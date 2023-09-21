@@ -43,6 +43,7 @@ export type CustomFixtures = {
 }
 
 export type ElementAssertionsInterface = {
+    hasContent(content: string): ContinuationInterface;
     hasSameContentOf(filename: string): ContinuationInterface;
 }
 

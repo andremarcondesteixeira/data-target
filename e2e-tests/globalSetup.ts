@@ -18,11 +18,12 @@ export default async function globalSetup() {
     const isDebugMode = process.env['DEBUG_MODE'] === '1';
     isDebugMode && console.info('starting server');
 
-    const server = express()
-        .use(express.static(__dirname, { fallthrough: false }))
-        .listen(port, host as string, () => {
-            isDebugMode && console.info(`server listening at ${process.env['BASE_URL']}`);
-        });
+    const app = express();
+    app.use(express.static(__dirname, { fallthrough: true }));
+    app.post('/say-hello', (_, response) => response.send('hello'));
+    const server = app.listen(port, host as string, () => {
+        isDebugMode && console.info(`server listening at ${process.env['BASE_URL']}`);
+    });
 
     return () => new Promise(done => {
         server.close(done);

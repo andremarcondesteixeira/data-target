@@ -1,6 +1,10 @@
 export declare type AnchorDataTargetConfig = {
-    errorHandler: (error: unknown, anchor: HTMLAnchorElement) => void;
-    httpRequestDispatcher: (anchor: HTMLAnchorElement) => Promise<{
+    errorHandler: (error: unknown, element: HTMLAnchorElement | HTMLFormElement) => void;
+    httpRequestDispatcherForAnchors: (anchor: HTMLAnchorElement) => Promise<{
+        content: string;
+        statusCode: number;
+    }>;
+    httpRequestDispatcherForForms: (anchor: HTMLFormElement) => Promise<{
         content: string;
         statusCode: number;
     }>;
