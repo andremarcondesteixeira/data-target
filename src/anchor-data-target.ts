@@ -101,7 +101,7 @@
     function getTargetElement(targetElementId: string) {
         const targetElement = document.getElementById(targetElementId);
         if (!targetElement)
-            throw new Error(`Anchor data-target: No element found with ID "${targetElementId}"`);
+            throw new Error(`data-target: No element found with ID "${targetElementId}"`);
         return targetElement as HTMLElement;
     }
 
