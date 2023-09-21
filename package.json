@@ -21,8 +21,12 @@
         "navigation",
         "hyperlinks",
         "anchors",
+        "forms",
+        "post",
+        "get",
         "html",
-        "utility"
+        "utility",
+        "partials"
     ],
     "author": "André Marcondes Teixeira",
     "license": "MIT",
