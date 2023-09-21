@@ -1,4 +1,4 @@
-export declare type AnchorDataTargetConfig = {
+export declare type DataTargetConfig = {
     errorHandler: (error: unknown, element: HTMLAnchorElement | HTMLFormElement) => void;
     httpRequestDispatcherForAnchors: (anchor: HTMLAnchorElement) => Promise<{
         content: string;
@@ -12,6 +12,6 @@ export declare type AnchorDataTargetConfig = {
 
 declare global {
     interface Window {
-        anchorDataTargetConfig: AnchorDataTargetConfig;
+        dataTargetConfig: DataTargetConfig;
     }
 }

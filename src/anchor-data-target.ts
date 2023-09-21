@@ -1,6 +1,6 @@
 /// <reference path="data-target.d.ts" />
 (() => {
-    window.anchorDataTargetConfig = {
+    window.dataTargetConfig = {
         errorHandler: (error: unknown, element: HTMLAnchorElement | HTMLFormElement) => {
             console.error({ error, element });
         },
@@ -73,7 +73,7 @@
         try {
             loadContent(element);
         } catch (error) {
-            window.anchorDataTargetConfig.errorHandler(error, element);
+            window.dataTargetConfig.errorHandler(error, element);
         }
     }
 
@@ -82,10 +82,10 @@
         const targetElement = getTargetElement(targetElementId);
         const response = await (() => {
             if (element instanceof HTMLAnchorElement) {
-                return window.anchorDataTargetConfig.httpRequestDispatcherForAnchors(element);
+                return window.dataTargetConfig.httpRequestDispatcherForAnchors(element);
             }
 
-            return window.anchorDataTargetConfig.httpRequestDispatcherForForms(element as HTMLFormElement);
+            return window.dataTargetConfig.httpRequestDispatcherForForms(element as HTMLFormElement);
         })();
         renderContentInsideTargetElement(targetElement, response.content);
         addClickListeners(targetElement);
