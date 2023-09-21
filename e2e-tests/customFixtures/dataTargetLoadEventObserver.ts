@@ -1,7 +1,7 @@
 import { Page } from "@playwright/test";
-import { AnchorDataTargetLoadEventSubscriber, LoadEventDetail, Observer, PlaywrightFixtures } from "./types";
+import { DataTargetLoadEventSubscriber, LoadEventDetail, Observer, PlaywrightFixtures } from "./types";
 
-export async function createAnchorDataTargetLoadEventObserver(
+export async function createDataTargetLoadEventObserver(
     { }: PlaywrightFixtures,
     use: (r: (page: Page) => Promise<AnchorDataTargetLoadEventObserver>) => Promise<void>
 ) {
@@ -23,7 +23,7 @@ export async function createAnchorDataTargetLoadEventObserver(
 
 export class AnchorDataTargetLoadEventObserver implements Observer {
     eventDetailLog: LoadEventDetail[] = [];
-    subscribers: AnchorDataTargetLoadEventSubscriber[] = [];
+    subscribers: DataTargetLoadEventSubscriber[] = [];
 
     push(eventDetail: LoadEventDetail) {
         this.eventDetailLog.push(eventDetail);
@@ -36,7 +36,7 @@ export class AnchorDataTargetLoadEventObserver implements Observer {
         });
     }
 
-    subscribe(callback: AnchorDataTargetLoadEventSubscriber) {
+    subscribe(callback: DataTargetLoadEventSubscriber) {
         this.subscribers.push(callback);
         this.eventDetailLog.forEach(eventDetail => {
             callback(eventDetail);

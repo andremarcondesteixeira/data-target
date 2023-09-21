@@ -1,5 +1,5 @@
 import { Page } from "@playwright/test";
-import { AnchorDataTargetLoadEventObserverFixture, Assertion, Observer, PreparePageFixture } from "../types";
+import { DataTargetLoadEventObserverFixture, Assertion, Observer, PreparePageFixture } from "../types";
 
 export class TestRunner {
     constructor(
@@ -7,7 +7,7 @@ export class TestRunner {
         private actions: ((page: Page) => Promise<void>)[],
         private assertions: Assertion[],
         private preparePage: PreparePageFixture,
-        private createAnchorDataTargetLoadEventObserver: AnchorDataTargetLoadEventObserverFixture,
+        private createAnchorDataTargetLoadEventObserver: DataTargetLoadEventObserverFixture,
     ) { }
 
     async run() {

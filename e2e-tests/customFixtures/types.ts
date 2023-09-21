@@ -12,9 +12,9 @@ export type ActionsInterface = {
     then(): AssertionsEntryPointInterface;
 }
 
-export type AnchorDataTargetLoadEventObserverFixture = (page: Page) => Promise<Observer>;
+export type DataTargetLoadEventObserverFixture = (page: Page) => Promise<Observer>;
 
-export type AnchorDataTargetLoadEventSubscriber = (eventDetail: LoadEventDetail) => void;
+export type DataTargetLoadEventSubscriber = (eventDetail: LoadEventDetail) => void;
 
 export type Assertion = (page: Page, observer: Observer) => Promise<void>;
 
@@ -37,7 +37,7 @@ export type ContinueOrFinishInterface = {
 }
 
 export type CustomFixtures = {
-    createAnchorDataTargetLoadEventObserver: AnchorDataTargetLoadEventObserverFixture;
+    createDataTargetLoadEventObserver: DataTargetLoadEventObserverFixture;
     preparePage: PreparePageFixture;
     withPageContent: WithPageContentFixture;
 }
@@ -60,7 +60,7 @@ export type LoadEventDetail = {
 export type Observer = {
     push(eventDetail: LoadEventDetail): void;
     notifyAllSubscribers(eventDetail: LoadEventDetail): void;
-    subscribe(callback: AnchorDataTargetLoadEventSubscriber): void;
+    subscribe(callback: DataTargetLoadEventSubscriber): void;
 }
 
 export type PlaywrightFixtures = CustomFixtures & PlaywrightTestArgs & PlaywrightTestOptions & PlaywrightWorkerArgs & PlaywrightWorkerOptions;

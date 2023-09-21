@@ -1,11 +1,11 @@
 import { test as base } from '@playwright/test';
-import { createAnchorDataTargetLoadEventObserver } from './anchorDataTargetLoadEventObserver';
+import { createDataTargetLoadEventObserver } from './dataTargetLoadEventObserver';
 import { preparePage } from './preparePage';
 import { withPageContent } from './withPageContentFixture';
 import type { CustomFixtures } from './types';
 
 const test = base.extend<CustomFixtures>({
-    createAnchorDataTargetLoadEventObserver,
+    createDataTargetLoadEventObserver,
     preparePage,
     withPageContent,
 });
