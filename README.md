@@ -2,7 +2,7 @@
 
 ## Basic functionality
 
-This library allows HTML anchor and forms to render the response of the request inside another element.
+This library allows HTML anchors and forms to render the response of the request inside another element.
 
 The element in which the response will be rendered inside must have it's `id` attribute's value replicated in the `data-target` attribute of the corresponding anchor.
 
