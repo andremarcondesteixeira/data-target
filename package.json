@@ -5,7 +5,7 @@
     "main": "dist/anchor-data-target.min.js",
     "scripts": {
         "test": "npm run transpile-for-tests && npm run run-tests",
-        "transpile-for-tests": "tsc --project ./src/tsconfig.json --outDir ./e2e-tests/build",
+        "transpile-for-tests": "rimraf --glob './e2e-tests/build' && tsc --project ./src/tsconfig.json --outDir ./e2e-tests/build",
         "run-tests": "npx playwright test --config=e2e-tests/playwright.config.ts",
         "build": "npm run transpile && npm run minify",
         "transpile": "tsc --project ./src/tsconfig.json",
@@ -42,6 +42,7 @@
         "eslint-config-google": "^0.14.0",
         "express": "^4.18.1",
         "husky": "^8.0.1",
+        "rimraf": "^5.0.1",
         "typescript": "^4.7.4",
         "uglify-js": "^3.17.0"
     }
