@@ -112,7 +112,7 @@
     }
 
     function dispatchContentLoadedEvent(targetElement: HTMLElement, detail: ContentLoadedEventDetail) {
-        targetElement.dispatchEvent(new CustomEvent('anchor-data-target:load', {
+        targetElement.dispatchEvent(new CustomEvent('data-target:load', {
             bubbles: true,
             cancelable: true,
             detail

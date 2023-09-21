@@ -17,7 +17,7 @@ test.describe('basic functionality using anchors:', () => {
         }
     );
 
-    test('an "anchor-data-target:load" event is fired after the target element has received content',
+    test('an "data-target:load" event is fired after the target element has received content',
         async ({ withPageContent }) => {
             const html = /*html*/ `
                 <a id="hyperlink"
@@ -55,7 +55,7 @@ test.describe('basic functionality using forms with GET method:', () => {
         }
     );
 
-    test('an "anchor-data-target:load" event is fired after the target element has received content',
+    test('an "data-target:load" event is fired after the target element has received content',
         async ({ withPageContent }) => {
             const html = /*html*/ `
                 <form action="/pages/the_road_not_taken.html" method="get" data-target="target">
@@ -93,7 +93,7 @@ test.describe('basic functionality using forms with POST method:', () => {
         }
     );
 
-    test('an "anchor-data-target:load" event is fired after the target element has received content',
+    test('an "data-target:load" event is fired after the target element has received content',
         async ({ withPageContent }) => {
             const html = /*html*/ `
                 <form action="/say-hello" method="post" data-target="target">
