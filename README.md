@@ -4,7 +4,7 @@
 
 This library allows HTML anchors and forms to render the response of the request inside another element.
 
-The element in which the response will be rendered inside must have it's `id` attribute's value replicated in the `data-target` attribute of the corresponding anchor.
+The element in which the response will be rendered inside must have it's `id` attribute's value replicated in the `data-target` attribute of the corresponding anchor or form.
 
 After the response is rendered inside the target element, the library will look for more `data-target` attributes inside the inner HTML of the target element.
 
