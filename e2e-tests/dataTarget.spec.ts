@@ -93,7 +93,7 @@ test.describe('basic functionality using forms with POST method:', () => {
         }
     );
 
-    test('an "data-target:load" event is fired after the target element has received content',
+    test('a "data-target:load" event is fired after the target element has received content',
         async ({ withPageContent }) => {
             const html = /*html*/ `
                 <form action="/say-hello" method="post" data-target="target">
