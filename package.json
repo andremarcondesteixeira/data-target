@@ -1,21 +1,21 @@
 {
-    "name": "anchor-data-target",
+    "name": "data-target",
     "version": "0.0.1",
-    "description": "Allows an HTML anchor element to render the response inside another element through the usage of a data-target attribute",
-    "main": "dist/anchor-data-target.min.js",
+    "description": "Allows HTML anchors and forms to render the response inside another element through the usage of a data-target attribute",
+    "main": "dist/data-target.min.js",
     "scripts": {
         "test": "npm run transpile-for-tests && npm run run-tests",
         "transpile-for-tests": "rimraf --glob './e2e-tests/build' && tsc --project ./src/tsconfig.json --outDir ./e2e-tests/build",
         "run-tests": "npx playwright test --config=e2e-tests/playwright.config.ts",
         "build": "npm run transpile && npm run minify",
         "transpile": "tsc --project ./src/tsconfig.json",
-        "minify": "uglifyjs ./dist/anchor-data-target.js --compress --mangle --output ./dist/anchor-data-target.min.js --source-map",
+        "minify": "uglifyjs ./dist/data-target.js --compress --mangle --output ./dist/data-target.min.js --source-map",
         "lint": "eslint --fix src/*.ts && eslint --fix e2e-tests/*.ts",
         "prepare": "husky install"
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/andremarcondesteixeira/anchor-data-target"
+        "url": "https://github.com/andremarcondesteixeira/data-target"
     },
     "keywords": [
         "navigation",
@@ -27,9 +27,9 @@
     "author": "André Marcondes Teixeira",
     "license": "MIT",
     "bugs": {
-        "url": "https://github.com/andremarcondesteixeira/anchor-data-target/issues"
+        "url": "https://github.com/andremarcondesteixeira/data-target/issues"
     },
-    "homepage": "https://andremarcondesteixeira.github.io/anchor-data-target/",
+    "homepage": "https://andremarcondesteixeira.github.io/data-target/",
     "devDependencies": {
         "@playwright/test": "^1.25.0",
         "@types/express": "^4.17.13",

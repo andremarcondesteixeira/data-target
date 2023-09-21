@@ -1,6 +1,6 @@
 "use strict";
 (() => {
-    window.anchorDataTargetConfig = {
+    window.dataTargetConfig = {
         errorHandler: (error, element) => {
             console.error({ error, element });
         },
@@ -66,7 +66,7 @@
             loadContent(element);
         }
         catch (error) {
-            window.anchorDataTargetConfig.errorHandler(error, element);
+            window.dataTargetConfig.errorHandler(error, element);
         }
     }
     async function loadContent(element) {
@@ -74,9 +74,9 @@
         const targetElement = getTargetElement(targetElementId);
         const response = await (() => {
             if (element instanceof HTMLAnchorElement) {
-                return window.anchorDataTargetConfig.httpRequestDispatcherForAnchors(element);
+                return window.dataTargetConfig.httpRequestDispatcherForAnchors(element);
             }
-            return window.anchorDataTargetConfig.httpRequestDispatcherForForms(element);
+            return window.dataTargetConfig.httpRequestDispatcherForForms(element);
         })();
         renderContentInsideTargetElement(targetElement, response.content);
         addClickListeners(targetElement);
@@ -91,7 +91,7 @@
     function getTargetElement(targetElementId) {
         const targetElement = document.getElementById(targetElementId);
         if (!targetElement)
-            throw new Error(`Anchor data-target: No element found with ID "${targetElementId}"`);
+            throw new Error(`data-target: No element found with ID "${targetElementId}"`);
         return targetElement;
     }
     function renderContentInsideTargetElement(targetElement, html) {
@@ -100,11 +100,11 @@
         targetElement.insertAdjacentHTML('afterbegin', html);
     }
     function dispatchContentLoadedEvent(targetElement, detail) {
-        targetElement.dispatchEvent(new CustomEvent('anchor-data-target:load', {
+        targetElement.dispatchEvent(new CustomEvent('data-target:load', {
             bubbles: true,
             cancelable: true,
             detail
         }));
     }
 })();
-//# sourceMappingURL=anchor-data-target.js.map
+//# sourceMappingURL=data-target.js.map
