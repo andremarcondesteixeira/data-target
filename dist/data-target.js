@@ -4,18 +4,35 @@
         errorHandler: (error, element) => {
             console.error({ error, element });
         },
-        httpRequestDispatcherForAnchors: async (anchor) => {
-            const response = await fetch(anchor.href);
-            return {
-                content: await response.text(),
-                statusCode: response.status
-            };
-        },
-        httpRequestDispatcherForForms: async (form) => {
-            const method = form.method;
-            const formData = new FormData(form);
-            let response;
-            if (method.toLowerCase() === 'get') {
+        httpRequestDispatcher: async (element) => {
+            if (element instanceof HTMLAnchorElement) {
+                return dispatchRequestForAnchor(element);
+            }
+            return dispatchRequestForForm(element);
+            async function dispatchRequestForAnchor(anchor) {
+                const response = await fetch(anchor.href);
+                return {
+                    content: await response.text(),
+                    statusCode: response.status
+                };
+            }
+            async function dispatchRequestForForm(form) {
+                const method = form.method;
+                const formData = new FormData(form);
+                let response;
+                if (method.toLowerCase() === 'get') {
+                    response = await dispatchGETRequestForForm(form);
+                }
+                else {
+                    response = await fetch(form.action, { method, body: formData });
+                }
+                return {
+                    content: await response.text(),
+                    statusCode: response.status
+                };
+            }
+            async function dispatchGETRequestForForm(form) {
+                const formData = new FormData(form);
                 const entries = formData.entries();
                 const entriesArray = Array.from(entries);
                 const entriesArrayWithoutFiles = entriesArray.map(([key, value]) => {
@@ -26,16 +43,9 @@
                 }).filter((pair) => !!pair);
                 const entriesObject = Object.fromEntries(entriesArrayWithoutFiles);
                 const queryString = new URLSearchParams(entriesObject);
-                response = await fetch(`${form.action}?${queryString}`);
+                return fetch(`${form.action}?${queryString}`);
             }
-            else {
-                response = await fetch(form.action, { method, body: formData });
-            }
-            return {
-                content: await response.text(),
-                statusCode: response.status
-            };
-        }
+        },
     };
     addClickListeners(document.body);
     addSubmitListeners(document.body);
@@ -72,12 +82,7 @@
     async function loadContent(element) {
         const targetElementId = element.getAttribute('data-target');
         const targetElement = getTargetElement(targetElementId);
-        const response = await (() => {
-            if (element instanceof HTMLAnchorElement) {
-                return window.dataTargetConfig.httpRequestDispatcherForAnchors(element);
-            }
-            return window.dataTargetConfig.httpRequestDispatcherForForms(element);
-        })();
+        const response = await window.dataTargetConfig.httpRequestDispatcher(element);
         renderContentInsideTargetElement(targetElement, response.content);
         addClickListeners(targetElement);
         addSubmitListeners(targetElement);
