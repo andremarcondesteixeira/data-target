@@ -16,7 +16,7 @@ export async function preparePage(
         if (!!args?.beforeLoadingLib)
             await args.beforeLoadingLib(page);
 
-        await page.addScriptTag({ url: `/build/anchor-data-target.js` });
+        await page.addScriptTag({ url: `/build/data-target.js` });
         return page;
     });
 }
