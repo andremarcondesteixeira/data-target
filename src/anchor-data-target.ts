@@ -1,4 +1,4 @@
-/// <reference path="anchor-data-target.d.ts" />
+/// <reference path="data-target.d.ts" />
 (() => {
     window.anchorDataTargetConfig = {
         errorHandler: (error: unknown, element: HTMLAnchorElement | HTMLFormElement) => {
