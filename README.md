@@ -8,7 +8,7 @@ The element in which the response will be rendered inside must have it's `id` at
 
 After the response is rendered inside the target element, the library will look for more `data-target` attributes inside the inner HTML of the target element.
 
-By default, the browser's URL will not be changed when clicking an anchor with the `data-target` attribute, but this behavior can be changed. Look at the "Configuration" section below for more information.
+By default, the browser's URL will not be changed after rendering the response inside the target element, but this behavior can be changed. Look at the "Configuration" section below for more information.
 
 Please note that if the rendered response contains javascript code, this code will not be executed by the browser. If you want to execute javascript code according to the rendered response, you could listen to the "data-target:load" event to create your logic to load you modules. To see an example see the "Events" section.
 
@@ -111,7 +111,7 @@ errorHandler: (error: unknown, element: HTMLAnchorElement | HTMLFormElement) => 
 
 ### `httpRequestDispatcher`
 
-Reimplement this function if you need a more strict security control or any other requirement that may affect the http request dispatching logic.
+Reimplement this function if you need a more strict security control or any other requirement that may affect the http request dispatching logic, like changing the browser's url or using a different fetching library.
 
 This is the default implementation:
 
