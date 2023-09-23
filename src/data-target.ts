@@ -1,138 +1,114 @@
 /// <reference path="data-target.d.ts" />
+
 (() => {
-    window.dataTargetConfig = {
-        errorHandler: (error: unknown, element: HTMLAnchorElement | HTMLFormElement) => {
-            console.error({ error, element });
-        },
-        httpRequestDispatcher: async (element: HTMLAnchorElement | HTMLFormElement) => {
-            if (element instanceof HTMLAnchorElement) {
-                return dispatchRequestForAnchor(element);
-            }
-            
-            return dispatchRequestForForm(element);
-
-            async function dispatchRequestForAnchor(anchor: HTMLAnchorElement) {
-                const response = await fetch(anchor.href);
+    window.dataTarget = {
+        config: {
+            errorHandler: (error, element) => console.error({ error, element }),
+            httpRequestDispatcher: async (input, init) => {
+                const response = await fetch(input, init);
                 return {
                     content: await response.text(),
-                    statusCode: response.status
+                    statusCode: response.status,
                 };
-            }
-
-            async function dispatchRequestForForm(form: HTMLFormElement) {
-                const method = form.method;
-                const formData = new FormData(form);
-                let response: Response;
-
-                if (method.toLowerCase() === 'get') {
-                    response = await dispatchGETRequestForForm(form);
-                } else {
-                    response = await fetch(form.action, { method, body: formData });
+            },
+        },
+        programmaticAccess: {
+            _dispatchRequestAndRenderResponse: async (url, targetElementId) => {
+                try {
+                    const response = await window.dataTarget.config.httpRequestDispatcher(url);
+                    const targetElement = getTargetElement(targetElementId);
+                    renderContentInsideTargetElement(targetElement, response.content);
+                } catch (error) {
+                    window.dataTarget.config.errorHandler({ error, programmaticAccess: true });
                 }
+            },
+            _makeDataTargetAttributesWork: root => {
+                root.querySelectorAll<HTMLAnchorElement>('a[data-target]:not([data-target=""])')
+                    .forEach(anchor => anchor.addEventListener('click', event => {
+                        event.preventDefault();
+                        const invokerAnchor = event.currentTarget as HTMLAnchorElement;
+                        tryLoadContent(invokerAnchor);
+                    }));
 
-                return {
-                    content: await response.text(),
-                    statusCode: response.status
-                };
-            }
-
-            async function dispatchGETRequestForForm(form: HTMLFormElement) {
-                const formData = new FormData(form);
-                const entries = formData.entries();
-                const entriesArray = Array.from(entries);
-                const entriesArrayWithoutFiles = entriesArray.map(([key, value]) => {
-                    if (value instanceof File) {
-                        return null;
-                    }
-
-                    return [key, value];
-                }).filter((pair): pair is [string, string] => !!pair);
-                const entriesObject: Record<string, string> = Object.fromEntries(entriesArrayWithoutFiles);
-                const queryString = new URLSearchParams(entriesObject);
-                return fetch(`${form.action}?${queryString}`);
-            }
-        },
+                root.querySelectorAll<HTMLFormElement>('form[data-target]:not([data-target=""])')
+                    .forEach(form => form.addEventListener('submit', event => {
+                        event.preventDefault();
+                        const invokerForm = event.currentTarget as HTMLFormElement;
+                        tryLoadContent(invokerForm);
+                    }));
+            },
+        }
     };
 
-    window.dataTargetInit = (root: HTMLElement) => {
-        addClickListeners(root);
-        addSubmitListeners(root);
-    }
+    Object.freeze(window.dataTarget.programmaticAccess);
 
-    window.dataTargetInit(document.body);
+    window.dataTarget.programmaticAccess._makeDataTargetAttributesWork(document.body);
 
-    function addClickListeners(root: HTMLElement) {
-        const anchors: NodeListOf<HTMLAnchorElement> = root.querySelectorAll('a[data-target]:not([data-target=""])');
-        anchors.forEach((anchor: HTMLAnchorElement) => {
-            anchor.addEventListener('click', handleClick);
-        });
-    }
-
-    function addSubmitListeners(root: HTMLElement) {
-        const forms: NodeListOf<HTMLFormElement> = root.querySelectorAll('form[data-target]:not([data-target=""])');
-        forms.forEach((form: HTMLFormElement) => {
-            form.addEventListener('submit', handleSubmit);
-        });
-    }
-
-    function handleClick(event: MouseEvent) {
-        event.preventDefault();
-        const target = event.currentTarget as HTMLAnchorElement;
-        tryLoadContent(target);
-    }
-
-    function handleSubmit(event: SubmitEvent) {
-        event.preventDefault();
-        const target = event.currentTarget as HTMLFormElement;
-        tryLoadContent(target);
-    }
-
-    function tryLoadContent(element: HTMLAnchorElement | HTMLFormElement) {
+    function tryLoadContent(invokerElement: HTMLAnchorElement | HTMLFormElement) {
         try {
-            loadContent(element);
+            loadContent(invokerElement);
         } catch (error) {
-            window.dataTargetConfig.errorHandler(error, element);
+            window.dataTarget.config.errorHandler(error, invokerElement);
         }
     }
 
-    async function loadContent(element: HTMLAnchorElement | HTMLFormElement) {
-        const targetElementId = element.getAttribute('data-target') as string;
+    async function loadContent(invokerElement: HTMLAnchorElement | HTMLFormElement) {
+        const targetElementId = invokerElement.getAttribute('data-target') as string;
         const targetElement = getTargetElement(targetElementId);
-        const response = await window.dataTargetConfig.httpRequestDispatcher(element);
+
+        const response = await (async () => invokerElement instanceof HTMLAnchorElement ?
+            window.dataTarget.config.httpRequestDispatcher(invokerElement.href)
+            : dispatchRequestForForm(invokerElement)
+        )();
+
         renderContentInsideTargetElement(targetElement, response.content);
-        window.dataTargetInit(targetElement);
-        const url = element instanceof HTMLAnchorElement ? element.href : element.action;
-        dispatchContentLoadedEvent(targetElement, {
-            url,
-            targetElementId,
-            responseStatusCode: response.statusCode
-        });
+        window.dataTarget.programmaticAccess._makeDataTargetAttributesWork(targetElement);
+
+        const url = invokerElement instanceof HTMLAnchorElement ? invokerElement.href : invokerElement.action;
+        targetElement.dispatchEvent(new CustomEvent('data-target:load', {
+            bubbles: true,
+            cancelable: true,
+            detail: { url, targetElementId, responseStatusCode: response.statusCode }
+        }));
     }
 
     function getTargetElement(targetElementId: string) {
         const targetElement = document.getElementById(targetElementId);
-        if (!targetElement)
-            throw new Error(`data-target: No element found with ID "${targetElementId}"`);
-        return targetElement as HTMLElement;
+        if (targetElement === null) throw new Error(`data-target: No target element found with ID "${targetElementId}"`);
+        return targetElement;
+    }
+
+    async function dispatchRequestForForm(form: HTMLFormElement) {
+        const method = form.method;
+        const body = new FormData(form);
+
+        return method.toLowerCase() === 'get' ?
+            dispatchGETRequestForForm(form, body)
+            : window.dataTarget.config.httpRequestDispatcher(form.action, { method, body });
+    }
+
+    async function dispatchGETRequestForForm(form: HTMLFormElement, formData: FormData) {
+        const entries = Array.from(formData.entries());
+        const entriesWithoutFiles = entries
+            .map(([key, value]) => value instanceof File ? null : [key, value])
+            .filter((pair): pair is [string, string] => !!pair);
+        const queryString = new URLSearchParams(Object.fromEntries(entriesWithoutFiles));
+        return window.dataTarget.config.httpRequestDispatcher(`${form.action}?${queryString}`);
     }
 
     function renderContentInsideTargetElement(targetElement: HTMLElement, html: string) {
-        while (targetElement.lastChild)
-            targetElement.removeChild(targetElement.lastChild);
+        while (targetElement.lastChild) targetElement.removeChild(targetElement.lastChild);
         targetElement.insertAdjacentHTML('afterbegin', html);
-    }
-
-    function dispatchContentLoadedEvent(targetElement: HTMLElement, detail: ContentLoadedEventDetail) {
-        targetElement.dispatchEvent(new CustomEvent('data-target:load', {
-            bubbles: true,
-            cancelable: true,
-            detail
-        }));
     }
 })();
 
-type ContentLoadedEventDetail = {
+export type ContentLoadedEventDetail = {
     url: string;
     targetElementId: string;
     responseStatusCode: number;
 }
+
+export type RequestResponse = {
+    content: string;
+    statusCode: number;
+};
