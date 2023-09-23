@@ -54,8 +54,12 @@
         },
     };
 
-    addClickListeners(document.body);
-    addSubmitListeners(document.body);
+    window.dataTargetInit = (root: HTMLElement) => {
+        addClickListeners(root);
+        addSubmitListeners(root);
+    }
+
+    window.dataTargetInit(document.body);
 
     function addClickListeners(root: HTMLElement) {
         const anchors: NodeListOf<HTMLAnchorElement> = root.querySelectorAll('a[data-target]:not([data-target=""])');
@@ -96,8 +100,7 @@
         const targetElement = getTargetElement(targetElementId);
         const response = await window.dataTargetConfig.httpRequestDispatcher(element);
         renderContentInsideTargetElement(targetElement, response.content);
-        addClickListeners(targetElement);
-        addSubmitListeners(targetElement);
+        window.dataTargetInit(targetElement);
         const url = element instanceof HTMLAnchorElement ? element.href : element.action;
         dispatchContentLoadedEvent(targetElement, {
             url,

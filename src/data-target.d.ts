@@ -9,5 +9,6 @@ export declare type DataTargetConfig = {
 declare global {
     interface Window {
         dataTargetConfig: DataTargetConfig;
+        dataTargetInit: (root: HTMLElement) => void;
     }
 }
