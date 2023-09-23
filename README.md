@@ -10,7 +10,7 @@ After the response is rendered inside the target element, the library will look 
 
 By default, the browser's URL will not be changed after rendering the response inside the target element, but this behavior can be changed. Look at the "Configuration" section below for more information.
 
-Please note that if the rendered response contains javascript code, this code will not be executed by the browser. If you want to execute javascript code according to the rendered response, you could listen to the "data-target:load" event to create your logic to load you modules. To see an example see the "Events" section.
+Please note that if the rendered response contains javascript code, this code will not be executed by the browser. If you want to execute javascript code according to the rendered response, you could listen to the "data-target:load" event to create your logic to load your modules. To see an example see the "Events" section.
 
 ## Example using an anchor:
 
