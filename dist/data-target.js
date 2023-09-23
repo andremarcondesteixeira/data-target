@@ -47,8 +47,11 @@
             }
         },
     };
-    addClickListeners(document.body);
-    addSubmitListeners(document.body);
+    window.dataTargetInit = (root) => {
+        addClickListeners(root);
+        addSubmitListeners(root);
+    };
+    window.dataTargetInit(document.body);
     function addClickListeners(root) {
         const anchors = root.querySelectorAll('a[data-target]:not([data-target=""])');
         anchors.forEach((anchor) => {
@@ -84,8 +87,7 @@
         const targetElement = getTargetElement(targetElementId);
         const response = await window.dataTargetConfig.httpRequestDispatcher(element);
         renderContentInsideTargetElement(targetElement, response.content);
-        addClickListeners(targetElement);
-        addSubmitListeners(targetElement);
+        window.dataTargetInit(targetElement);
         const url = element instanceof HTMLAnchorElement ? element.href : element.action;
         dispatchContentLoadedEvent(targetElement, {
             url,
