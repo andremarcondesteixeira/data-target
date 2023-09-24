@@ -101,14 +101,3 @@
         targetElement.insertAdjacentHTML('afterbegin', html);
     }
 })();
-
-export type ContentLoadedEventDetail = {
-    url: string;
-    targetElementId: string;
-    responseStatusCode: number;
-}
-
-export type RequestResponse = {
-    content: string;
-    statusCode: number;
-};
