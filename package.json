@@ -1,6 +1,6 @@
 {
     "name": "data-target",
-    "version": "0.0.7",
+    "version": "0.0.8",
     "description": "Allows HTML anchors and forms to render the response inside another element through the usage of a data-target attribute",
     "main": "dist/data-target.min.js",
     "scripts": {
