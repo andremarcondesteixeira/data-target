@@ -11,6 +11,11 @@
                     statusCode: response.status,
                 };
             },
+            loadingMessageElement: () => {
+                const span = document.createElement('span');
+                span.innerText = 'loading';
+                return span;
+            }
         },
         programmaticAccess: {
             _dispatchRequestAndRenderResponse: async (url, targetElementId) => {
@@ -55,6 +60,8 @@
     async function loadContent(invokerElement: HTMLAnchorElement | HTMLFormElement) {
         const targetElementId = invokerElement.getAttribute('data-target') as string;
         const targetElement = getTargetElement(targetElementId);
+
+        renderContentInsideTargetElement(targetElement, window.dataTarget.config.loadingMessageElement().outerHTML);
 
         const response = await (async () => invokerElement instanceof HTMLAnchorElement ?
             window.dataTarget.config.httpRequestDispatcher(invokerElement.href)

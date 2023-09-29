@@ -5,6 +5,7 @@ export declare type DataTargetDefinitions = {
             content: string;
             statusCode: number;
         }>;
+        loadingMessageElement: () => HTMLElement;
     };
     programmaticAccess: {
         _dispatchRequestAndRenderResponse: (url: string, targetElementId: string) => void;
