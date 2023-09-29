@@ -1,16 +1,14 @@
 export declare type DataTargetDefinitions = {
     config: {
-        errorHandler: (error: unknown, invokerElement?: HTMLAnchorElement | HTMLFormElement) => void;
+        errorHandler: (error: unknown, urlOrInvokerElement?: string | HTMLAnchorElement | HTMLFormElement) => void;
         httpRequestDispatcher: (input: RequestInfo | URL, init?: RequestInit | undefined) => Promise<{
             content: string;
             statusCode: number;
         }>;
-        loadingMessageElement: () => HTMLElement;
+        loadingIndicator: () => string | HTMLElement;
     };
-    programmaticAccess: {
-        _dispatchRequestAndRenderResponse: (url: string, targetElementId: string) => void;
-        _makeDataTargetAttributesWork: (root: HTMLElement) => void;
-    }
+    request: (urlOrInvokerElement: string | HTMLAnchorElement | HTMLFormElement, targetElementId: string) => void;
+    attach: (root: HTMLElement) => void;
 };
 
 declare global {

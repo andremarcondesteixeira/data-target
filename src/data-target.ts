@@ -3,7 +3,7 @@
 (() => {
     window.dataTarget = {
         config: {
-            errorHandler: (error, element) => console.error({ error, element }),
+            errorHandler: (error, urlOrInvokerElement) => console.error({ error, urlOrInvokerElement }),
             httpRequestDispatcher: async (input, init) => {
                 const response = await fetch(input, init);
                 return {
@@ -11,71 +11,60 @@
                     statusCode: response.status,
                 };
             },
-            loadingMessageElement: () => {
+            loadingIndicator: () => {
                 const span = document.createElement('span');
                 span.innerText = 'loading';
                 return span;
             }
         },
-        programmaticAccess: {
-            _dispatchRequestAndRenderResponse: async (url, targetElementId) => {
-                try {
-                    const response = await window.dataTarget.config.httpRequestDispatcher(url);
-                    const targetElement = getTargetElement(targetElementId);
-                    renderContentInsideTargetElement(targetElement, response.content);
-                } catch (error) {
-                    window.dataTarget.config.errorHandler({ error, programmaticAccess: true });
-                }
-            },
-            _makeDataTargetAttributesWork: root => {
-                root.querySelectorAll<HTMLAnchorElement>('a[data-target]:not([data-target=""])')
-                    .forEach(anchor => anchor.addEventListener('click', event => {
-                        event.preventDefault();
-                        const invokerAnchor = event.currentTarget as HTMLAnchorElement;
-                        tryLoadContent(invokerAnchor);
-                    }));
+        request: async (urlOrInvokerElement, targetElementId) => {
+            try {
+                await loadContent(urlOrInvokerElement, targetElementId);
+            } catch (error) {
+                window.dataTarget.config.errorHandler(error, urlOrInvokerElement);
+            }
+        },
+        attach: root => {
+            root.querySelectorAll<HTMLAnchorElement>('a[data-target]:not([data-target=""])')
+                .forEach(anchor => anchor.addEventListener('click', event => {
+                    event.preventDefault();
+                    const invokerAnchor = event.currentTarget as HTMLAnchorElement;
+                    window.dataTarget.request(invokerAnchor, invokerAnchor.href);
+                }));
 
-                root.querySelectorAll<HTMLFormElement>('form[data-target]:not([data-target=""])')
-                    .forEach(form => form.addEventListener('submit', event => {
-                        event.preventDefault();
-                        const invokerForm = event.currentTarget as HTMLFormElement;
-                        tryLoadContent(invokerForm);
-                    }));
-            },
-        }
+            root.querySelectorAll<HTMLFormElement>('form[data-target]:not([data-target=""])')
+                .forEach(form => form.addEventListener('submit', event => {
+                    event.preventDefault();
+                    const invokerForm = event.currentTarget as HTMLFormElement;
+                    window.dataTarget.request(invokerForm, invokerForm.action);
+                }));
+        },
     };
 
-    Object.freeze(window.dataTarget.programmaticAccess);
+    window.dataTarget.attach(document.body);
 
-    window.dataTarget.programmaticAccess._makeDataTargetAttributesWork(document.body);
-
-    function tryLoadContent(invokerElement: HTMLAnchorElement | HTMLFormElement) {
-        try {
-            loadContent(invokerElement);
-        } catch (error) {
-            window.dataTarget.config.errorHandler(error, invokerElement);
-        }
-    }
-
-    async function loadContent(invokerElement: HTMLAnchorElement | HTMLFormElement) {
-        const targetElementId = invokerElement.getAttribute('data-target') as string;
+    async function loadContent(urlOrInvokerElement: string | HTMLAnchorElement | HTMLFormElement, targetElementId: string) {
         const targetElement = getTargetElement(targetElementId);
 
-        renderContentInsideTargetElement(targetElement, window.dataTarget.config.loadingMessageElement().outerHTML);
+        const loadingStringOrElement = window.dataTarget.config.loadingIndicator();
+        const loading = loadingStringOrElement instanceof HTMLElement ?
+            loadingStringOrElement.outerHTML :
+            loadingStringOrElement;
+        renderContentInsideTargetElement(targetElement, loading);
 
-        const response = await (async () => invokerElement instanceof HTMLAnchorElement ?
-            window.dataTarget.config.httpRequestDispatcher(invokerElement.href)
-            : dispatchRequestForForm(invokerElement)
-        )();
+        const { response, url } = await dispatchRequest(urlOrInvokerElement);
 
         renderContentInsideTargetElement(targetElement, response.content);
-        window.dataTarget.programmaticAccess._makeDataTargetAttributesWork(targetElement);
+        window.dataTarget.attach(targetElement);
 
-        const url = invokerElement instanceof HTMLAnchorElement ? invokerElement.href : invokerElement.action;
         targetElement.dispatchEvent(new CustomEvent('data-target:load', {
             bubbles: true,
             cancelable: true,
-            detail: { url, targetElementId, responseStatusCode: response.statusCode }
+            detail: {
+                url,
+                targetElementId,
+                responseStatusCode: response.statusCode
+            }
         }));
     }
 
@@ -85,26 +74,48 @@
         return targetElement;
     }
 
-    async function dispatchRequestForForm(form: HTMLFormElement) {
-        const method = form.method;
-        const body = new FormData(form);
-
-        return method.toLowerCase() === 'get' ?
-            dispatchGETRequestForForm(form, body)
-            : window.dataTarget.config.httpRequestDispatcher(form.action, { method, body });
+    function renderContentInsideTargetElement(targetElement: HTMLElement, html: string) {
+        while (targetElement.lastChild) targetElement.removeChild(targetElement.lastChild);
+        targetElement.insertAdjacentHTML('afterbegin', html);
     }
 
-    async function dispatchGETRequestForForm(form: HTMLFormElement, formData: FormData) {
+    async function dispatchRequest(urlOrInvokerElement: string | HTMLAnchorElement | HTMLFormElement) {
+        let url: string;
+        let response: {
+            content: string;
+            statusCode: number;
+        };
+
+        if (urlOrInvokerElement instanceof HTMLAnchorElement) {
+            url = urlOrInvokerElement.href;
+            response = await window.dataTarget.config.httpRequestDispatcher(url);
+        } else if (urlOrInvokerElement instanceof HTMLFormElement) {
+            url = urlOrInvokerElement.action;
+            const method = urlOrInvokerElement.method;
+            const body = new FormData(urlOrInvokerElement);
+
+            if (method.toLowerCase() === 'get') {
+                response = await dispatchGETRequestForForm(urlOrInvokerElement, body);
+            } else {
+                response = await window.dataTarget.config.httpRequestDispatcher(url, { method, body });
+            }
+        } else {
+            url = urlOrInvokerElement;
+            response = await window.dataTarget.config.httpRequestDispatcher(url);
+        }
+
+        return {
+            url,
+            response
+        };
+    }
+
+    function dispatchGETRequestForForm(form: HTMLFormElement, formData: FormData) {
         const entries = Array.from(formData.entries());
         const entriesWithoutFiles = entries
             .map(([key, value]) => value instanceof File ? null : [key, value])
             .filter((pair): pair is [string, string] => !!pair);
         const queryString = new URLSearchParams(Object.fromEntries(entriesWithoutFiles));
         return window.dataTarget.config.httpRequestDispatcher(`${form.action}?${queryString}`);
-    }
-
-    function renderContentInsideTargetElement(targetElement: HTMLElement, html: string) {
-        while (targetElement.lastChild) targetElement.removeChild(targetElement.lastChild);
-        targetElement.insertAdjacentHTML('afterbegin', html);
     }
 })();

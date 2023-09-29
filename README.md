@@ -79,89 +79,85 @@ window.addEventListener('data-target:load', async (event) => {
 
 ## Configuration
 
-This library exposes a global object inside `window`, called `dataTargetConfig`, that you can use to configure the library's behavior:
+This library exposes a global object inside `window` called `dataTarget`, which you can use to configure the library's behavior and invoke the library programmatically:
 
 ``` Typescript
-export declare type DataTargetConfig = {
-    errorHandler: (error: unknown, element: HTMLAnchorElement | HTMLFormElement) => void;
-    httpRequestDispatcher: (element: HTMLAnchorElement | HTMLFormElement) => Promise<{
-        content: string;
-        statusCode: number;
-    }>;
+export declare type DataTargetDefinitions = {
+    config: {
+        errorHandler: (error: unknown, urlOrInvokerElement?: string | HTMLAnchorElement | HTMLFormElement) => void;
+        httpRequestDispatcher: (input: RequestInfo | URL, init?: RequestInit | undefined) => Promise<{
+            content: string;
+            statusCode: number;
+        }>;
+        loadingIndicator: () => string | HTMLElement;
+    };
+    request: (urlOrInvokerElement: string | HTMLAnchorElement | HTMLFormElement, targetElementId: string) => void;
+    attach: (root: HTMLElement) => void;
 };
 
 declare global {
     interface Window {
-        dataTargetConfig: DataTargetConfig;
+        dataTarget: DataTargetDefinitions;
     }
 }
+
 ```
 
-### `errorHandler`
+### `window.dataTarget.config.errorHandler`
+
+The library calls this function whenever an error occurs.
 
 Use this function to personalize your error logs capturing logic.
 
 This is the default implementation:
 
 ``` Typescript
-errorHandler: (error: unknown, element: HTMLAnchorElement | HTMLFormElement) => {
-    console.error({ error, element });
-},
+{
+    ...
+    errorHandler: (error, urlOrInvokerElement) => console.error({ error, urlOrInvokerElement }),
+    ...
+}
 ```
 
-### `httpRequestDispatcher`
+### `window.dataTarget.config.httpRequestDispatcher`
 
-Reimplement this function if you need a more strict security control or any other requirement that may affect the http request dispatching logic, like changing the browser's url or using a different fetching library.
+This function is used by the library do dispatch http requests.
+
+You can reimplement this function if you need a more strict security control or any other requirement that may affect the http request dispatching logic, like changing the browser's url or using a different fetching library.
 
 This is the default implementation:
 
 ``` Typescript
-httpRequestDispatcher: async (element: HTMLAnchorElement | HTMLFormElement) => {
-    if (element instanceof HTMLAnchorElement) {
-        return dispatchRequestForAnchor(element);
-    }
-    
-    return dispatchRequestForForm(element);
-
-    async function dispatchRequestForAnchor(anchor: HTMLAnchorElement) {
-        const response = await fetch(anchor.href);
+{
+    ...
+    httpRequestDispatcher: async (input, init) => {
+        const response = await fetch(input, init);
         return {
             content: await response.text(),
-            statusCode: response.status
+            statusCode: response.status,
         };
-    }
-
-    async function dispatchRequestForForm(form: HTMLFormElement) {
-        const method = form.method;
-        const formData = new FormData(form);
-        let response: Response;
-
-        if (method.toLowerCase() === 'get') {
-            response = await dispatchGETRequestForForm(form);
-        } else {
-            response = await fetch(form.action, { method, body: formData });
-        }
-
-        return {
-            content: await response.text(),
-            statusCode: response.status
-        };
-    }
-
-    async function dispatchGETRequestForForm(form: HTMLFormElement) {
-        const formData = new FormData(form);
-        const entries = formData.entries();
-        const entriesArray = Array.from(entries);
-        const entriesArrayWithoutFiles = entriesArray.map(([key, value]) => {
-            if (value instanceof File) {
-                return null;
-            }
-
-            return [key, value];
-        }).filter((pair): pair is [string, string] => !!pair);
-        const entriesObject: Record<string, string> = Object.fromEntries(entriesArrayWithoutFiles);
-        const queryString = new URLSearchParams(entriesObject);
-        return fetch(`${form.action}?${queryString}`);
-    }
-},
+    },
+    ...
+}
 ```
+
+### `window.dataTarget.config.loadingIndicator`
+
+The library calls the function to display a loading feedback to the end user.
+
+You can reimplement it to personalize your loading feedback.
+
+### `window.dataTarget.request`
+
+This function allows you to programmatically invoke the request.
+
+Behind the scenes, it will also use the `httpRequestDispatcher` and the `loadingIndicator` functions.
+
+Avoid overriding this function, as it could break the library's funcionality.
+
+### `window.dataTarget.attach`
+
+This function allows you to programmatically attach the library's event listeners:
+
+- `onClick` event listeners to anchor containing a non-empty data-target attribute
+- `onSubmit` event listeners to forms containing a non-empty data-target attribute
