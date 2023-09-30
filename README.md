@@ -109,7 +109,6 @@ declare global {
         dataTarget: DataTargetDefinitions;
     }
 }
-
 ```
 
 ### `window.dataTarget.config.errorHandler`
@@ -155,6 +154,8 @@ This is the default implementation:
 The library calls the function to display a loading feedback to the end user.
 
 You can reimplement it to personalize your loading feedback.
+
+## Using the library programmatically
 
 ### `window.dataTarget.request`
 
