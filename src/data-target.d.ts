@@ -15,8 +15,8 @@ export declare type DataTargetDefinitions = {
     };
     request: (
         urlOrInvokerElement: string | URL | HTMLAnchorElement | HTMLFormElement,
-        targetElementId: string
-    ) => void;
+        targetElementId?: string
+    ) => Promise<void>;
     attach: (root: HTMLElement) => void;
 };
 

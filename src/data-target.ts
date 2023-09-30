@@ -27,33 +27,81 @@ type HTMLContainer = {
         },
         request: async (urlOrInvokerElement, targetElementId) => {
             try {
-                if (typeof urlOrInvokerElement === 'string') {
-                    urlOrInvokerElement = new URL(urlOrInvokerElement);
+                if (
+                    typeof urlOrInvokerElement !== 'string'
+                    && !(urlOrInvokerElement instanceof URL)
+                    && !(urlOrInvokerElement instanceof HTMLAnchorElement)
+                    && !(urlOrInvokerElement instanceof HTMLFormElement)
+                ) {
+                    throw new Error('The first parameter of the request function must be of one of the following types: string, URL, HTMLAnchorElement, HTMLFormElement');
                 }
 
-                await loadContent(urlOrInvokerElement, {
-                    id: targetElementId
+                if (typeof urlOrInvokerElement === 'string' || urlOrInvokerElement instanceof URL) {
+                    if (!targetElementId) {
+                        throw new Error('When passing a URL object or a string in the first parameter of the request function, a second parameter containing the target element id is mandatory, but it was not provided');
+                    }
+
+                    return request(urlOrInvokerElement, {
+                        id: targetElementId,
+                    });
+                }
+
+                if (!urlOrInvokerElement.hasAttribute('data-target')) {
+                    if (!targetElementId) {
+                        throw new Error('When an element without the data-target property is passed in the first parameter of the request function, a second parameter containing the target element id is mandatory, but it was not provided');
+                    }
+
+                    return request(urlOrInvokerElement, {
+                        id: targetElementId,
+                    });
+                }
+
+                if (urlOrInvokerElement instanceof HTMLAnchorElement) {
+                    return request(urlOrInvokerElement, {
+                        id: urlOrInvokerElement.href,
+                    });
+                }
+
+                return request(urlOrInvokerElement, {
+                    id: urlOrInvokerElement.action,
                 });
             } catch (error) {
                 window.dataTarget.config.errorHandler(error, urlOrInvokerElement);
             }
         },
-        attach: root => {
-            root.querySelectorAll<HTMLAnchorElement>('a[data-target]:not([data-target=""])')
-                .forEach(anchor => anchor.addEventListener('click', event => {
-                    event.preventDefault();
-                    window.dataTarget.request(anchor, anchor.getAttribute('data-target')!);
-                }));
-
-            root.querySelectorAll<HTMLFormElement>('form[data-target]:not([data-target=""])')
-                .forEach(form => form.addEventListener('submit', event => {
-                    event.preventDefault();
-                    window.dataTarget.request(form, form.getAttribute('data-target')!);
-                }));
-        },
+        attach: root => attach(root),
     };
 
-    window.dataTarget.attach(document.body);
+    attach(document.body);
+
+    function attach(root: HTMLElement) {
+        root.querySelectorAll<HTMLAnchorElement>('a[data-target]:not([data-target=""])')
+            .forEach(anchor => anchor.addEventListener('click', event => {
+                event.preventDefault();
+                request(anchor, { id: anchor.getAttribute('data-target')! });
+            }));
+
+        root.querySelectorAll<HTMLFormElement>('form[data-target]:not([data-target=""])')
+            .forEach(form => form.addEventListener('submit', event => {
+                event.preventDefault();
+                request(form, { id: form.getAttribute('data-target')! });
+            }));
+    }
+
+    async function request(
+        urlOrInvokerElement: string | URL | HTMLAnchorElement | HTMLFormElement,
+        elementLocator: ElementLocator,
+    ) {
+        try {
+            if (typeof urlOrInvokerElement === 'string') {
+                urlOrInvokerElement = new URL(urlOrInvokerElement);
+            }
+
+            await loadContent(urlOrInvokerElement, elementLocator);
+        } catch (error) {
+            window.dataTarget.config.errorHandler(error, urlOrInvokerElement);
+        }
+    }
 
     async function loadContent(
         urlOrInvokerElement: URL | HTMLAnchorElement | HTMLFormElement,
@@ -74,7 +122,7 @@ type HTMLContainer = {
         renderContentInsideTargetElement(targetElement, {
             html: response.content
         });
-        window.dataTarget.attach(targetElement);
+        attach(targetElement);
 
         targetElement.dispatchEvent(new CustomEvent('data-target:load', {
             bubbles: true,
@@ -89,12 +137,16 @@ type HTMLContainer = {
 
     function getTargetElement(elementLocator: ElementLocator) {
         const targetElement = document.getElementById(elementLocator.id);
-        if (targetElement === null) throw new Error(`data-target: No target element found with ID "${elementLocator.id}"`);
+        if (targetElement === null) {
+            throw new Error(`data-target: No target element found with ID "${elementLocator.id}"`);
+        }
         return targetElement;
     }
 
     function renderContentInsideTargetElement(targetElement: HTMLElement, htmlContainer: HTMLContainer) {
-        while (targetElement.lastChild) targetElement.removeChild(targetElement.lastChild);
+        while (targetElement.lastChild) {
+            targetElement.removeChild(targetElement.lastChild);
+        }
         targetElement.insertAdjacentHTML('afterbegin', htmlContainer.html);
     }
 
