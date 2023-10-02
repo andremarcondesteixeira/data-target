@@ -10,9 +10,9 @@ After the response is rendered inside the target element, the library will look 
 
 By default, the browser's URL will not be changed after rendering the response inside the target element, but this behavior can be changed. Look at the "Configuration" section below for more information.
 
-Please note that if the rendered response contains javascript code, this code will not be executed by the browser. If you want to execute javascript code according to the rendered response, you could listen to the "data-target:load" event to create your logic to load your modules. To see an example see the "Events" section.
+Please note that if the rendered response contains javascript code, this code will not be executed by the browser. If you want to execute javascript code according to the rendered response, you could listen to the `data-target:loaded` event to create your logic to load your modules. To see an example see the "Events" section below.
 
-## Example using an anchor:
+### Example using an anchor:
 
 ``` HTML
 <a href="/path" data-target="the-target-element-id">Click me!</a>
@@ -21,7 +21,7 @@ Please note that if the rendered response contains javascript code, this code wi
 </div>
 ```
 
-## Example using a form:
+### Example using a form:
 
 ``` HTML
 <form action="/path" method="post" data-target="the-target-element-id">
@@ -35,51 +35,77 @@ Please note that if the rendered response contains javascript code, this code wi
 
 ## Events
 
-After a response is rendered inside the target element, a "data-target:load" event will be dispatched with the following format:
+### `data-target:before-load`
+
+This a `CustomEvent` that is dispatched by the target element before the library sends an HTTP request.
 
 ``` Typescript
-{
+targetElement.dispatchEvent(new CustomEvent('data-target:before-request', {
+    bubbles: true,
     detail: {
-        url: string;
-        targetElementId: string;
-        responseStatusCode: number;
+        url: url.href,
+    },
+}));
+```
+
+You can get a reference of the target element by using the `target` property of the event.
+
+### `data-target:loaded`
+
+This is a `CustomEvent` dispatched by the target element after it received the response of the HTTP request.
+
+``` Typescript
+targetElement.dispatchEvent(new CustomEvent('data-target:loaded', {
+    bubbles: true,
+    detail: {
+        url: url.href,
+        responseStatusCode: response.statusCode
     }
-}
+}));
 ```
 
-### Example
+You can access the element which received the response through the `target` property of the event.
 
-``` Javascript
-window.addEventListener('data-target:load', (event) => {
-    console.log(
-        `loaded URL ${event.detail.url} inside element with `
-        + `ID "${event.detail.targetElementId}, with response `
-        + `status code ${event.detail.responseStatusCode}"`
-    );
-});
+### Example of using the events
+
+You can, for example, use the events to show loading indicators and dynamically execute some functions from javascript modules:
+
+``` HTML
+<script type="module">
+    window.addEventListener('DOMContentLoaded', () => {
+        const modulesMap = {
+            [`${location.origin}/test`]: '/modules/test.js',
+        };
+
+        window.addEventListener('data-target:before-load', event => {
+            showLoadingIndicator(event.target);
+            const scriptPath = modulesMap[event.detail.url];
+            if (scriptPath) {
+                const exportedMembers = await import(scriptPath);
+                if (exportedMembers.onBeforeLoad) {
+                    exportedMembers.onBeforeLoad(event);
+                }
+            }
+        });
+
+        window.addEventListener('data-target:loaded', async (event) => {
+            const scriptPath = modulesMap[event.detail.url];
+            if (scriptPath) {
+                const exportedMembers = await import(scriptPath);
+                if (exportedMembers.onLoaded) {
+                    exportedMembers.onLoaded(event);
+                }
+            }
+        });
+    });
+</script>
 ```
 
-Another example is using this event to dynamically load some javascript modules according to which url was loaded:
+## Configuration and programmatic access
 
-``` Javascript
-const modulesMap = {
-    'http://localhost/foo': '/modules/foo.js',
-    'http://localhost/bar': '/modules/bar.js',
-    'http://localhost/baz': '/modules/baz.js',
-    'http://localhost/qux': '/modules/qux.js'
-};
+This library exposes a global object inside the `window` object called `dataTarget`, which you can use to configure the library's behavior and invoke the library programmatically.
 
-window.addEventListener('data-target:load', async (event) => {
-    const scriptPath = modulesMap[event.detail.url];
-    if (scriptPath) {
-        await import(scriptPath);
-    }
-});
-```
-
-## Configuration
-
-This library exposes a global object inside `window` called `dataTarget`, which you can use to configure the library's behavior and invoke the library programmatically:
+The configuration is made by overriding the default implementations of the functions in `window.dataTarget.config` and the programmatic access is made through the `window.dataTarget.$` object, which is freezed and cannot be changed.
 
 ``` Typescript
 export declare type DataTargetDefinitions = {
@@ -95,13 +121,14 @@ export declare type DataTargetDefinitions = {
             content: string;
             statusCode: number;
         }>;
-        loadingIndicator: () => string | HTMLElement;
     };
-    request: (
-        urlOrInvokerElement: string | URL | HTMLAnchorElement | HTMLFormElement,
-        targetElementId: string
-    ) => Promise<void>;
-    attach: (root: HTMLElement) => void;
+    $: {
+        request: (
+            urlOrInvokerElement: string | URL | HTMLAnchorElement | HTMLFormElement,
+            targetElementId?: string
+        ) => Promise<void>;
+        attach: (root: HTMLElement) => void;
+    }
 };
 
 declare global {
@@ -111,7 +138,9 @@ declare global {
 }
 ```
 
-### `window.dataTarget.config.errorHandler`
+### Configuration
+
+#### `window.dataTarget.config.errorHandler`
 
 The library calls this function whenever an error occurs.
 
@@ -127,7 +156,7 @@ This is the default implementation:
 }
 ```
 
-### `window.dataTarget.config.httpRequestDispatcher`
+#### `window.dataTarget.config.httpRequestDispatcher`
 
 This function is used by the library do dispatch http requests.
 
@@ -149,23 +178,20 @@ This is the default implementation:
 }
 ```
 
-### `window.dataTarget.config.loadingIndicator`
+### Programmatic access
 
-The library calls the function to display a loading feedback to the end user.
+#### `window.dataTarget.$.request`
 
-You can reimplement it to personalize your loading feedback.
+This function allows you to dispatch an HTTP request programmaticaly.
 
-## Using the library programmatically
+Behind the scenes, it will also use the `window.dataTarget.config.httpRequestDispatcher` function.
 
-### `window.dataTarget.request`
+There are some rules you need to follow to use this function:
 
-This function allows you to programmatically invoke the request.
+- If the first parameter is a string or a URL object, then you MUST pass the second parameter with the ID of the target element
+- If the first parameter is a referente to an anchor or form, and the referenced element does not have a `data-target` attribute, you MUST provide the ID of the target element through the second parameter
 
-Behind the scenes, it will also use the `httpRequestDispatcher` and the `loadingIndicator` functions.
-
-Avoid overriding this function, as it could break the library's funcionality.
-
-### `window.dataTarget.attach`
+#### `window.dataTarget.$.attach`
 
 This function allows you to programmatically attach the library's event listeners:
 

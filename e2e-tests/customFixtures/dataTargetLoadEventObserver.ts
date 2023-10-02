@@ -12,7 +12,7 @@ export async function createDataTargetLoadEventObserver(
         });
         await page.addScriptTag({
             content: `
-                addEventListener('data-target:load', event => {
+                addEventListener('data-target:loaded', event => {
                     logEventDetail(event.detail);
                 });
             `

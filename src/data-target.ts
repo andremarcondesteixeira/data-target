@@ -19,58 +19,57 @@ type HTMLContainer = {
                     statusCode: response.status,
                 };
             },
-            loadingIndicator: () => {
-                const span = document.createElement('span');
-                span.innerText = 'loading';
-                return span;
-            }
         },
-        request: async (urlOrInvokerElement, targetElementId) => {
-            try {
-                if (
-                    typeof urlOrInvokerElement !== 'string'
-                    && !(urlOrInvokerElement instanceof URL)
-                    && !(urlOrInvokerElement instanceof HTMLAnchorElement)
-                    && !(urlOrInvokerElement instanceof HTMLFormElement)
-                ) {
-                    throw new Error('The first parameter of the request function must be of one of the following types: string, URL, HTMLAnchorElement, HTMLFormElement');
-                }
-
-                if (typeof urlOrInvokerElement === 'string' || urlOrInvokerElement instanceof URL) {
-                    if (!targetElementId) {
-                        throw new Error('When passing a URL object or a string in the first parameter of the request function, a second parameter containing the target element id is mandatory, but it was not provided');
+        $: {
+            request: async (urlOrInvokerElement, targetElementId) => {
+                try {
+                    if (
+                        typeof urlOrInvokerElement !== 'string'
+                        && !(urlOrInvokerElement instanceof URL)
+                        && !(urlOrInvokerElement instanceof HTMLAnchorElement)
+                        && !(urlOrInvokerElement instanceof HTMLFormElement)
+                    ) {
+                        throw new Error('The first parameter of the request function must be of one of the following types: string, URL, HTMLAnchorElement, HTMLFormElement');
                     }
-
-                    return request(urlOrInvokerElement, {
-                        id: targetElementId,
-                    });
-                }
-
-                if (!urlOrInvokerElement.hasAttribute('data-target')) {
-                    if (!targetElementId) {
-                        throw new Error('When an element without the data-target property is passed in the first parameter of the request function, a second parameter containing the target element id is mandatory, but it was not provided');
+    
+                    if (typeof urlOrInvokerElement === 'string' || urlOrInvokerElement instanceof URL) {
+                        if (!targetElementId) {
+                            throw new Error('When passing a URL object or a string in the first parameter of the request function, a second parameter containing the target element id is mandatory, but it was not provided');
+                        }
+    
+                        return request(urlOrInvokerElement, {
+                            id: targetElementId,
+                        });
                     }
-
+    
+                    if (!urlOrInvokerElement.hasAttribute('data-target')) {
+                        if (!targetElementId) {
+                            throw new Error('When an element without the data-target property is passed in the first parameter of the request function, a second parameter containing the target element id is mandatory, but it was not provided');
+                        }
+    
+                        return request(urlOrInvokerElement, {
+                            id: targetElementId,
+                        });
+                    }
+    
+                    if (urlOrInvokerElement instanceof HTMLAnchorElement) {
+                        return request(urlOrInvokerElement, {
+                            id: urlOrInvokerElement.href,
+                        });
+                    }
+    
                     return request(urlOrInvokerElement, {
-                        id: targetElementId,
+                        id: urlOrInvokerElement.action,
                     });
+                } catch (error) {
+                    window.dataTarget.config.errorHandler(error, urlOrInvokerElement);
                 }
-
-                if (urlOrInvokerElement instanceof HTMLAnchorElement) {
-                    return request(urlOrInvokerElement, {
-                        id: urlOrInvokerElement.href,
-                    });
-                }
-
-                return request(urlOrInvokerElement, {
-                    id: urlOrInvokerElement.action,
-                });
-            } catch (error) {
-                window.dataTarget.config.errorHandler(error, urlOrInvokerElement);
-            }
-        },
-        attach: root => attach(root),
+            },
+            attach: root => attach(root),
+        }
     };
+
+    Object.freeze(window.dataTarget.$);
 
     attach(document.body);
 
@@ -108,28 +107,26 @@ type HTMLContainer = {
         elementLocator: ElementLocator
     ) {
         const targetElement = getTargetElement(elementLocator);
+        const url = getUrl(urlOrInvokerElement);
 
-        const loadingStringOrElement = window.dataTarget.config.loadingIndicator();
-        const loading = loadingStringOrElement instanceof HTMLElement ?
-            loadingStringOrElement.outerHTML :
-            loadingStringOrElement;
-        renderContentInsideTargetElement(targetElement, {
-            html: loading
-        });
+        targetElement.dispatchEvent(new CustomEvent('data-target:before-request', {
+            bubbles: true,
+            detail: {
+                url: url.href,
+            },
+        }));
 
-        const { response, url } = await dispatchRequest(urlOrInvokerElement);
+        const response = await dispatchRequest(urlOrInvokerElement);
 
         renderContentInsideTargetElement(targetElement, {
             html: response.content
         });
         attach(targetElement);
 
-        targetElement.dispatchEvent(new CustomEvent('data-target:load', {
+        targetElement.dispatchEvent(new CustomEvent('data-target:loaded', {
             bubbles: true,
-            cancelable: true,
             detail: {
                 url: url.href,
-                targetElementId: elementLocator.id,
                 responseStatusCode: response.statusCode
             }
         }));
@@ -150,35 +147,37 @@ type HTMLContainer = {
         targetElement.insertAdjacentHTML('afterbegin', htmlContainer.html);
     }
 
-    async function dispatchRequest(urlOrInvokerElement: URL | HTMLAnchorElement | HTMLFormElement) {
-        let url: URL;
-        let response: {
-            content: string;
-            statusCode: number;
-        };
+    function dispatchRequest(urlOrInvokerElement: URL | HTMLAnchorElement | HTMLFormElement) {
+        const url = getUrl(urlOrInvokerElement);
 
         if (urlOrInvokerElement instanceof HTMLAnchorElement) {
-            url = new URL(urlOrInvokerElement.href);
-            response = await window.dataTarget.config.httpRequestDispatcher(url);
-        } else if (urlOrInvokerElement instanceof HTMLFormElement) {
-            url = new URL(urlOrInvokerElement.action);
+            return window.dataTarget.config.httpRequestDispatcher(url);
+        }
+        
+        if (urlOrInvokerElement instanceof HTMLFormElement) {
             const method = urlOrInvokerElement.method;
             const body = new FormData(urlOrInvokerElement);
 
             if (method.toLowerCase() === 'get') {
-                response = await dispatchGETRequestForForm(urlOrInvokerElement, body);
+                return dispatchGETRequestForForm(urlOrInvokerElement, body);
             } else {
-                response = await window.dataTarget.config.httpRequestDispatcher(url, { method, body });
+                return window.dataTarget.config.httpRequestDispatcher(url, { method, body });
             }
-        } else {
-            url = new URL(urlOrInvokerElement.href);
-            response = await window.dataTarget.config.httpRequestDispatcher(url);
         }
 
-        return {
-            url,
-            response
-        };
+        return window.dataTarget.config.httpRequestDispatcher(url);
+    }
+
+    function getUrl(urlOrInvokerElement: URL | HTMLAnchorElement | HTMLFormElement) {
+        if (urlOrInvokerElement instanceof HTMLAnchorElement) {
+            return new URL(urlOrInvokerElement.href);
+        }
+        
+        if (urlOrInvokerElement instanceof HTMLFormElement) {
+            return new URL(urlOrInvokerElement.action);
+        }
+
+        return urlOrInvokerElement;
     }
 
     function dispatchGETRequestForForm(form: HTMLFormElement, formData: FormData) {

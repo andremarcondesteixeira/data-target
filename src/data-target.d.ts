@@ -11,13 +11,14 @@ export declare type DataTargetDefinitions = {
             content: string;
             statusCode: number;
         }>;
-        loadingIndicator: () => string | HTMLElement;
     };
-    request: (
-        urlOrInvokerElement: string | URL | HTMLAnchorElement | HTMLFormElement,
-        targetElementId?: string
-    ) => Promise<void>;
-    attach: (root: HTMLElement) => void;
+    $: {
+        request: (
+            urlOrInvokerElement: string | URL | HTMLAnchorElement | HTMLFormElement,
+            targetElementId?: string
+        ) => Promise<void>;
+        attach: (root: HTMLElement) => void;
+    }
 };
 
 declare global {

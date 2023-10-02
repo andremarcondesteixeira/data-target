@@ -53,7 +53,6 @@ export type LoadEventAssertionsInterface = {
 
 export type LoadEventDetail = {
     url: string;
-    targetElementId: string;
     responseStatusCode: number;
 };
 
