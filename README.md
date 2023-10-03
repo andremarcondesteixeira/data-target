@@ -77,7 +77,7 @@ You can, for example, use the events to show loading indicators and dynamically 
             [`${location.origin}/test`]: '/modules/test.js',
         };
 
-        window.addEventListener('data-target:before-load', event => {
+        window.addEventListener('data-target:before-load', async (event) => {
             showLoadingIndicator(event.target);
             const scriptPath = modulesMap[event.detail.url];
             if (scriptPath) {

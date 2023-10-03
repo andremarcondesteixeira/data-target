@@ -109,7 +109,7 @@ type HTMLContainer = {
         const targetElement = getTargetElement(elementLocator);
         const url = getUrl(urlOrInvokerElement);
 
-        targetElement.dispatchEvent(new CustomEvent('data-target:before-request', {
+        targetElement.dispatchEvent(new CustomEvent('data-target:before-load', {
             bubbles: true,
             detail: {
                 url: url.href,
