@@ -6,7 +6,7 @@ export declare type DataTargetDefinitions = {
         ) => void;
         httpRequestDispatcher: (
             input: RequestInfo | URL,
-            init?: RequestInit | undefined
+            init?: RequestInit
         ) => Promise<{
             content: string;
             statusCode: number;
@@ -15,7 +15,8 @@ export declare type DataTargetDefinitions = {
     $: {
         request: (
             urlOrInvokerElement: string | URL | HTMLAnchorElement | HTMLFormElement,
-            targetElementId?: string
+            targetElementId?: string,
+            init?: RequestInit
         ) => Promise<void>;
         attach: (root: HTMLElement) => void;
     }

@@ -39,7 +39,7 @@ Please note that if the rendered response contains javascript code, this code wi
 
 This a `CustomEvent` that is dispatched by the target element before the library sends an HTTP request.
 
-``` Typescript
+``` javascript
 targetElement.dispatchEvent(new CustomEvent('data-target:before-request', {
     bubbles: true,
     detail: {
@@ -54,7 +54,7 @@ You can get a reference of the target element by using the `target` property of 
 
 This is a `CustomEvent` dispatched by the target element after it received the response of the HTTP request.
 
-``` Typescript
+``` javascript
 targetElement.dispatchEvent(new CustomEvent('data-target:loaded', {
     bubbles: true,
     detail: {
@@ -108,6 +108,7 @@ This library exposes a global object inside the `window` object called `dataTarg
 The configuration is made by overriding the default implementations of the functions in `window.dataTarget.config` and the programmatic access is made through the `window.dataTarget.$` object, which is freezed and cannot be changed.
 
 ``` Typescript
+// Typescript
 export declare type DataTargetDefinitions = {
     config: {
         errorHandler: (
@@ -125,7 +126,8 @@ export declare type DataTargetDefinitions = {
     $: {
         request: (
             urlOrInvokerElement: string | URL | HTMLAnchorElement | HTMLFormElement,
-            targetElementId?: string
+            targetElementId?: string,
+            init?: RequestInit
         ) => Promise<void>;
         attach: (root: HTMLElement) => void;
     }
