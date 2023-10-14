@@ -72,6 +72,7 @@
         }));
     }
     async function loadContent(urlOrInvokerElement, elementLocator, init) {
+        var _a;
         try {
             if (typeof urlOrInvokerElement === 'string') {
                 urlOrInvokerElement = new URL(urlOrInvokerElement);
@@ -85,17 +86,19 @@
                 },
             }));
             const response = await dispatchRequest(urlOrInvokerElement, init);
-            renderContentInsideTargetElement(targetElement, {
-                html: response.content
-            });
-            attach(targetElement);
-            targetElement.dispatchEvent(new CustomEvent('data-target:loaded', {
-                bubbles: true,
-                detail: {
-                    url: url.href,
-                    responseStatusCode: response.statusCode
-                }
-            }));
+            if (!((_a = init === null || init === void 0 ? void 0 : init.signal) === null || _a === void 0 ? void 0 : _a.aborted)) {
+                renderContentInsideTargetElement(targetElement, {
+                    html: response.content
+                });
+                attach(targetElement);
+                targetElement.dispatchEvent(new CustomEvent('data-target:loaded', {
+                    bubbles: true,
+                    detail: {
+                        url: url.href,
+                        responseStatusCode: response.statusCode
+                    }
+                }));
+            }
         }
         catch (error) {
             window.dataTarget.config.errorHandler(error, urlOrInvokerElement);

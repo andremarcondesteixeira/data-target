@@ -113,18 +113,20 @@
     
             const response = await dispatchRequest(urlOrInvokerElement, init);
     
-            renderContentInsideTargetElement(targetElement, {
-                html: response.content
-            });
-            attach(targetElement);
-    
-            targetElement.dispatchEvent(new CustomEvent('data-target:loaded', {
-                bubbles: true,
-                detail: {
-                    url: url.href,
-                    responseStatusCode: response.statusCode
-                }
-            }));
+            if (!init?.signal?.aborted) {
+                renderContentInsideTargetElement(targetElement, {
+                    html: response.content
+                });
+                attach(targetElement);
+        
+                targetElement.dispatchEvent(new CustomEvent('data-target:loaded', {
+                    bubbles: true,
+                    detail: {
+                        url: url.href,
+                        responseStatusCode: response.statusCode
+                    }
+                }));
+            }
         } catch(error) {
             window.dataTarget.config.errorHandler(error, urlOrInvokerElement)
         }
