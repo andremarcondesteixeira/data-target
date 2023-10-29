@@ -97,17 +97,13 @@
         init?: RequestInit,
     ) {
         try {
-            if (typeof urlOrInvokerElement === 'string') {
-                urlOrInvokerElement = new URL(urlOrInvokerElement);
-            }
-    
             const targetElement = getTargetElement(elementLocator);
             const url = getUrl(urlOrInvokerElement);
     
             targetElement.dispatchEvent(new CustomEvent('data-target:before-load', {
                 bubbles: true,
                 detail: {
-                    url: url.href,
+                    url,
                 },
             }));
     
@@ -122,7 +118,7 @@
                 targetElement.dispatchEvent(new CustomEvent('data-target:loaded', {
                     bubbles: true,
                     detail: {
-                        url: url.href,
+                        url,
                         responseStatusCode: response.statusCode
                     }
                 }));
@@ -147,7 +143,7 @@
         targetElement.insertAdjacentHTML('afterbegin', htmlContainer.html);
     }
 
-    function dispatchRequest(urlOrInvokerElement: URL | HTMLAnchorElement | HTMLFormElement, init?: RequestInit) {
+    function dispatchRequest(urlOrInvokerElement: string | URL | HTMLAnchorElement | HTMLFormElement, init?: RequestInit) {
         const url = getUrl(urlOrInvokerElement);
 
         if (urlOrInvokerElement instanceof HTMLAnchorElement) {
@@ -168,13 +164,17 @@
         return window.dataTarget.config.httpRequestDispatcher(url);
     }
 
-    function getUrl(urlOrInvokerElement: URL | HTMLAnchorElement | HTMLFormElement) {
+    function getUrl(urlOrInvokerElement: string | URL | HTMLAnchorElement | HTMLFormElement) {
         if (urlOrInvokerElement instanceof HTMLAnchorElement) {
-            return new URL(urlOrInvokerElement.href);
+            return urlOrInvokerElement.href;
         }
 
         if (urlOrInvokerElement instanceof HTMLFormElement) {
-            return new URL(urlOrInvokerElement.action);
+            return urlOrInvokerElement.action;
+        }
+
+        if (urlOrInvokerElement instanceof URL) {
+            return urlOrInvokerElement.href;
         }
 
         return urlOrInvokerElement;

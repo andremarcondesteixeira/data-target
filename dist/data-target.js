@@ -74,15 +74,12 @@
     async function loadContent(urlOrInvokerElement, elementLocator, init) {
         var _a;
         try {
-            if (typeof urlOrInvokerElement === 'string') {
-                urlOrInvokerElement = new URL(urlOrInvokerElement);
-            }
             const targetElement = getTargetElement(elementLocator);
             const url = getUrl(urlOrInvokerElement);
             targetElement.dispatchEvent(new CustomEvent('data-target:before-load', {
                 bubbles: true,
                 detail: {
-                    url: url.href,
+                    url,
                 },
             }));
             const response = await dispatchRequest(urlOrInvokerElement, init);
@@ -94,7 +91,7 @@
                 targetElement.dispatchEvent(new CustomEvent('data-target:loaded', {
                     bubbles: true,
                     detail: {
-                        url: url.href,
+                        url,
                         responseStatusCode: response.statusCode
                     }
                 }));
@@ -136,10 +133,13 @@
     }
     function getUrl(urlOrInvokerElement) {
         if (urlOrInvokerElement instanceof HTMLAnchorElement) {
-            return new URL(urlOrInvokerElement.href);
+            return urlOrInvokerElement.href;
         }
         if (urlOrInvokerElement instanceof HTMLFormElement) {
-            return new URL(urlOrInvokerElement.action);
+            return urlOrInvokerElement.action;
+        }
+        if (urlOrInvokerElement instanceof URL) {
+            return urlOrInvokerElement.href;
         }
         return urlOrInvokerElement;
     }
